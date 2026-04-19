@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html lang="vi" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Trang xác thực dễ thương</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=M+PLUS+Rounded+1c:wght@400;500;700;800&family=Quicksand:wght@500;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" th:href="@{/css/auth-cute.css}">
+</head>
+<body>
+<div class="falling-hearts" aria-hidden="true">
+    <span>❤</span><span>✿</span><span>❤</span><span>❀</span><span>❤</span>
+    <span>✿</span><span>❤</span><span>❀</span><span>❤</span><span>✿</span>
+</div>
+<a class="page-back" th:href="@{/}" onclick="history.back(); return false;">← Back</a>
+<div class="page-wrap">
+    <div class="card">
+        <div class="badge">❤ Loli Cute Auth ❤</div>
+        <h2 class="title">Chào công chúa nhỏ</h2>
+        <p class="subtitle">Chọn chức năng để tiếp tục nha ~</p>
+
+        <div class="home-links">
+            <a th:href="@{/auth/register}">Đăng ký tài khoản</a>
+            <a th:href="@{/auth/login}">Đăng nhập</a>
+            <a th:href="@{/auth/forgot-password}">Quên mật khẩu</a>
+            <a th:href="@{/auth/reset-password}">Đặt lại mật khẩu</a>
+        </div>
+    </div>
+</div>
+</body>
+</html>

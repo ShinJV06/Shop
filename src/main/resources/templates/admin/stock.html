@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang="vi" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Nhập kho — Admin</title>
+    <link rel="stylesheet" th:href="@{/css/admin-panel.css}">
+</head>
+<body class="admin-body">
+<div class="admin-app">
+    <aside th:replace="~{admin/fragments :: sidebar (active='stock')}"></aside>
+    <div class="admin-main">
+        <header class="admin-main-header">
+            <div>
+                <div class="admin-breadcrumb"><a th:href="@{/admin}">Admin</a> / Nhập kho</div>
+                <h1>Nhập acc &amp; import</h1>
+                <p>Thêm từng acc hoặc import file. Duyệt acc CTV và danh sách kho xem tại <a th:href="@{/admin/accounts}">Quản lý acc</a>.</p>
+            </div>
+        </header>
+        <div class="admin-content">
+            <p th:if="${successMessage}" class="admin-alert admin-alert--ok" th:text="${successMessage}"></p>
+            <p th:if="${errorMessage}" class="admin-alert admin-alert--err" th:text="${errorMessage}"></p>
+
+            <div class="admin-panel">
+                <div class="admin-form-block">
+                    <h2>Thêm acc</h2>
+                    <form class="admin-form-grid" th:action="@{/admin/inventory/add}" method="post" enctype="multipart/form-data">
+                        <label>Sản phẩm</label>
+                        <select name="productId" required>
+                            <option th:each="p : ${products}" th:value="${p.id}" th:text="${p.name} + ' (' + ${p.slug} + ')'"></option>
+                        </select>
+                        <label>Ảnh minh hoạ (tuỳ chọn)</label>
+                        <input type="file" name="listingImage" accept="image/jpeg,image/png,image/webp,image/gif">
+                        <p class="admin-muted" style="grid-column:1/-1;margin:0;font-size:0.85rem">Bỏ trống thì dùng ảnh mặc định của gói trên shop.</p>
+                        <label>Game</label><input name="game" placeholder="Genshin Impact">
+                        <label>Rank / AR</label><input name="rankInfo">
+                        <label>Skin</label><input name="skinInfo">
+                        <label>Mô tả thêm</label><textarea name="extraInfo"></textarea>
+                        <label>Credentials</label><textarea name="credentials" required></textarea>
+                        <button class="admin-btn admin-btn--primary" style="margin-top:14px" type="submit">Lưu acc</button>
+                    </form>
+                </div>
+                <div class="admin-form-block">
+                    <h2>Import file</h2>
+                    <p class="admin-muted">Mỗi dòng: <code>credentials|game|rank|skin|mô tả</code> hoặc chỉ credentials.</p>
+                    <form class="admin-form-grid" th:action="@{/admin/inventory/import}" method="post" enctype="multipart/form-data">
+                        <label>Sản phẩm</label>
+                        <select name="productId" required>
+                            <option th:each="p : ${products}" th:value="${p.id}" th:text="${p.name}"></option>
+                        </select>
+                        <label>Game mặc định</label><input name="defaultGame">
+                        <label>Rank mặc định</label><input name="defaultRank">
+                        <label>File</label><input type="file" name="file" accept=".txt,.csv" required>
+                        <button class="admin-btn admin-btn--primary" style="margin-top:14px" type="submit">Import</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+</body>
+</html>

@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="vi" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Chi tiết đơn</title>
+    <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@600;700;800&display=swap" rel="stylesheet">
+    <style>
+        :root { --text: #4a2040; --mute: #9d6580; }
+        body { font-family: 'Nunito', sans-serif; background: #fff7f9; color: var(--text); margin: 0; padding: 24px 20px 48px; }
+        .wrap { max-width: 640px; margin: 0 auto; }
+        a { color: #a855f7; font-weight: 800; }
+        h1 { font-size: 1.35rem; margin: 0 0 8px; }
+        .meta { color: var(--mute); font-weight: 600; font-size: 0.92rem; margin-bottom: 20px; }
+        .box { background: rgba(255,255,255,0.92); border: 1.5px solid #fbcfe8; border-radius: 18px; padding: 16px 18px; margin-bottom: 14px; box-shadow: 0 6px 22px rgba(244,114,182,0.1); }
+        .box h3 { margin: 0 0 10px; font-size: 1rem; }
+        pre { white-space: pre-wrap; word-break: break-word; background: #fdf2f8; padding: 12px 14px; border-radius: 12px; border: 1px solid #fbcfe8; font-size: 0.88rem; margin: 0; }
+        .hint { font-size: 0.85rem; color: var(--mute); font-weight: 600; margin-top: 10px; }
+        ul { margin: 0; padding-left: 18px; font-size: 0.85rem; color: var(--mute); }
+    </style>
+</head>
+<body>
+<div class="wrap">
+    <p><a th:href="@{/my-orders}">← Lịch sử mua hàng</a></p>
+    <h1>Đơn #<span th:text="${order.id}">0</span></h1>
+    <p class="meta">
+        Trạng thái: <strong th:text="${order.status}">-</strong> —
+        Tổng: <strong th:text="${order.totalAmount} + 'đ'">0đ</strong>
+    </p>
+
+    <div class="box" th:each="line : ${order.lines}">
+        <h3 th:text="${line.productNameSnapshot}">Sản phẩm</h3>
+        <p class="meta" style="margin:0 0 8px">Đơn giá: <span th:text="${line.unitPrice} + 'đ'">0đ</span></p>
+        <div th:if="${line.deliveredCredentials != null}">
+            <p style="margin:0 0 6px;font-weight:800">Acc đã giao cho bạn:</p>
+            <pre th:text="${line.deliveredCredentials}">-</pre>
+        </div>
+        <p th:if="${line.deliveredCredentials == null && order.status.name() == 'PAID'}" class="hint">Đang cập nhật thông tin acc — nếu thiếu hãy liên hệ shop.</p>
+        <p th:if="${order.status.name() == 'PENDING_PAYMENT'}" class="hint">Đơn đang chờ thanh toán. Sau khi shop xác nhận, acc sẽ hiện tại đây.</p>
+    </div>
+
+    <div class="box" th:if="${!#lists.isEmpty(logs)}">
+        <h3 style="margin-bottom:8px">Ghi chú hệ thống</h3>
+        <ul>
+            <li th:each="log : ${logs}">
+                <span th:text="${#dates.format(log.createdAt, 'dd/MM HH:mm')}">-</span>:
+                <span th:text="${log.detail}">-</span>
+            </li>
+        </ul>
+    </div>
+</div>
+</body>
+</html>

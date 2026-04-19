@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html lang="vi" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Đơn hàng — Admin</title>
+    <link rel="stylesheet" th:href="@{/css/admin-panel.css}">
+</head>
+<body class="admin-body">
+<div class="admin-app">
+    <aside th:replace="~{admin/fragments :: sidebar (active='orders')}"></aside>
+    <div class="admin-main">
+        <header class="admin-main-header">
+            <div>
+                <div class="admin-breadcrumb"><a th:href="@{/admin}">Admin</a> / Đơn hàng</div>
+                <h1>Đơn hàng</h1>
+                <p>Chọn đơn để xem chi tiết, xác nhận thanh toán và acc đã giao.</p>
+            </div>
+        </header>
+        <div class="admin-content">
+            <div class="admin-panel admin-table-wrap">
+                <table class="admin-table">
+                    <thead>
+                    <tr>
+                        <th>ID</th>
+                        <th>Khách (user id)</th>
+                        <th>Trạng thái</th>
+                        <th>Tổng</th>
+                        <th>Ngày tạo</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    <tr th:each="o : ${orders}">
+                        <td><a th:href="@{/admin/orders/{id}(id=${o.id})}" th:text="${o.id}">1</a></td>
+                        <td th:text="${o.buyerId}">1</td>
+                        <td><span class="admin-muted" th:text="${o.status}">-</span></td>
+                        <td th:text="${o.totalAmount} + 'đ'">0</td>
+                        <td th:text="${o.createdAt}">-</td>
+                    </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+</body>
+</html>

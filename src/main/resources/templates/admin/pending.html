@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="vi" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Duyệt CTV — Admin</title>
+    <link rel="stylesheet" th:href="@{/css/admin-panel.css}">
+</head>
+<body class="admin-body">
+<div class="admin-app">
+    <aside th:replace="~{admin/fragments :: sidebar (active='pending')}"></aside>
+    <div class="admin-main">
+        <header class="admin-main-header">
+            <div>
+                <div class="admin-breadcrumb"><a th:href="@{/admin}">Admin</a> / Duyệt CTV</div>
+                <h1>Acc chờ duyệt từ CTV</h1>
+                <p>Duyệt xong acc mới được đưa vào kho bán; từ chối sẽ đánh dấu lỗi.</p>
+            </div>
+        </header>
+        <div class="admin-content">
+            <p th:if="${successMessage}" class="admin-alert admin-alert--ok" th:text="${successMessage}"></p>
+            <p th:if="${errorMessage}" class="admin-alert admin-alert--err" th:text="${errorMessage}"></p>
+            <div class="admin-panel admin-table-wrap">
+                <table class="admin-table">
+                    <thead>
+                    <tr>
+                        <th>ID</th>
+                        <th>Sản phẩm</th>
+                        <th>CTV (user id)</th>
+                        <th>Game</th>
+                        <th>Preview</th>
+                        <th></th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    <tr th:each="it : ${items}">
+                        <td th:text="${it.id}">1</td>
+                        <td th:text="${it.product.name}">-</td>
+                        <td th:text="${it.submittedById}">-</td>
+                        <td th:text="${it.game}">-</td>
+                        <td><code th:text="${#strings.abbreviate(it.credentials, 48)}">-</code></td>
+                        <td>
+                            <div class="admin-stack">
+                                <form class="inline" th:action="@{/admin/pending/{id}/approve(id=${it.id})}" method="post">
+                                    <button class="admin-btn admin-btn--green" type="submit">Duyệt</button>
+                                </form>
+                                <form class="inline" th:action="@{/admin/pending/{id}/reject(id=${it.id})}" method="post">
+                                    <button class="admin-btn admin-btn--rose" type="submit">Từ chối</button>
+                                </form>
+                            </div>
+                        </td>
+                    </tr>
+                    <tr th:if="${#lists.isEmpty(items)}">
+                        <td colspan="6" class="admin-muted" style="padding:24px">Không có acc chờ duyệt.</td>
+                    </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+</body>
+</html>

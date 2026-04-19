@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html lang="vi" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Hồ sơ người dùng</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=M+PLUS+Rounded+1c:wght@400;500;700;800&family=Quicksand:wght@500;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" th:href="@{/css/auth-cute.css}">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+</head>
+<body>
+<div class="falling-hearts" aria-hidden="true">
+    <span>❤</span><span>✿</span><span>❤</span><span>❀</span><span>❤</span>
+    <span>✿</span><span>❤</span><span>❀</span><span>❤</span><span>✿</span>
+</div>
+<a class="page-back" th:href="@{/}">← Về trang chủ</a>
+
+<div class="page-wrap" style="padding-top:20px">
+    <div class="card" style="max-width:520px">
+        <div class="badge">❤ Hồ sơ đáng yêu ❤</div>
+        <h2 class="title">Thông tin tài khoản</h2>
+        <p class="subtitle">Xem và chỉnh sửa thông tin cá nhân của bạn.</p>
+
+        <div class="msg success" id="msgSuccess" style="display:none"></div>
+        <div class="msg error" id="msgError" style="display:none"></div>
+
+        <div class="home-links" style="margin:16px 0">
+            <a href="javascript:void(0)">Vai trò: <span th:text="${profile.role}" style="color:#a855f7;font-weight:800"></span></a>
+            <a href="javascript:void(0)">Ngày tạo: <span th:text="${#dates.format(profile.createdAt, 'dd/MM/yyyy HH:mm')}"></span></a>
+            <a href="javascript:void(0)">Số dư ví: <span th:text="${walletFormatted}" style="color:#16a34a;font-weight:800"></span></a>
+            <a href="javascript:void(0)">Đăng nhập qua: <span th:text="${profile.provider != null ? profile.provider : 'Tài khoản thường'}" style="color:#a855f7;font-weight:800"></span></a>
+        </div>
+
+        <form id="profileForm" onsubmit="return saveProfile(event)">
+            <label>TUsername (không thể đổi)</label>
+            <input type="text" th:value="${profile.username}" readonly style="opacity:0.6;cursor:not-allowed">
+
+            <label>Email (không thể đổi)</label>
+            <input type="email" th:value="${profile.email}" readonly style="opacity:0.6;cursor:not-allowed">
+
+            <label>Số điện thoại <span style="font-weight:400;font-size:0.8rem;color:#9d6580">(để admin liên hệ)</span></label>
+            <input type="tel" id="phone" name="phone" th:value="${profile.phone}" placeholder="Nhập số điện thoại...">
+
+            <button class="btn" type="submit" id="saveBtn">
+                <i class="fas fa-save"></i> Lưu thay đổi
+            </button>
+        </form>
+
+        <div class="links" style="margin-top:20px">
+            <a th:href="@{/wallet}"><i class="fas fa-wallet"></i> Nạp tiền</a>
+            <a th:href="@{/}">Trang chủ</a>
+        </div>
+
+        <form th:action="@{/auth/logout}" method="post" style="margin-top:16px">
+            <button class="btn" type="submit" style="background:linear-gradient(135deg,#f472b6,#fb7185)">Đăng xuất</button>
+        </form>
+    </div>
+</div>
+
+<script th:inline="javascript">
+function saveProfile(e) {
+    e.preventDefault();
+    const phone = document.getElementById('phone').value.trim();
+    const btn = document.getElementById('saveBtn');
+    btn.disabled = true;
+    btn.textContent = 'Đang lưu...';
+
+    fetch('/profile/update', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ phone: phone })
+    })
+    .then(res => res.json())
+    .then(data => {
+        if (data.message) {
+            showMsg('success', data.message);
+        } else {
+            showMsg('error', 'Có lỗi xảy ra!');
+        }
+    })
+    .catch(() => showMsg('error', 'Lỗi kết nối!'))
+    .finally(() => {
+        btn.disabled = false;
+        btn.innerHTML = '<i class="fas fa-save"></i> Lưu thay đổi';
+    });
+    return false;
+}
+function showMsg(type, text) {
+    const el = document.getElementById(type === 'success' ? 'msgSuccess' : 'msgError');
+    el.textContent = text;
+    el.style.display = 'block';
+    setTimeout(() => { el.style.display = 'none'; }, 5000);
+}
+</script>
+</body>
+</html>

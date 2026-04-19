@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html lang="vi" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Người dùng — Admin</title>
+    <link rel="stylesheet" th:href="@{/css/admin-panel.css}">
+</head>
+<body class="admin-body">
+<div class="admin-app">
+    <aside th:replace="~{admin/fragments :: sidebar (active='users')}"></aside>
+    <div class="admin-main">
+        <header class="admin-main-header">
+            <div>
+                <div class="admin-breadcrumb"><a th:href="@{/admin}">Admin</a> / Người dùng</div>
+                <h1>Quản lý người dùng</h1>
+                <p>Khóa tài khoản, đổi role (CTV / Admin / …), reset mật khẩu, xem lịch sử mua.</p>
+            </div>
+        </header>
+        <div class="admin-content">
+            <p th:if="${successMessage}" class="admin-alert admin-alert--ok" th:text="${successMessage}"></p>
+            <p th:if="${errorMessage}" class="admin-alert admin-alert--err" th:text="${errorMessage}"></p>
+            <div class="admin-panel admin-table-wrap">
+                <table class="admin-table">
+                    <thead>
+                    <tr>
+                        <th>ID</th>
+                        <th>Username</th>
+                        <th>Email</th>
+                        <th>Role</th>
+                        <th>Khóa</th>
+                        <th>Hành động</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    <tr th:each="u : ${users}">
+                        <td th:text="${u.id}">1</td>
+                        <td th:text="${u.username}">a</td>
+                        <td th:text="${u.email}">e</td>
+                        <td>
+                            <form class="inline" th:action="@{/admin/users/{id}/role(id=${u.id})}" method="post">
+                                <select name="role" onchange="this.form.submit()" style="max-width:160px;padding:8px 10px;border-radius:10px;border:1px solid #ddd6e6;font:inherit">
+                                    <option th:each="r : ${T(com.example.demo.entity.Enum.Role).values()}"
+                                            th:value="${r.name()}" th:text="${r.name()}"
+                                            th:selected="${u.role == r}">USER</option>
+                                </select>
+                            </form>
+                        </td>
+                        <td th:text="${u.locked} ? 'Có' : 'Không'">Không</td>
+                        <td>
+                            <div class="admin-stack">
+                                <form class="inline" th:if="${!u.locked}" th:action="@{/admin/users/{id}/lock(id=${u.id})}" method="post">
+                                    <button class="admin-btn admin-btn--rose" type="submit">Khóa</button>
+                                </form>
+                                <form class="inline" th:if="${u.locked}" th:action="@{/admin/users/{id}/unlock(id=${u.id})}" method="post">
+                                    <button class="admin-btn admin-btn--green" type="submit">Mở khóa</button>
+                                </form>
+                                <form class="inline" th:action="@{/admin/users/{id}/reset-password(id=${u.id})}" method="post"
+                                      onsubmit="return confirm('Reset mật khẩu user này?');">
+                                    <button class="admin-btn admin-btn--sky" type="submit">Reset MK</button>
+                                </form>
+                                <a class="admin-btn admin-btn--orange" th:href="@{/admin/users/{id}/orders(id=${u.id})}" style="text-decoration:none">Lịch sử mua</a>
+                            </div>
+                        </td>
+                    </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+</body>
+</html>

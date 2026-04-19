@@ -1,0 +1,150 @@
+<!DOCTYPE html>
+<html lang="vi" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Nạp tiền</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=M+PLUS+Rounded+1c:wght@400;500;700;800&family=Quicksand:wght@500;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" th:href="@{/css/auth-cute.css}">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+</head>
+<body>
+<div class="falling-hearts" aria-hidden="true">
+    <span>❤</span><span>✿</span><span>❤</span><span>❀</span><span>❤</span>
+    <span>✿</span><span>❤</span><span>❀</span><span>❤</span><span>✿</span>
+</div>
+<a class="page-back" th:href="@{/}">← Về trang chủ</a>
+
+<div class="page-wrap" style="padding-top:20px">
+    <div class="card" style="max-width:520px">
+        <div class="badge">💰 Ví của bạn</div>
+        <h2 class="title">Nạp tiền</h2>
+
+        <div class="wallet-balance" style="text-align:center;margin:20px 0">
+            <div style="font-size:0.85rem;color:#9d6580;font-weight:700;margin-bottom:4px">Số dư hiện tại</div>
+            <div id="walletBalance" style="font-size:2.2rem;font-weight:900;background:linear-gradient(135deg,#be185d,#a855f7);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text" th:text="${wallet}">0đ</div>
+        </div>
+
+        <div class="msg success" id="msgSuccess" style="display:none"></div>
+        <div class="msg error" id="msgError" style="display:none"></div>
+
+        <div style="margin:20px 0">
+            <label style="font-weight:700;color:#4a2040;display:block;margin-bottom:8px">Chọn số tiền nạp:</label>
+            <div class="amount-options" style="display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-bottom:16px">
+                <button type="button" class="amount-btn active" onclick="selectAmount(10000)" data-amount="10000">10.000đ</button>
+                <button type="button" class="amount-btn" onclick="selectAmount(20000)" data-amount="20000">20.000đ</button>
+                <button type="button" class="amount-btn" onclick="selectAmount(50000)" data-amount="50000">50.000đ</button>
+                <button type="button" class="amount-btn" onclick="selectAmount(100000)" data-amount="100000">100.000đ</button>
+                <button type="button" class="amount-btn" onclick="selectAmount(200000)" data-amount="200000">200.000đ</button>
+                <button type="button" class="amount-btn" onclick="selectAmount(500000)" data-amount="500000">500.000đ</button>
+            </div>
+            <label style="font-weight:700;color:#4a2040;display:block;margin-bottom:8px">Hoặc nhập số tiền khác:</label>
+            <input type="number" id="customAmount" min="1000" step="1000" placeholder="Nhập số tiền..." style="width:100%;padding:10px 14px;border:2px solid #fbcfe8;border-radius:12px;font-size:1rem;font-family:inherit;font-weight:700;color:#4a2040;background:#fff7f9;outline:none" oninput="clearAmountSelection()">
+        </div>
+
+        <button class="btn" style="width:100%;font-size:1rem;padding:13px;margin-top:8px" onclick="submitDeposit()">
+            <i class="fas fa-wallet"></i> Nạp tiền ngay
+        </button>
+
+        <div style="margin-top:20px;padding:14px;background:#fce7f3;border-radius:14px;border:1px solid #fbcfe8">
+            <div style="font-weight:800;color:#be185d;margin-bottom:8px;font-size:0.9rem">📌 Hướng dẫn nạp tiền</div>
+            <ol style="font-size:0.82rem;color:#4a2040;font-weight:600;padding-left:16px;line-height:1.8">
+                <li>Chọn hoặc nhập số tiền muốn nạp</li>
+                <li>Bấm "Nạp tiền ngay"</li>
+                <li>Chuyển khoản qua Momo/ZaloBank theo thông tin hiển thị</li>
+                <li>Admin sẽ cộng tiền vào tài khoản trong vài phút</li>
+            </ol>
+        </div>
+
+        <div style="margin-top:24px">
+            <div style="font-weight:800;color:#4a2040;margin-bottom:12px">📜 Lịch sử giao dịch</div>
+            <div th:if="${#lists.isEmpty(transactions)}" style="text-align:center;color:#9d6580;font-weight:700;padding:20px 0;font-size:0.88rem">Chưa có giao dịch nào.</div>
+            <div th:each="tx : ${transactions}" style="display:flex;align-items:center;gap:10px;padding:10px 0;border-bottom:1px solid #fbcfe8">
+                <div style="width:36px;height:36px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:0.9rem"
+                     th:style="${tx.type == 'DEPOSIT'} ? 'background:#dcfce7;color:#16a34a' : 'background:#fee2e2;color:#dc2626'">
+                    <i class="fas" th:class="${tx.type == 'DEPOSIT'} ? 'fa-arrow-down' : 'fa-arrow-up'"></i>
+                </div>
+                <div style="flex:1">
+                    <div style="font-weight:700;font-size:0.85rem;color:#4a2040" th:text="${tx.detail}">Nạp tiền</div>
+                    <div style="font-size:0.75rem;color:#9d6580" th:text="${#dates.format(tx.createdAt, 'dd/MM/yyyy HH:mm')}">-</div>
+                </div>
+                <div style="font-weight:800;font-size:0.9rem"
+                     th:style="${tx.type == 'DEPOSIT'} ? 'color:#16a34a' : 'color:#dc2626'"
+                     th:text="${tx.type == 'DEPOSIT'} ? '+' + ${#numbers.formatDecimal(tx.amount != null ? tx.amount : 0, 0, 'COMMA', 0, 'POINT')} + 'đ' : '-' + ${#numbers.formatDecimal(tx.amount != null ? tx.amount : 0, 0, 'COMMA', 0, 'POINT')} + 'đ'">0đ</div>
+            </div>
+        </div>
+
+        <div class="links" style="margin-top:20px">
+            <a th:href="@{/profile}">Chỉnh sửa profile</a>
+            <a th:href="@{/}">Trang chủ</a>
+        </div>
+    </div>
+</div>
+
+<style>
+.amount-btn {
+    padding: 10px 8px;
+    border: 2px solid #fbcfe8;
+    border-radius: 12px;
+    background: #fff;
+    color: #4a2040;
+    font-weight: 800;
+    font-size: 0.88rem;
+    font-family: inherit;
+    cursor: pointer;
+    transition: all 0.2s;
+}
+.amount-btn:hover, .amount-btn.active {
+    border-color: #f472b6;
+    background: #fce7f3;
+    color: #be185d;
+}
+</style>
+
+<script th:inline="javascript">
+let selectedAmount = 10000;
+function selectAmount(amount) {
+    selectedAmount = amount;
+    document.getElementById('customAmount').value = '';
+    document.querySelectorAll('.amount-btn').forEach(b => b.classList.remove('active'));
+    document.querySelector(`.amount-btn[data-amount="${amount}"]`).classList.add('active');
+}
+function clearAmountSelection() {
+    document.querySelectorAll('.amount-btn').forEach(b => b.classList.remove('active'));
+    const val = document.getElementById('customAmount').value;
+    if (val) selectedAmount = parseInt(val);
+}
+function submitDeposit() {
+    const amount = selectedAmount;
+    if (!amount || amount < 1000) {
+        showMsg('error', 'Số tiền tối thiểu là 1.000đ');
+        return;
+    }
+    const conf = confirm('Bạn muốn nạp ' + amount.toLocaleString('vi-VN') + 'đ?\n\nAdmin sẽ cộng tiền vào tài khoản sau khi bạn chuyển khoản.');
+    if (!conf) return;
+
+    fetch('/wallet/deposit', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ amount: amount })
+    })
+    .then(res => res.json())
+    .then(data => {
+        if (data.message) {
+            showMsg('success', data.message + ' Số dư: ' + data.newBalance);
+            document.getElementById('walletBalance').textContent = data.newBalance;
+        }
+    })
+    .catch(() => showMsg('error', 'Lỗi kết nối!'));
+}
+function showMsg(type, text) {
+    const el = document.getElementById(type === 'success' ? 'msgSuccess' : 'msgError');
+    el.textContent = text;
+    el.style.display = 'block';
+    setTimeout(() => { el.style.display = 'none'; }, 6000);
+}
+</script>
+</body>
+</html>

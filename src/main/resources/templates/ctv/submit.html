@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html lang="vi" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CTV — Đăng acc</title>
+    <link rel="stylesheet" th:href="@{/css/admin-panel.css}">
+</head>
+<body class="admin-body">
+<div class="admin-app">
+    <aside th:replace="~{ctv/fragments :: ctvSidebar}"></aside>
+    <div class="admin-main">
+        <header class="admin-main-header">
+            <div>
+                <div class="admin-breadcrumb"><a th:href="@{/}">Shop</a> / CTV</div>
+                <h1>Đăng acc lên kho</h1>
+                <p>Chọn đúng <strong>gói acc</strong>, đính kèm <strong>ảnh minh hoạ</strong> (bắt buộc), dán <strong>nội dung acc</strong>. Ghi chú tuỳ chọn. Admin duyệt xong acc mới được bán.</p>
+            </div>
+        </header>
+        <div class="admin-content">
+            <p th:if="${successMessage}" class="admin-alert admin-alert--ok" th:text="${successMessage}"></p>
+            <p th:if="${errorMessage}" class="admin-alert admin-alert--err" th:text="${errorMessage}"></p>
+
+            <div class="admin-panel" style="padding:22px 24px;max-width:520px">
+                <form class="admin-form-grid" th:action="@{/ctv/submit}" method="post" enctype="multipart/form-data">
+                    <label>Gói acc &amp; giá bán trên shop</label>
+                    <select name="productId" required>
+                        <option th:each="p : ${products}" th:value="${p.id}" th:text="|${p.name} — ${productPriceFormatted[p.id]}|"></option>
+                    </select>
+                    <p class="admin-muted" style="grid-column:1/-1;margin:0;font-size:0.85rem">Giá theo gói — khách mua đúng mức này sau khi admin duyệt acc.</p>
+                    <label>Ảnh minh hoạ acc (bắt buộc)</label>
+                    <input type="file" name="listingImage" accept="image/jpeg,image/png,image/webp,image/gif" required>
+                    <label>Nội dung acc (bắt buộc)</label>
+                    <textarea name="credentials" required rows="5" placeholder="Ví dụ: user:password hoặc toàn bộ chuỗi giao khách…"></textarea>
+                    <label>Ghi chú (không bắt buộc)</label>
+                    <input name="ghiChu" placeholder="AR, nhân vật nổi bật…">
+                    <button class="admin-btn admin-btn--primary" style="margin-top:16px" type="submit">Gửi duyệt</button>
+                </form>
+            </div>
+
+            <p class="admin-muted" style="margin-top:20px">
+                Acc đang chờ duyệt của bạn: <strong th:text="${myPendingCount}">0</strong> —
+                <a th:href="@{/admin/accounts}">Admin xem trong bảng kho acc</a>.
+            </p>
+        </div>
+    </div>
+</div>
+</body>
+</html>

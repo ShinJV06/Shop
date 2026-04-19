@@ -1,0 +1,142 @@
+<!DOCTYPE html>
+<html lang="vi" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Tổng quan — Admin</title>
+    <link rel="stylesheet" th:href="@{/css/admin-panel.css}">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
+</head>
+<body class="admin-body">
+<div class="admin-app">
+    <aside th:replace="~{admin/fragments :: sidebar (active='dashboard')}"></aside>
+    <div class="admin-main">
+        <header class="admin-main-header">
+            <div>
+                <div class="admin-breadcrumb"><a th:href="@{/admin}">Admin</a> / Tổng quan</div>
+                <h1>Dashboard</h1>
+                <p>Biểu đồ doanh thu 7 ngày (đơn đã thanh toán) và các chỉ số nhanh.</p>
+            </div>
+        </header>
+        <div class="admin-content">
+            <p class="admin-muted" style="margin:0 0 18px">
+                <!-- Tạm thời ẩn: Nhập kho, Sản phẩm, Đơn hàng -->
+                <!--
+                <a class="admin-btn admin-btn--sky" style="text-decoration:none;display:inline-block;margin:0 8px 8px 0" th:href="@{/admin/stock}">Nhập kho</a>
+                <a class="admin-btn admin-btn--orange" style="text-decoration:none;display:inline-block;margin:0 8px 8px 0" th:href="@{/admin/products}">Sản phẩm</a>
+                <a class="admin-btn admin-btn--green" style="text-decoration:none;display:inline-block;margin:0 8px 8px 0" th:href="@{/admin/orders}">Đơn hàng</a>
+                -->
+                <a class="admin-btn admin-btn--rose" style="text-decoration:none;display:inline-block;margin:0 8px 8px 0" th:href="@{/admin/accounts}">Quản lý acc</a>
+            </p>
+            <div class="admin-panel" style="padding:20px 22px 8px;margin-bottom:22px">
+                <h2 style="margin:0 0 14px;font-size:1rem;font-weight:800">Doanh thu đã thanh toán (7 ngày)</h2>
+                <div class="admin-chart-wrap">
+                    <canvas id="revChart" height="120" aria-label="Biểu đồ doanh thu"></canvas>
+                </div>
+            </div>
+
+            <div class="admin-stat-grid">
+                <div class="admin-stat">
+                    <div class="admin-stat-icon">💰</div>
+                    <div>
+                        <h3>Doanh thu hôm nay</h3>
+                        <p class="num" th:text="${stats.revenueToday} + 'đ'">0đ</p>
+                    </div>
+                </div>
+                <div class="admin-stat">
+                    <div class="admin-stat-icon">📅</div>
+                    <div>
+                        <h3>Doanh thu tháng</h3>
+                        <p class="num" th:text="${stats.revenueMonth} + 'đ'">0đ</p>
+                    </div>
+                </div>
+                <div class="admin-stat">
+                    <div class="admin-stat-icon">📦</div>
+                    <div>
+                        <h3>Tổng đơn</h3>
+                        <p class="num" th:text="${stats.ordersTotal}">0</p>
+                    </div>
+                </div>
+                <div class="admin-stat">
+                    <div class="admin-stat-icon">⏳</div>
+                    <div>
+                        <h3>Chờ thanh toán</h3>
+                        <p class="num" th:text="${stats.ordersPendingPayment}">0</p>
+                    </div>
+                </div>
+                <div class="admin-stat">
+                    <div class="admin-stat-icon">✨</div>
+                    <div>
+                        <h3>Acc đã bán</h3>
+                        <p class="num" th:text="${stats.soldItems}">0</p>
+                    </div>
+                </div>
+                <div class="admin-stat">
+                    <div class="admin-stat-icon">📂</div>
+                    <div>
+                        <h3>Acc còn tồn</h3>
+                        <p class="num" th:text="${stats.stockAvailable}">0</p>
+                    </div>
+                </div>
+                <div class="admin-stat">
+                    <div class="admin-stat-icon">👋</div>
+                    <div>
+                        <h3>User mới hôm nay</h3>
+                        <p class="num" th:text="${stats.newUsersToday}">0</p>
+                    </div>
+                </div>
+                <div class="admin-stat">
+                    <div class="admin-stat-icon">🤝</div>
+                    <div>
+                        <h3>CTV chờ duyệt</h3>
+                        <p class="num" th:text="${stats.pendingModeration}">0</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<script th:inline="javascript">
+    /*<![CDATA[*/
+    const chartLabels = /*[[${stats.chartLabels}]]*/ [];
+    const chartValues = /*[[${stats.chartValues}]]*/ [];
+    /*]]>*/
+    const ctx = document.getElementById('revChart');
+    if (ctx && typeof Chart !== 'undefined') {
+        new Chart(ctx, {
+            type: 'bar',
+            data: {
+                labels: chartLabels,
+                datasets: [{
+                    label: 'VNĐ (đơn PAID)',
+                    data: chartValues,
+                    borderRadius: 8,
+                    backgroundColor: 'rgba(168, 85, 247, 0.55)',
+                    borderColor: 'rgba(244, 114, 182, 0.9)',
+                    borderWidth: 1
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: { display: false }
+                },
+                scales: {
+                    y: {
+                        beginAtZero: true,
+                        ticks: {
+                            callback: function (v) {
+                                if (v >= 1e6) return (v / 1e6).toFixed(1) + 'M';
+                                if (v >= 1e3) return (v / 1e3).toFixed(0) + 'k';
+                                return v;
+                            }
+                        }
+                    }
+                }
+            }
+        });
+    }
+</script>
+</body>
+</html>

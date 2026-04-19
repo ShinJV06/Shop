@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html lang="vi" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Lịch sử mua — Admin</title>
+    <link rel="stylesheet" th:href="@{/css/admin-panel.css}">
+</head>
+<body class="admin-body">
+<div class="admin-app">
+    <aside th:replace="~{admin/fragments :: sidebar (active='users')}"></aside>
+    <div class="admin-main">
+        <header class="admin-main-header">
+            <div>
+                <div class="admin-breadcrumb">
+                    <a th:href="@{/admin}">Admin</a> /
+                    <a th:href="@{/admin/users}">Người dùng</a> /
+                    Lịch sử
+                </div>
+                <h1>Lịch sử đơn hàng</h1>
+                <p>User ID <strong th:text="${targetUserId}">0</strong> — các đơn đã tạo trên hệ thống.</p>
+            </div>
+        </header>
+        <div class="admin-content">
+            <div class="admin-panel admin-table-wrap">
+                <table class="admin-table">
+                    <thead>
+                    <tr>
+                        <th>Đơn</th>
+                        <th>Trạng thái</th>
+                        <th>Tổng</th>
+                        <th>Ngày</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    <tr th:each="o : ${orders}">
+                        <td><a th:href="@{/admin/orders/{id}(id=${o.id})}" th:text="'#' + ${o.id}">#1</a></td>
+                        <td th:text="${o.status}">PENDING</td>
+                        <td th:text="${o.totalAmount} + 'đ'">0đ</td>
+                        <td th:text="${o.createdAt}">-</td>
+                    </tr>
+                    <tr th:if="${#lists.isEmpty(orders)}">
+                        <td colspan="4" class="admin-muted" style="padding:24px">Chưa có đơn.</td>
+                    </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+</body>
+</html>

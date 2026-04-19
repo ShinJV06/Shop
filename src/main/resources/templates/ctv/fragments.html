@@ -1,0 +1,25 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<body>
+<aside th:fragment="ctvSidebar" class="admin-sidebar admin-sidebar--ctv" aria-label="CTV menu">
+    <div class="admin-sidebar-brand">
+        <a th:href="@{/ctv/submit}">
+            <span class="logo">🤝</span>
+            <div>
+                Cộng tác viên
+                <small>Đăng acc chờ duyệt</small>
+            </div>
+        </a>
+    </div>
+    <nav class="admin-nav">
+        <div class="admin-nav-section">CTV</div>
+        <a th:href="@{/ctv/submit}" class="is-active">
+            <span class="ic">➕</span> Đăng / import acc
+        </a>
+    </nav>
+    <div class="admin-sidebar-footer">
+        <a th:href="@{/}">← Về cửa hàng</a>
+    </div>
+</aside>
+</body>
+</html>

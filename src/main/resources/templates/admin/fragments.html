@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<body>
+<aside th:fragment="sidebar (active)" class="admin-sidebar" aria-label="Admin menu">
+    <div class="admin-sidebar-brand">
+        <a th:href="@{/admin}">
+            <span class="logo">🌸</span>
+            <div>
+                Genshin Cute Shop
+                <small>Administration</small>
+            </div>
+        </a>
+    </div>
+    <nav class="admin-nav">
+        <div class="admin-nav-section">Menu</div>
+        <a th:href="@{/admin}" th:classappend="${active == 'dashboard'} ? ' is-active'">
+            <span class="ic">📊</span> Tổng quan
+        </a>
+        <a th:href="@{/admin/users}" th:classappend="${active == 'users'} ? ' is-active'">
+            <span class="ic">👤</span> Người dùng
+        </a>
+        <a th:href="@{/admin/accounts}" th:classappend="${active == 'accounts'} ? ' is-active'">
+            <span class="ic">🎮</span> Quản lý acc
+        </a>
+        <!-- Tạm thời ẩn: Nhập kho, Sản phẩm, Đơn hàng -->
+        <!--
+        <a th:href="@{/admin/stock}" th:classappend="${active == 'stock'} ? ' is-active'">
+            <span class="ic">📥</span> Nhập kho
+        </a>
+        <a th:href="@{/admin/products}" th:classappend="${active == 'products'} ? ' is-active'">
+            <span class="ic">🏷️</span> Sản phẩm
+        </a>
+        <a th:href="@{/admin/orders}" th:classappend="${active == 'orders'} ? ' is-active'">
+            <span class="ic">🧾</span> Đơn hàng
+        </a>
+        -->
+    </nav>
+    <div class="admin-sidebar-footer">
+        <a th:href="@{/}">← Về cửa hàng</a>
+    </div>
+</aside>
+</body>
+</html>

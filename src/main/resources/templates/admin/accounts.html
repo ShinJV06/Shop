@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html lang="vi" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Quản lý acc — Admin</title>
+    <link rel="stylesheet" th:href="@{/css/admin-panel.css}">
+</head>
+<body class="admin-body">
+<div class="admin-app">
+    <aside th:replace="~{admin/fragments :: sidebar (active='accounts')}"></aside>
+    <div class="admin-main">
+        <header class="admin-main-header">
+            <div>
+                <div class="admin-breadcrumb"><a th:href="@{/admin}">Admin</a> / Quản lý acc</div>
+                <h1>Quản lý kho acc</h1>
+                <p class="admin-muted">Chỉ danh sách và thao tác — nhập acc tại <a th:href="@{/admin/stock}">Nhập kho</a>, giá gói tại <a th:href="@{/admin/products}">Sản phẩm</a>, đơn tại <a th:href="@{/admin/orders}">Đơn hàng</a>.</p>
+            </div>
+        </header>
+        <div class="admin-content">
+            <p th:if="${successMessage}" class="admin-alert admin-alert--ok" th:text="${successMessage}"></p>
+            <p th:if="${errorMessage}" class="admin-alert admin-alert--err" th:text="${errorMessage}"></p>
+
+            <div class="admin-panel admin-table-wrap">
+                <table class="admin-table">
+                    <thead>
+                    <tr>
+                        <th>Ảnh</th>
+                        <th>ID</th>
+                        <th>Sản phẩm</th>
+                        <th>Giá gói</th>
+                        <th>Người đăng</th>
+                        <th>Duyệt</th>
+                        <th>Bán</th>
+                        <th>Ẩn</th>
+                        <th>Preview acc</th>
+                        <th>Hành động</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    <tr th:each="it : ${items}" th:with="imgSrc=${(it.listingImagePath != null && !#strings.isEmpty(it.listingImagePath)) ? it.listingImagePath : it.product.imagePath}">
+                        <td>
+                            <img class="admin-inv-thumb" th:src="${imgSrc}" alt="">
+                        </td>
+                        <td th:text="${it.id}">1</td>
+                        <td th:text="${it.product.name}">-</td>
+                        <td th:text="${priceByProductId[it.product.id]}">0đ</td>
+                        <td th:with="sid=${it.submittedById}">
+                            <span th:if="${sid == null}">—</span>
+                            <span th:if="${sid != null and submitterNames.containsKey(sid)}" th:text="${submitterNames.get(sid)}">ctv1</span>
+                            <span th:if="${sid != null and !submitterNames.containsKey(sid)}" th:text="'#' + ${sid}">#1</span>
+                        </td>
+                        <td>
+                            <span th:if="${it.moderationStatus.name() == 'PENDING'}" class="admin-moderation-badge admin-moderation-badge--pending">Chờ duyệt</span>
+                            <span th:if="${it.moderationStatus.name() == 'APPROVED'}" class="admin-moderation-badge admin-moderation-badge--approved">Đã duyệt</span>
+                            <span th:if="${it.moderationStatus.name() == 'REJECTED'}" class="admin-moderation-badge admin-moderation-badge--rejected">Từ chối</span>
+                        </td>
+                        <td th:text="${it.status}">-</td>
+                        <td th:text="${it.hidden} ? 'Có' : 'Không'">-</td>
+                        <td><code th:text="${#strings.abbreviate(it.credentials, 36)}">-</code></td>
+                        <td>
+                            <div class="admin-stack">
+                                <form class="inline" th:if="${it.moderationStatus.name() == 'PENDING'}" th:action="@{/admin/pending/{id}/approve(id=${it.id})}" method="post">
+                                    <button class="admin-btn admin-btn--green" type="submit">Duyệt</button>
+                                </form>
+                                <form class="inline" th:if="${it.moderationStatus.name() == 'PENDING'}" th:action="@{/admin/pending/{id}/reject(id=${it.id})}" method="post">
+                                    <button class="admin-btn admin-btn--rose" type="submit">Từ chối</button>
+                                </form>
+                                <form class="inline" th:action="@{/admin/inventory/{id}/hidden(id=${it.id})}" method="post">
+                                    <input type="hidden" name="hidden" th:value="${!it.hidden}">
+                                    <button class="admin-btn admin-btn--rose" type="submit" th:text="${it.hidden} ? 'Hiện' : 'Ẩn'">Ẩn</button>
+                                </form>
+                                <form class="inline" th:action="@{/admin/inventory/{id}/status(id=${it.id})}" method="post">
+                                    <select name="status" onchange="this.form.submit()" style="padding:8px;border-radius:10px;border:1px solid #ddd6e6;font:inherit;max-width:130px">
+                                        <option th:each="s : ${T(com.example.demo.entity.Enum.InventoryItemStatus).values()}"
+                                                th:value="${s.name()}" th:text="${s.name()}"
+                                                th:selected="${it.status == s}"></option>
+                                    </select>
+                                </form>
+                            </div>
+                        </td>
+                    </tr>
+                    <tr th:if="${#lists.isEmpty(items)}">
+                        <td colspan="10" class="admin-muted" style="padding:20px">Chưa có acc trong kho.</td>
+                    </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+</body>
+</html>

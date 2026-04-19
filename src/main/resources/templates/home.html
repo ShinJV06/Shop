@@ -1,0 +1,1482 @@
+<!DOCTYPE html>
+<html lang="vi" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Shop Acc Genshin - Cute</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=M+PLUS+Rounded+1c:wght@400;500;700;800&family=Nunito:wght@400;600;700;800;900&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --pink:      #f472b6;
+            --pink-soft: #fce7f3;
+            --pink-mid:  #fbcfe8;
+            --rose:      #fb7185;
+            --lavender:  #e9d5ff;
+            --purple:    #a855f7;
+            --cream:     #fff7f9;
+            --text:      #4a2040;
+            --text-mute: #9d6580;
+            --card-bg:   rgba(255,255,255,0.72);
+            --shadow:    0 8px 32px rgba(244,114,182,0.18);
+            --radius:    20px;
+        }
+
+        *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+        html { scroll-behavior: smooth; }
+
+        body {
+            font-family: 'Nunito', 'M PLUS Rounded 1c', sans-serif;
+            background: var(--cream);
+            color: var(--text);
+            overflow-x: hidden;
+            min-height: 100vh;
+        }
+
+        /* ── BACKGROUND ── */
+        body::before {
+            content: '';
+            position: fixed;
+            inset: 0;
+            background:
+                radial-gradient(ellipse 80% 60% at 10% 0%,   #fce7f3 0%, transparent 60%),
+                radial-gradient(ellipse 70% 50% at 90% 100%, #ede9fe 0%, transparent 55%),
+                radial-gradient(ellipse 60% 40% at 50% 50%,  #fff0f6 0%, transparent 70%);
+            z-index: -2;
+            pointer-events: none;
+        }
+
+        /* ── FALLING PETALS ── */
+        .petals {
+            position: fixed;
+            top: 0; left: 0;
+            width: 100%; height: 100%;
+            pointer-events: none;
+            z-index: 0;
+            overflow: hidden;
+        }
+        .petal {
+            position: absolute;
+            top: -40px;
+            font-size: 18px;
+            opacity: 0;
+            animation: fall linear infinite;
+        }
+        .petal:nth-child(1)  { left:  5%; animation-duration: 7s;  animation-delay: 0s;   font-size: 14px; }
+        .petal:nth-child(2)  { left: 15%; animation-duration: 9s;  animation-delay: 1.5s; }
+        .petal:nth-child(3)  { left: 25%; animation-duration: 6s;  animation-delay: 3s;   font-size: 22px; }
+        .petal:nth-child(4)  { left: 35%; animation-duration: 8s;  animation-delay: 0.5s; font-size: 12px; }
+        .petal:nth-child(5)  { left: 50%; animation-duration: 10s; animation-delay: 2s;   font-size: 20px; }
+        .petal:nth-child(6)  { left: 60%; animation-duration: 7.5s;animation-delay: 4s;   font-size: 16px; }
+        .petal:nth-child(7)  { left: 70%; animation-duration: 8.5s;animation-delay: 1s;   }
+        .petal:nth-child(8)  { left: 80%; animation-duration: 6.5s;animation-delay: 3.5s; font-size: 14px; }
+        .petal:nth-child(9)  { left: 90%; animation-duration: 9.5s;animation-delay: 0.8s; font-size: 24px; }
+        .petal:nth-child(10) { left: 45%; animation-duration: 7s;  animation-delay: 5s;   font-size: 12px; }
+        @keyframes fall {
+            0%   { transform: translateY(0) rotate(0deg) translateX(0);   opacity: 0; }
+            10%  { opacity: 0.85; }
+            80%  { opacity: 0.7; }
+            100% { transform: translateY(105vh) rotate(540deg) translateX(60px); opacity: 0; }
+        }
+
+        /* ── SIDE GIRLS ── */
+        .side-girl {
+            position: fixed;
+            bottom: 0;
+            height: 340px;
+            z-index: 1;
+            pointer-events: none;
+            filter: drop-shadow(0 0 20px rgba(244,114,182,0.25));
+            transition: transform 0.4s ease;
+        }
+        .side-girl.left  { left: 0;   transform: scaleX(1); }
+        .side-girl.right { right: 0;  transform: scaleX(-1); }
+        @media (max-width: 1100px) { .side-girl { display: none; } }
+
+        /* ── HEADER ── */
+        .header {
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0 5vw;
+            height: 64px;
+            background: rgba(255, 247, 249, 0.82);
+            backdrop-filter: blur(14px);
+            -webkit-backdrop-filter: blur(14px);
+            border-bottom: 1.5px solid var(--pink-mid);
+        }
+        .brand {
+            font-size: 1.25rem;
+            font-weight: 800;
+            color: var(--pink);
+            text-decoration: none;
+            letter-spacing: -0.3px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        .brand span { font-size: 1.4rem; }
+        .nav {
+            display: flex;
+            align-items: center;
+            gap: 4px;
+        }
+        .nav a {
+            text-decoration: none;
+            color: var(--text-mute);
+            font-size: 0.85rem;
+            font-weight: 700;
+            padding: 6px 12px;
+            border-radius: 30px;
+            transition: background 0.2s, color 0.2s;
+        }
+        .nav .nav-cart {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+        }
+        .user-menu {
+            position: relative;
+        }
+        .user-trigger {
+            width: 42px;
+            height: 42px;
+            border: 2px solid var(--pink-mid);
+            border-radius: 50%;
+            padding: 0;
+            background: rgba(255,255,255,0.86);
+            cursor: pointer;
+            box-shadow: 0 8px 20px rgba(244,114,182,0.15);
+            overflow: hidden;
+        }
+        .user-trigger img {
+            display: block;
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+        .user-dropdown {
+            position: absolute;
+            top: calc(100% + 10px);
+            right: 0;
+            min-width: 180px;
+            background: rgba(255,255,255,0.95);
+            border: 1.5px solid var(--pink-mid);
+            border-radius: 18px;
+            padding: 12px;
+            box-shadow: 0 18px 36px rgba(244,114,182,0.16);
+            display: none;
+        }
+        .user-dropdown.open {
+            display: block;
+        }
+        .user-name {
+            color: var(--text);
+            font-size: 0.88rem;
+            font-weight: 900;
+            margin-bottom: 10px;
+        }
+        .user-logout {
+            width: 100%;
+            border: none;
+            border-radius: 999px;
+            padding: 10px 14px;
+            background: linear-gradient(135deg, #f472b6, #a855f7);
+            color: #fff;
+            font-weight: 800;
+            cursor: pointer;
+        }
+        .cart-count-badge {
+            min-width: 22px;
+            height: 22px;
+            padding: 0 6px;
+            border-radius: 999px;
+            background: linear-gradient(135deg, #f472b6, #a855f7);
+            color: #fff;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.72rem;
+            font-weight: 900;
+            box-shadow: 0 3px 10px rgba(244,114,182,0.25);
+        }
+        .nav a:hover { background: var(--pink-soft); color: var(--pink); }
+        .nav .cta {
+            background: linear-gradient(135deg, #f472b6, #c084fc);
+            color: #fff !important;
+            padding: 7px 18px;
+            border-radius: 30px;
+            font-weight: 800;
+            box-shadow: 0 3px 12px rgba(244,114,182,0.4);
+            transition: transform 0.15s, box-shadow 0.15s;
+        }
+        .nav .cta:hover { transform: translateY(-1px); box-shadow: 0 6px 18px rgba(244,114,182,0.45); background: linear-gradient(135deg, #f472b6, #c084fc); }
+
+        /* ── MAIN ── */
+        main {
+            position: relative;
+            z-index: 2;
+            max-width: min(1180px, calc(100vw - 220px));
+            margin: 0 auto;
+            padding: 0 clamp(20px, 4vw, 48px) 140px;
+        }
+        @media (max-width: 1100px) {
+            main { max-width: 900px; padding: 0 24px 100px; }
+        }
+
+        /* Đơn / duyệt — admin & user */
+        .home-ops {
+            margin: 28px 0 8px;
+            padding: 22px 24px 26px;
+            background: rgba(255, 255, 255, 0.88);
+            border: 1.5px solid var(--pink-mid);
+            border-radius: var(--radius);
+            box-shadow: var(--shadow);
+            backdrop-filter: blur(12px);
+        }
+        .home-ops h3 {
+            font-size: 1.05rem;
+            font-weight: 900;
+            color: var(--text);
+            margin: 0 0 6px;
+        }
+        .home-ops > p.sub {
+            font-size: 0.88rem;
+            color: var(--text-mute);
+            font-weight: 600;
+            margin: 0 0 16px;
+        }
+        .home-ops-grid {
+            display: grid;
+            gap: 20px;
+        }
+        @media (min-width: 860px) {
+            .home-ops-grid { grid-template-columns: 1fr 1fr; }
+        }
+        .home-ops-block {
+            border: 1px solid rgba(251, 207, 232, 0.95);
+            border-radius: 16px;
+            padding: 14px 16px 16px;
+            background: rgba(255, 247, 249, 0.65);
+        }
+        .home-ops-block h4 {
+            margin: 0 0 10px;
+            font-size: 0.92rem;
+            font-weight: 900;
+            color: #be185d;
+        }
+        .home-ops table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 0.82rem;
+            font-weight: 700;
+        }
+        .home-ops th, .home-ops td {
+            padding: 8px 6px;
+            text-align: left;
+            border-bottom: 1px solid rgba(251, 207, 232, 0.7);
+        }
+        .home-ops th { color: var(--text-mute); font-size: 0.75rem; text-transform: uppercase; letter-spacing: 0.04em; }
+        .home-ops a.admin-link {
+            display: inline-block;
+            margin-top: 10px;
+            font-weight: 900;
+            color: #a855f7;
+            text-decoration: none;
+        }
+        .home-ops a.admin-link:hover { text-decoration: underline; }
+
+        /* ── HERO ── */
+        .hero {
+            text-align: center;
+            padding: 70px 0 50px;
+        }
+        .hero-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            background: var(--pink-soft);
+            border: 1.5px solid var(--pink-mid);
+            color: #be185d;
+            font-size: 0.8rem;
+            font-weight: 700;
+            padding: 6px 18px;
+            border-radius: 30px;
+            margin-bottom: 22px;
+            letter-spacing: 0.5px;
+        }
+        .hero h1 {
+            font-size: clamp(2rem, 5vw, 3rem);
+            font-weight: 900;
+            line-height: 1.2;
+            background: linear-gradient(135deg, #be185d 0%, #a855f7 60%, #f472b6 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            margin-bottom: 16px;
+        }
+        .hero p {
+            font-size: 1.05rem;
+            color: var(--text-mute);
+            font-weight: 600;
+            max-width: 480px;
+            margin: 0 auto 32px;
+            line-height: 1.7;
+        }
+        .hero-actions {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 12px;
+            flex-wrap: wrap;
+        }
+        .btn-primary {
+            background: linear-gradient(135deg, #f472b6, #a855f7);
+            color: #fff;
+            border: none;
+            padding: 13px 32px;
+            border-radius: 50px;
+            font-size: 0.95rem;
+            font-weight: 800;
+            font-family: inherit;
+            cursor: pointer;
+            text-decoration: none;
+            box-shadow: 0 4px 18px rgba(244,114,182,0.4);
+            transition: transform 0.15s, box-shadow 0.15s;
+            display: inline-block;
+        }
+        .btn-primary:hover { transform: translateY(-2px); box-shadow: 0 8px 24px rgba(244,114,182,0.45); }
+        .btn-outline {
+            background: var(--card-bg);
+            color: var(--pink);
+            border: 2px solid var(--pink-mid);
+            padding: 11px 28px;
+            border-radius: 50px;
+            font-size: 0.95rem;
+            font-weight: 800;
+            font-family: inherit;
+            cursor: pointer;
+            text-decoration: none;
+            transition: background 0.2s, border-color 0.2s;
+            display: inline-block;
+        }
+        .btn-outline:hover { background: var(--pink-soft); border-color: var(--pink); }
+
+        /* ── SECTION TITLE ── */
+        .section-title {
+            text-align: center;
+            font-size: 1.5rem;
+            font-weight: 900;
+            color: var(--text);
+            margin: 50px 0 28px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+        }
+        .section-title::before,
+        .section-title::after {
+            content: '';
+            flex: 1;
+            height: 2px;
+            background: linear-gradient(90deg, transparent, var(--pink-mid));
+            max-width: 100px;
+            border-radius: 2px;
+        }
+        .section-title::after { background: linear-gradient(270deg, transparent, var(--pink-mid)); }
+
+        /* ── POPUP ── */
+        .popup-overlay {
+            position: fixed;
+            inset: 0;
+            background: rgba(74,32,64,0.45);
+            backdrop-filter: blur(4px);
+            display: none;
+            align-items: center;
+            justify-content: center;
+            z-index: 999;
+        }
+        .popup-overlay.open { display: flex; }
+        .popup-box {
+            background: #fff;
+            padding: 40px 36px;
+            border-radius: 24px;
+            text-align: center;
+            width: 320px;
+            box-shadow: 0 24px 60px rgba(244,114,182,0.3);
+            animation: popIn 0.3s cubic-bezier(0.34,1.56,0.64,1);
+        }
+        @keyframes popIn {
+            from { transform: scale(0.75); opacity: 0; }
+            to   { transform: scale(1);    opacity: 1; }
+        }
+        .popup-box .popup-icon { font-size: 3rem; margin-bottom: 12px; }
+        .popup-box h2 { font-size: 1.35rem; font-weight: 900; color: var(--text); margin-bottom: 10px; }
+        .popup-box p  { color: var(--text-mute); font-weight: 600; margin-bottom: 24px; font-size: 1rem; }
+
+        /* ── SPIN SECTION ── */
+        .spin-open-btn {
+            display: block;
+            margin: 0 auto 20px;
+        }
+
+        /* ── SPIN MODAL ── */
+        .spin-modal-overlay {
+            position: fixed;
+            inset: 0;
+            background: rgba(74,32,64,0.5);
+            backdrop-filter: blur(6px);
+            -webkit-backdrop-filter: blur(6px);
+            display: none;
+            align-items: center;
+            justify-content: center;
+            z-index: 998;
+        }
+        .spin-modal-overlay.open { display: flex; }
+        .spin-modal {
+            background: linear-gradient(160deg, #fff7f9 0%, #fce7f3 50%, #ede9fe 100%);
+            border-radius: 28px;
+            border: 2px solid var(--pink-mid);
+            padding: 36px 32px 32px;
+            width: min(480px, 92vw);
+            text-align: center;
+            box-shadow: 0 32px 80px rgba(244,114,182,0.35);
+            animation: popIn 0.35s cubic-bezier(0.34,1.56,0.64,1);
+            position: relative;
+        }
+        .spin-modal-close {
+            position: absolute;
+            top: 14px; right: 16px;
+            background: var(--pink-soft);
+            border: 1.5px solid var(--pink-mid);
+            color: var(--text-mute);
+            width: 32px; height: 32px;
+            border-radius: 50%;
+            font-size: 1rem;
+            line-height: 1;
+            cursor: pointer;
+            display: flex; align-items: center; justify-content: center;
+            transition: background 0.2s, color 0.2s;
+        }
+        .spin-modal-close:hover { background: var(--pink-mid); color: var(--text); }
+        .spin-modal h3 {
+            font-size: 1.3rem;
+            font-weight: 900;
+            background: linear-gradient(135deg, #be185d, #a855f7);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            margin-bottom: 6px;
+        }
+        .spin-modal .spin-sub {
+            font-size: 0.85rem;
+            color: var(--text-mute);
+            font-weight: 600;
+            margin-bottom: 24px;
+        }
+        .spin-wheel-wrap {
+            width: 240px;
+            height: 240px;
+            margin: 0 auto 24px;
+            position: relative;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .spin-wheel-wrap img {
+            width: 100%;
+            height: 100%;
+            object-fit: contain;
+            transition: transform 5s cubic-bezier(0.33, 1, 0.68, 1);
+            filter: drop-shadow(0 8px 28px rgba(244,114,182,0.4));
+        }
+        .spin-wheel-wrap::after {
+            content: '▼';
+            position: absolute;
+            top: -18px;
+            font-size: 1.6rem;
+            color: var(--rose);
+            filter: drop-shadow(0 2px 4px rgba(244,114,182,0.4));
+        }
+
+        /* ── PRODUCT CARDS ── */
+        .cards {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+            gap: 24px;
+        }
+        .card {
+            background: var(--card-bg);
+            border-radius: var(--radius);
+            border: 1.5px solid var(--pink-mid);
+            padding: 18px 18px 24px;
+            display: flex;
+            flex-direction: column;
+            box-shadow: var(--shadow);
+            backdrop-filter: blur(10px);
+            transition: transform 0.2s, box-shadow 0.2s;
+            position: relative;
+            overflow: hidden;
+        }
+        .card::before {
+            content: '';
+            position: absolute;
+            top: -30px; right: -30px;
+            width: 90px; height: 90px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, var(--pink-soft), var(--lavender));
+            opacity: 0.7;
+        }
+        .card:hover { transform: translateY(-5px); box-shadow: 0 16px 48px rgba(244,114,182,0.24); }
+        .card-image {
+            position: relative;
+            margin: -4px -4px 16px;
+            border-radius: 18px;
+            overflow: hidden;
+            border: 1.5px solid rgba(251,207,232,0.9);
+            box-shadow: 0 12px 26px rgba(244,114,182,0.16);
+            background: rgba(255,255,255,0.7);
+        }
+        .card-image::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.4), transparent);
+            z-index: 2;
+            transition: left 0.5s;
+        }
+        .card-image:hover::before {
+            left: 100%;
+        }
+        .card-image img {
+            display: block;
+            width: 100%;
+            height: clamp(280px, 32vw, 340px);
+            min-height: 280px;
+            object-fit: contain;
+            object-position: center center;
+            padding: 8px;
+            background: transparent;
+            transition: transform 0.4s ease, filter 0.4s ease;
+        }
+        .card:hover .card-image img {
+            transform: scale(1.08);
+            filter: brightness(1.05) saturate(1.1);
+        }
+        .card-image::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            height: 60px;
+            background: linear-gradient(to top, rgba(0,0,0,0.3), transparent);
+            pointer-events: none;
+            z-index: 1;
+        }
+
+        /* Kho acc nổi bật — 3 cột, ảnh lớn */
+        .warehouse-wrap {
+            max-width: min(1320px, calc(100vw - 170px));
+            margin: 0 auto;
+            padding: 0 2px;
+        }
+        @media (max-width: 1100px) {
+            .warehouse-wrap { max-width: 100%; }
+        }
+        .cards.cards-warehouse {
+            display: grid;
+            gap: 24px;
+            grid-template-columns: repeat(3, minmax(0, 1fr));
+        }
+        .cards.cards-warehouse { grid-template-columns: repeat(3, 380px); justify-content: center; }
+        @media (max-width: 1200px) {
+            .cards.cards-warehouse { grid-template-columns: repeat(3, minmax(280px, 1fr)); }
+        }
+        @media (max-width: 900px) {
+            .cards.cards-warehouse { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+        }
+        @media (max-width: 600px) {
+            .cards.cards-warehouse { grid-template-columns: 1fr; }
+        }
+        .cards.cards-warehouse .card {
+            padding: 22px 22px 28px;
+            max-width: 100%;
+            min-width: 0;
+        }
+        .cards.cards-warehouse .card-image {
+            margin: -6px -6px 18px;
+            border-radius: 20px;
+            height: 480px;
+            min-height: 480px;
+            overflow: hidden;
+        }
+        .cards.cards-warehouse .card-image img {
+            display: block;
+            width: 100% !important;
+            height: 100% !important;
+            min-height: unset !important;
+            object-fit: contain !important;
+            object-position: center center !important;
+            padding: 12px;
+            background: rgba(255,255,255,0.5);
+        }
+        .card-tag {
+            display: inline-block;
+            font-size: 0.72rem;
+            font-weight: 800;
+            padding: 3px 10px;
+            border-radius: 20px;
+            margin-bottom: 12px;
+            background: var(--pink-soft);
+            color: #be185d;
+        }
+        .card-tag.purple { background: var(--lavender); color: #6b21a8; }
+        .card-tag.gold   { background: #fef9c3; color: #854d0e; }
+        .card h3 {
+            font-size: 1.1rem;
+            font-weight: 900;
+            color: var(--text);
+            margin-bottom: 8px;
+        }
+        .card p {
+            font-size: 0.88rem;
+            color: var(--text-mute);
+            font-weight: 600;
+            line-height: 1.6;
+            margin-bottom: 20px;
+            flex: 1;
+        }
+        .card-footer {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 12px;
+            margin-top: auto;
+        }
+        .price {
+            font-size: 1.25rem;
+            font-weight: 900;
+            background: linear-gradient(135deg, #be185d, #a855f7);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+        .card-buy {
+            background: linear-gradient(135deg, #f472b6, #a855f7);
+            color: #fff;
+            border: none;
+            padding: 8px 18px;
+            border-radius: 30px;
+            font-size: 0.82rem;
+            font-weight: 800;
+            font-family: inherit;
+            cursor: pointer;
+            box-shadow: 0 3px 10px rgba(244,114,182,0.35);
+            transition: transform 0.15s, box-shadow 0.15s;
+        }
+        .card-buy:hover { transform: scale(1.05); box-shadow: 0 5px 14px rgba(244,114,182,0.45); }
+        .card-actions {
+            display: flex;
+            gap: 8px;
+        }
+        .card-detail-btn {
+            background: rgba(255,255,255,0.9);
+            color: var(--pink);
+            border: 1.5px solid var(--pink-mid);
+            padding: 8px 14px;
+            border-radius: 30px;
+            font-size: 0.82rem;
+            font-weight: 800;
+            font-family: inherit;
+            cursor: pointer;
+            transition: background 0.15s, border-color 0.15s;
+        }
+        .card-detail-btn:hover { background: var(--pink-soft); border-color: var(--pink); }
+
+        /* ── ACC DETAIL MODAL ── */
+        .acc-detail-overlay {
+            position: fixed;
+            inset: 0;
+            background: rgba(74,32,64,0.6);
+            backdrop-filter: blur(8px);
+            -webkit-backdrop-filter: blur(8px);
+            display: none;
+            align-items: center;
+            justify-content: center;
+            z-index: 998;
+            padding: 20px;
+        }
+        .acc-detail-overlay.open { display: flex; }
+        .acc-detail-modal {
+            background: linear-gradient(160deg, #fff7f9 0%, #fce7f3 50%, #ede9fe 100%);
+            border-radius: 28px;
+            border: 2px solid var(--pink-mid);
+            width: min(900px, 95vw);
+            max-height: 90vh;
+            overflow-y: auto;
+            box-shadow: 0 32px 80px rgba(244,114,182,0.35);
+            animation: popIn 0.35s cubic-bezier(0.34,1.56,0.64,1);
+            position: relative;
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+        }
+        @media (max-width: 700px) {
+            .acc-detail-modal { grid-template-columns: 1fr; }
+        }
+        .acc-detail-close {
+            position: absolute;
+            top: 14px; right: 16px;
+            background: rgba(255,255,255,0.9);
+            border: 1.5px solid var(--pink-mid);
+            color: var(--text-mute);
+            width: 36px; height: 36px;
+            border-radius: 50%;
+            font-size: 1.1rem;
+            line-height: 1;
+            cursor: pointer;
+            display: flex; align-items: center; justify-content: center;
+            transition: background 0.2s, color 0.2s;
+            z-index: 10;
+        }
+        .acc-detail-close:hover { background: var(--pink-mid); color: var(--text); }
+        .acc-detail-image {
+            padding: 24px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: rgba(255,255,255,0.5);
+            border-radius: 26px 0 0 26px;
+        }
+        @media (max-width: 700px) {
+            .acc-detail-image { border-radius: 26px 26px 0 0; }
+        }
+        .acc-detail-image img {
+            width: 100%;
+            max-height: 400px;
+            object-fit: contain;
+            border-radius: 16px;
+            box-shadow: 0 12px 32px rgba(168,85,247,0.2);
+        }
+        .acc-detail-info {
+            padding: 32px 28px 28px;
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
+        }
+        .acc-detail-tag {
+            display: inline-block;
+            font-size: 0.78rem;
+            font-weight: 800;
+            padding: 4px 12px;
+            border-radius: 20px;
+            background: var(--pink-soft);
+            color: #be185d;
+            width: fit-content;
+        }
+        .acc-detail-tag.purple { background: var(--lavender); color: #6b21a8; }
+        .acc-detail-tag.gold { background: #fef9c3; color: #854d0e; }
+        .acc-detail-info h2 {
+            font-size: 1.5rem;
+            font-weight: 900;
+            color: var(--text);
+            margin: 0;
+        }
+        .acc-detail-meta {
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+        }
+        .acc-detail-row {
+            display: flex;
+            gap: 8px;
+            font-size: 0.88rem;
+            color: var(--text-mute);
+            font-weight: 600;
+        }
+        .acc-detail-row span:first-child { font-weight: 700; }
+        .acc-detail-specs {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 12px;
+        }
+        .acc-detail-spec {
+            background: rgba(255,255,255,0.7);
+            border: 1px solid var(--pink-mid);
+            border-radius: 14px;
+            padding: 12px;
+            text-align: center;
+        }
+        .spec-label {
+            display: block;
+            font-size: 0.72rem;
+            font-weight: 700;
+            color: var(--text-mute);
+            text-transform: uppercase;
+            letter-spacing: 0.04em;
+            margin-bottom: 4px;
+        }
+        .spec-value {
+            display: block;
+            font-size: 0.92rem;
+            font-weight: 800;
+            color: var(--text);
+        }
+        .acc-detail-desc {
+            background: rgba(255,255,255,0.6);
+            border: 1px solid rgba(251,207,232,0.8);
+            border-radius: 14px;
+            padding: 14px 16px;
+        }
+        .acc-detail-desc h4 {
+            margin: 0 0 6px;
+            font-size: 0.88rem;
+            font-weight: 800;
+            color: var(--text);
+        }
+        .acc-detail-desc p {
+            margin: 0;
+            font-size: 0.88rem;
+            color: var(--text-mute);
+            font-weight: 600;
+            line-height: 1.5;
+        }
+        .acc-detail-footer {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 16px;
+            margin-top: auto;
+            padding-top: 16px;
+            border-top: 1px solid rgba(251,207,232,0.7);
+        }
+        .acc-detail-price {
+            font-size: 1.6rem;
+            font-weight: 900;
+            background: linear-gradient(135deg, #be185d, #a855f7);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+        .acc-detail-footer .card-buy {
+            padding: 12px 28px;
+            font-size: 0.95rem;
+        }
+
+        /* ── FAB ── */
+        .chat-fab {
+            position: fixed;
+            bottom: 28px;
+            right: 28px;
+            background: linear-gradient(135deg, #f472b6, #a855f7);
+            color: #fff;
+            font-size: 0.88rem;
+            font-weight: 800;
+            padding: 13px 22px;
+            border-radius: 50px;
+            text-decoration: none;
+            box-shadow: 0 6px 24px rgba(244,114,182,0.45);
+            z-index: 50;
+            transition: transform 0.2s, box-shadow 0.2s;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        .chat-fab:hover { transform: translateY(-3px) scale(1.04); box-shadow: 0 12px 32px rgba(244,114,182,0.5); }
+
+        @media (min-width: 1100px) {
+            .chat-fab {
+                bottom: 100px;
+                right: max(32px, calc(12vw + 8px));
+            }
+        }
+
+        /* ── STATS STRIP ── */
+        .stats {
+            display: flex;
+            justify-content: center;
+            gap: 40px;
+            flex-wrap: wrap;
+            padding: 32px 0;
+            margin: 10px 0 0;
+            border-top: 1.5px solid var(--pink-mid);
+            border-bottom: 1.5px solid var(--pink-mid);
+        }
+        .stat { text-align: center; }
+        .stat-num {
+            font-size: 1.8rem;
+            font-weight: 900;
+            background: linear-gradient(135deg, #be185d, #a855f7);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+        .stat-label { font-size: 0.82rem; color: var(--text-mute); font-weight: 700; margin-top: 2px; }
+
+        /* CART SHOWCASE */
+        .cart-showcase {
+            margin: 34px 0 10px;
+            display: grid;
+            grid-template-columns: minmax(0, 1.1fr) minmax(260px, 340px);
+            gap: 24px;
+            align-items: center;
+            background: linear-gradient(135deg, rgba(255,255,255,0.78), rgba(252,231,243,0.9));
+            border: 1.5px solid var(--pink-mid);
+            border-radius: 28px;
+            padding: 24px;
+            box-shadow: var(--shadow);
+            backdrop-filter: blur(12px);
+            overflow: hidden;
+        }
+        .cart-copy {
+            display: flex;
+            flex-direction: column;
+            gap: 14px;
+        }
+        .cart-kicker {
+            display: inline-flex;
+            width: fit-content;
+            align-items: center;
+            gap: 8px;
+            padding: 7px 14px;
+            border-radius: 999px;
+            background: rgba(255,255,255,0.8);
+            border: 1px solid var(--pink-mid);
+            color: #be185d;
+            font-size: 0.8rem;
+            font-weight: 800;
+        }
+        .cart-copy h3 {
+            font-size: clamp(1.45rem, 3vw, 2rem);
+            line-height: 1.2;
+            font-weight: 900;
+            color: var(--text);
+        }
+        .cart-copy p {
+            color: var(--text-mute);
+            font-size: 0.95rem;
+            line-height: 1.75;
+            font-weight: 600;
+        }
+        .cart-meta {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+        }
+        .cart-chip {
+            padding: 8px 14px;
+            border-radius: 999px;
+            background: rgba(255,255,255,0.84);
+            border: 1px solid var(--pink-mid);
+            color: var(--text);
+            font-size: 0.8rem;
+            font-weight: 800;
+        }
+        .cart-status {
+            min-height: 20px;
+            margin-top: 6px;
+            color: #be185d;
+            font-size: 0.85rem;
+            font-weight: 700;
+        }
+        .cart-art {
+            position: relative;
+            justify-self: center;
+            width: min(100%, 320px);
+        }
+        .cart-art::before {
+            content: '';
+            position: absolute;
+            inset: auto 10% -10% 10%;
+            height: 18px;
+            background: rgba(168,85,247,0.18);
+            filter: blur(16px);
+            border-radius: 50%;
+        }
+        .cart-art img {
+            position: relative;
+            display: block;
+            width: 100%;
+            aspect-ratio: 3 / 4;
+            object-fit: cover;
+            object-position: center top;
+            border-radius: 24px;
+            border: 3px solid rgba(255,255,255,0.85);
+            box-shadow: 0 18px 36px rgba(168,85,247,0.22);
+        }
+
+        @media (max-width: 760px) {
+            .cart-showcase {
+                grid-template-columns: 1fr;
+                padding: 20px;
+            }
+            .cart-art {
+                order: -1;
+                width: min(100%, 260px);
+            }
+        }
+    </style>
+</head>
+<body th:attr="data-logged-in=${session.userId != null}">
+
+<!-- POPUP -->
+<div class="popup-overlay" id="popup">
+    <div class="popup-box">
+        <div class="popup-icon">🎉</div>
+        <h2>Chúc mừng!</h2>
+        <p id="popup-text"></p>
+        <button onclick="closePopup()" class="btn-primary">Nhận thưởng!</button>
+    </div>
+</div>
+
+<!-- PETALS -->
+<div class="petals" aria-hidden="true">
+    <span class="petal">🌸</span>
+    <span class="petal">✿</span>
+    <span class="petal">🌸</span>
+    <span class="petal">❀</span>
+    <span class="petal">🌸</span>
+    <span class="petal">✿</span>
+    <span class="petal">🌸</span>
+    <span class="petal">❀</span>
+    <span class="petal">🌸</span>
+    <span class="petal">✿</span>
+</div>
+
+<!-- SIDE GIRLS -->
+<img class="side-girl left"  th:src="@{/images/girl-left-cutout.png(v=2)}"  alt="">
+<img class="side-girl right" th:src="@{/images/girl-right-cutout.png(v=2)}" alt="">
+
+<!-- HEADER -->
+<header class="header" id="trang-chu">
+    <a class="brand" href="#trang-chu">
+        <span>🌸</span> Genshin Cute Shop
+    </a>
+    <nav class="nav">
+        <a href="#trang-chu">Trang chủ</a>
+        <a href="#kho-acc">Mua ngay</a>
+        <a th:href="@{/cart}" class="nav-cart">Giỏ hàng <span class="cart-count-badge" id="cart-count" th:text="${cartSummary.count}">0</span></a>
+        <a th:href="@{/wallet}" th:if="${session.userId != null}">💰 Nạp tiền</a>
+        <a th:href="@{/profile}" th:if="${session.userId != null}">Profile</a>
+        <a th:href="@{/my-orders}" th:if="${session.userId != null}">Đơn mua</a>
+        <a th:href="@{/admin}" th:if="${session.role == 'ADMIN'}">Admin</a>
+        <a th:href="@{/ctv/submit}" th:if="${session.role == 'CTV'}">CTV</a>
+        <a href="#lien-he">Liên hệ</a>
+        <a th:href="@{/auth/login}" th:if="${session.userId == null}">Đăng nhập</a>
+        <a class="cta" th:href="@{/auth/register}" th:if="${session.userId == null}">Đăng ký ngay ✨</a>
+        <div class="user-menu" th:if="${session.userId != null}">
+            <button class="user-trigger" id="userMenuTrigger" type="button" aria-label="Tài khoản">
+                <img th:src="@{/images/user-avatar.png}" alt="User avatar" loading="lazy">
+            </button>
+            <div class="user-dropdown" id="userDropdown">
+                <div class="user-name" th:text="${session.username}">Username</div>
+                <a th:href="@{/my-orders}" style="display:block;padding:8px 0;font-weight:800;color:#a855f7;text-decoration:none;font-size:0.88rem">🛒 Lịch sử mua</a>
+                <form th:action="@{/auth/logout}" method="post">
+                    <button class="user-logout" type="submit">Logout</button>
+                </form>
+            </div>
+        </div>
+    </nav>
+</header>
+
+<main class="container">
+
+    <!-- HERO -->
+    <section class="hero">
+        <div class="hero-badge">🌸 Genshin Impact Account Shop 🌸</div>
+        <h1>Shop Acc Genshin<br>Siêu Cấp Dễ Thương</h1>
+        <p>Nick xịn, giá mềm, giao acc nhanh trong 5 phút. Uy tín hàng đầu, cam kết chất lượng!</p>
+        <div class="hero-actions">
+            <a href="#kho-acc" class="btn-primary">Xem kho acc ngay ✨</a>
+            <a th:href="@{/auth/register}" class="btn-outline">Đăng ký miễn phí</a>
+        </div>
+        <!-- TOP NAP TIEN -->
+        <div class="top-deposit-section" th:if="${!#lists.isEmpty(topDepositors)}" style="margin:24px 0;padding:24px;background:linear-gradient(135deg,rgba(255,255,255,0.9),rgba(252,231,243,0.9));border:2px solid #fbcfe8;border-radius:24px;box-shadow:0 8px 32px rgba(244,114,182,0.12)">
+            <div style="text-align:center;margin-bottom:20px">
+                <div style="display:inline-flex;align-items:center;gap:8px;background:#fef9c3;border:1.5px solid #fde047;border-radius:999px;padding:6px 16px;margin-bottom:12px">
+                    <span style="font-size:1.2rem">🏆</span>
+                    <span style="font-weight:800;font-size:0.82rem;color:#854d0e">Top Nạp Tiền</span>
+                </div>
+                <h3 style="font-size:1.1rem;font-weight:900;color:#4a2040;margin:0">Những khách hàng nạp nhiều nhất</h3>
+                <p style="font-size:0.82rem;color:#9d6580;font-weight:600;margin:4px 0 0">Cảm ơn các bạn đã tin tưởng shop!</p>
+            </div>
+            <div class="top-deposit-grid" style="display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:14px">
+                <div th:each="td,stat : ${topDepositors}" style="background:rgba(255,255,255,0.8);border:1.5px solid #fbcfe8;border-radius:16px;padding:16px 14px;text-align:center;transition:transform 0.2s;position:relative;overflow:hidden" th:styleappend="${stat.index == 0} ? 'border-color:#facc15;border-width:2px' : ''">
+                    <div th:if="${stat.index == 0}" style="position:absolute;top:8px;right:8px;font-size:1.1rem">👑</div>
+                    <div th:if="${stat.index == 1}" style="position:absolute;top:8px;right:8px;font-size:1rem">🥈</div>
+                    <div th:if="${stat.index == 2}" style="position:absolute;top:8px;right:8px;font-size:1rem">🥉</div>
+                    <div style="width:48px;height:48px;border-radius:50%;margin:0 auto 10px;display:flex;align-items:center;justify-content:center;font-weight:900;font-size:1.1rem"
+                         th:styleappend="${stat.index == 0} ? 'background:linear-gradient(135deg,#facc15,#f59e0b);color:#fff' : 'background:linear-gradient(135deg,#f472b6,#a855f7);color:#fff'"
+                         th:text="${td.avatar}">U</div>
+                    <div style="font-weight:800;font-size:0.9rem;color:#4a2040;margin-bottom:4px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis" th:text="${td.username}">Username</div>
+                    <div style="font-weight:900;font-size:0.85rem;background:linear-gradient(135deg,#be185d,#a855f7);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text" th:text="${td.total}">0đ</div>
+                </div>
+            </div>
+        </div>
+
+    </section>
+
+    <!-- STATS -->
+    <div class="stats">
+        <div class="stat">
+            <div class="stat-num">2,400+</div>
+            <div class="stat-label">Acc đã bán</div>
+        </div>
+        <div class="stat">
+            <div class="stat-num">99%</div>
+            <div class="stat-label">Khách hài lòng</div>
+        </div>
+        <div class="stat">
+            <div class="stat-num">5 phút</div>
+            <div class="stat-label">Giao acc tức thì</div>
+        </div>
+        <div class="stat">
+            <div class="stat-num">24/7</div>
+            <div class="stat-label">Hỗ trợ online</div>
+        </div>
+    </div>
+
+    <section class="cart-showcase" id="gio-hang" aria-labelledby="gio-hang-title">
+        <div class="cart-copy">
+            <span class="cart-kicker">🛒 Giỏ hàng nổi bật</span>
+            <h3 id="gio-hang-title">Thêm vào giỏ nhanh, chốt acc đẹp trong vài phút</h3>
+            <p>
+                Khu vực giỏ hàng trên trang chủ giờ có ảnh minh họa riêng để nổi bật hơn.
+                Bạn có thể dùng block này như điểm nhấn cho acc hot, flash sale hoặc danh sách chuẩn bị mua.
+            </p>
+            <div class="cart-meta">
+                <span class="cart-chip">Flash sale 20%</span>
+                <span class="cart-chip">Acc giao trong 5 phút</span>
+                <span class="cart-chip">Bảo hành đổi lỗi</span>
+            </div>
+            <div class="hero-actions">
+                <a href="#kho-acc" class="btn-primary">Thêm vào giỏ ngay</a>
+                <a th:href="@{/cart}" class="btn-outline">Xem giỏ hàng</a>
+            </div>
+            <p class="cart-status" id="cart-status"></p>
+        </div>
+        <div class="cart-art">
+            <img th:src="@{/images/home-cart-banner.png}" alt="Minh họa giỏ hàng trang chủ" loading="lazy">
+        </div>
+    </section>
+
+    <!-- SPIN -->
+    <h2 class="section-title">🎡 Vòng quay may mắn</h2>
+    <button onclick="openSpinModal()" class="btn-primary spin-open-btn">🎰 Thử vận may ngay!</button>
+
+    <!-- SPIN MODAL -->
+    <div class="spin-modal-overlay" id="spinModal">
+        <div class="spin-modal">
+            <button class="spin-modal-close" onclick="closeSpinModal()" title="Đóng">✕</button>
+            <h3>🎡 Vòng Quay May Mắn</h3>
+            <p class="spin-sub">Mỗi ngày 1 lần quay miễn phí — chúc bạn may mắn!</p>
+            <div class="spin-wheel-wrap">
+                <img id="wheel-image" th:src="@{/images/spin.png}" alt="Vòng quay">
+            </div>
+            <button onclick="startSpin()" id="spinBtn" class="btn-primary">🎰 Quay ngay!</button>
+        </div>
+    </div>
+
+    <!-- CARDS -->
+    <div class="warehouse-wrap" id="kho-acc">
+    <h2 class="section-title">Kho Acc Nổi Bật ✨</h2>
+    <p th:if="${#lists.isEmpty(visibleAccounts)}" style="text-align:center;color:var(--text-mute);font-weight:700">Chưa có acc trong kho — hãy thêm acc để hiển thị.</p>
+    <section class="cards cards-warehouse" th:if="${!#lists.isEmpty(visibleAccounts)}">
+        <article class="card" th:each="acc : ${visibleAccounts}" th:with="imgSrc=${(acc.listingImagePath != null && !#strings.isEmpty(acc.listingImagePath)) ? acc.listingImagePath : (acc.product != null ? acc.product.imagePath : '')}">
+            <div class="card-image" style="cursor:pointer" th:attr="onclick=|openAccDetail(${acc.id})|">
+                <img th:src="${imgSrc}" th:alt="${acc.product != null ? acc.product.name : 'Acc'}" loading="lazy">
+            </div>
+            <span th:class="${'card-tag' + (acc.product != null && #strings.contains(acc.product.slug,'premium') ? ' purple' : (acc.product != null && #strings.contains(acc.product.slug,'vip') ? ' gold' : ''))}">Acc</span>
+            <h3 th:text="${acc.product != null ? acc.product.name : 'Acc Genshin'}">Acc</h3>
+            <p th:text="${acc.rankInfo != null ? acc.rankInfo : (acc.product != null ? acc.product.description : 'Tài khoản Genshin Impact')}">Mô tả</p>
+            <div class="card-footer">
+                <div class="price" th:text="${accountPriceFormatted[acc.id]}">0đ</div>
+                <div class="card-actions">
+                    <button type="button" class="card-detail-btn" th:attr="onclick=|openAccDetail(${acc.id})|">Chi tiết</button>
+                    <button type="button" class="card-buy" th:attr="data-product-id=${acc.product != null ? acc.product.slug : ''}">Mua</button>
+                </div>
+            </div>
+        </article>
+    </section>
+    </div>
+
+    <!-- ACC DETAIL MODAL -->
+    <div class="acc-detail-overlay" id="accDetailModal">
+        <div class="acc-detail-modal">
+            <button class="acc-detail-close" onclick="closeAccDetail()" title="Đóng">✕</button>
+            <div class="acc-detail-image">
+                <img id="accDetailImage" src="" alt="Acc detail">
+            </div>
+            <div class="acc-detail-info">
+                <span class="acc-detail-tag" id="accDetailTag">Acc</span>
+                <h2 id="accDetailName">-</h2>
+                <div class="acc-detail-meta">
+                    <div class="acc-detail-row" th:if="false"><span>ID:</span> <span id="accDetailId">-</span></div>
+                    <div class="acc-detail-row" th:if="false"><span>Gói:</span> <span id="accDetailProduct">-</span></div>
+                </div>
+                <div class="acc-detail-specs">
+                    <div class="acc-detail-spec" id="accDetailRank">
+                        <span class="spec-label">Rank</span>
+                        <span class="spec-value">-</span>
+                    </div>
+                    <div class="acc-detail-spec" id="accDetailSkin">
+                        <span class="spec-label">Skin</span>
+                        <span class="spec-value">-</span>
+                    </div>
+                    <div class="acc-detail-spec" id="accDetailGame">
+                        <span class="spec-label">Server</span>
+                        <span class="spec-value">-</span>
+                    </div>
+                </div>
+                <div class="acc-detail-desc" id="accDetailExtra">
+                    <h4>Thông tin thêm</h4>
+                    <p>-</p>
+                </div>
+                <div class="acc-detail-footer">
+                    <div class="acc-detail-price" id="accDetailPrice">0đ</div>
+                    <button type="button" class="card-buy" id="accDetailBuyBtn">Mua ngay</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+</main>
+
+<!-- FAB -->
+<a class="chat-fab" href="https://www.facebook.com/utaitejapan?locale=vi_VN" target="_blank">
+    💬 Chat Facebook ngay
+</a>
+
+<script th:inline="javascript">
+    /* Account data for detail modal */
+    const accountData = /*[[${accountJson}]]*/ {};
+
+    function openAccDetail(id) {
+        const data = accountData[id];
+        if (!data) return;
+
+        document.getElementById('accDetailImage').src = data.image || '/images/placeholder.png';
+        document.getElementById('accDetailName').textContent = data.name;
+        document.getElementById('accDetailPrice').textContent = data.price;
+
+        const tagEl = document.getElementById('accDetailTag');
+        tagEl.textContent = 'Acc';
+        tagEl.className = 'acc-detail-tag' + (data.tagClass ? ' ' + data.tagClass : '');
+
+        document.querySelector('#accDetailRank .spec-value').textContent = data.rank;
+        document.querySelector('#accDetailSkin .spec-value').textContent = data.skin;
+        document.querySelector('#accDetailGame .spec-value').textContent = data.game;
+
+        const extraEl = document.getElementById('accDetailExtra');
+        if (data.extra) {
+            extraEl.querySelector('p').textContent = data.extra;
+            extraEl.style.display = 'block';
+        } else {
+            extraEl.style.display = 'none';
+        }
+
+        const buyBtn = document.getElementById('accDetailBuyBtn');
+        buyBtn.setAttribute('data-product-id', data.priceSlug);
+
+        document.getElementById('accDetailModal').classList.add('open');
+    }
+
+    function closeAccDetail() {
+        document.getElementById('accDetailModal').classList.remove('open');
+    }
+
+    document.getElementById('accDetailModal').addEventListener('click', function(e) {
+        if (e.target === this) closeAccDetail();
+    });
+
+    let isSpinning = false;
+    let currentRotation = 0;
+    const cartCountEl = document.getElementById('cart-count');
+    const cartStatusEl = document.getElementById('cart-status');
+    const isLoggedIn = document.body.dataset.loggedIn === 'true';
+    const userMenuTrigger = document.getElementById('userMenuTrigger');
+    const userDropdown = document.getElementById('userDropdown');
+    let inactivityTimer = null;
+
+    function openSpinModal() {
+        document.getElementById('spinModal').classList.add('open');
+    }
+
+    function closeSpinModal() {
+        if (isSpinning) return;
+        document.getElementById('spinModal').classList.remove('open');
+    }
+
+
+    document.getElementById('spinModal').addEventListener('click', function(e) {
+        if (e.target === this) closeSpinModal();
+    });
+
+    function startSpin() {
+        if (isSpinning) return;
+        const wheel = document.getElementById('wheel-image');
+        const btn = document.getElementById('spinBtn');
+
+        isSpinning = true;
+        btn.disabled = true;
+        btn.textContent = '🔄 Đang quay...';
+
+        fetch('/auth/spin')
+            .then(res => {
+                if (res.status === 401) {
+                    alert('Bạn chưa đăng nhập!');
+                    reset(); return null;
+                }
+                if (!res.ok) {
+                    alert('Lỗi server!');
+                    reset(); return null;
+                }
+                return res.json();
+            })
+            .then(data => {
+                if (!data) return;
+                const finalRotation = currentRotation + 360 * 5 + data.degree;
+                wheel.style.transform = `rotate(${finalRotation}deg)`;
+                currentRotation = finalRotation;
+                setTimeout(() => {
+                    showPopup(data.prize);
+                    reset();
+                }, 5000);
+            })
+            .catch(() => {
+                alert('Không kết nối được server!');
+                reset();
+            });
+    }
+
+    function reset() {
+        isSpinning = false;
+        const btn = document.getElementById('spinBtn');
+        btn.disabled = false;
+        btn.textContent = '🎰 Quay ngay!';
+    }
+
+    function showPopup(prize) {
+        closeSpinModal();
+        document.getElementById('popup-text').innerText = 'Bạn nhận được: ' + prize;
+        document.getElementById('popup').classList.add('open');
+    }
+
+    function closePopup() {
+        document.getElementById('popup').classList.remove('open');
+    }
+
+    function setupUserMenu() {
+        if (!userMenuTrigger || !userDropdown) return;
+
+        userMenuTrigger.addEventListener('click', function (event) {
+            event.stopPropagation();
+            userDropdown.classList.toggle('open');
+        });
+
+        document.addEventListener('click', function (event) {
+            if (!userDropdown.contains(event.target) && !userMenuTrigger.contains(event.target)) {
+                userDropdown.classList.remove('open');
+            }
+        });
+    }
+
+    function logoutForInactivity() {
+        fetch('/auth/logout', { method: 'POST' })
+            .finally(() => {
+                window.location.href = '/auth/login';
+            });
+    }
+
+    function resetInactivityTimer() {
+        if (!isLoggedIn) return;
+        window.clearTimeout(inactivityTimer);
+        inactivityTimer = window.setTimeout(logoutForInactivity, 10 * 60 * 1000);
+    }
+
+    function setupInactivityLogout() {
+        if (!isLoggedIn) return;
+        ['click', 'keydown', 'mousemove', 'scroll', 'touchstart'].forEach(eventName => {
+            window.addEventListener(eventName, resetInactivityTimer, { passive: true });
+        });
+        resetInactivityTimer();
+    }
+
+    function updateCartUi(cartSummary) {
+        cartCountEl.textContent = cartSummary.count;
+        if (cartSummary.message) {
+            cartStatusEl.textContent = cartSummary.message;
+        }
+    }
+
+    function addToCart(button) {
+        const productId = button.dataset.productId;
+        const originalText = button.textContent;
+        button.disabled = true;
+        button.textContent = 'Đang thêm...';
+
+        fetch('/cart/add', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({ productId })
+        })
+            .then(async res => {
+                const data = await res.json().catch(() => ({}));
+                if (res.status === 401) {
+                    window.location.href = '/auth/login';
+                    return null;
+                }
+                if (!res.ok) {
+                    throw new Error(data.message || 'Không thể thêm sản phẩm vào giỏ hàng.');
+                }
+                return data;
+            })
+            .then(data => {
+                if (!data) return;
+                updateCartUi(data);
+                if (data.message && data.message.includes('giỏ hàng')) {
+                    button.textContent = 'Đã có trong giỏ';
+                    button.disabled = true;
+                }
+            })
+            .catch(err => {
+                cartStatusEl.textContent = err.message;
+            })
+            .finally(() => {
+                if (button.textContent === 'Đang thêm...' || button.textContent === originalText) {
+                    button.disabled = false;
+                    button.textContent = originalText;
+                }
+            });
+    }
+
+    document.querySelectorAll('.card-buy').forEach(button => {
+        button.addEventListener('click', function () {
+            const originalText = this.textContent;
+            addToCart(this);
+        });
+    });
+
+    document.getElementById('accDetailBuyBtn').addEventListener('click', function() {
+        const productId = this.dataset.productId;
+        if (productId) {
+            addToCart(this);
+            setTimeout(closeAccDetail, 500);
+        }
+    });
+
+    setupUserMenu();
+    setupInactivityLogout();
+</script>
+</body>
+</html>

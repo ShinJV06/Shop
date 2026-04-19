@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html lang="vi" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Lịch sử mua hàng</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@600;700;800&display=swap" rel="stylesheet">
+    <style>
+        :root { --pink: #f472b6; --soft: #fce7f3; --text: #4a2040; --mute: #9d6580; }
+        body { font-family: 'Nunito', sans-serif; background: #fff7f9; color: var(--text); margin: 0; padding: 24px 20px 48px; }
+        .top { max-width: 720px; margin: 0 auto 20px; display: flex; flex-wrap: wrap; align-items: center; gap: 12px; justify-content: space-between; }
+        a { color: #a855f7; font-weight: 800; text-decoration: none; }
+        a:hover { text-decoration: underline; }
+        h1 { font-size: 1.5rem; margin: 0; }
+        p.sub { color: var(--mute); margin: 8px 0 0; font-weight: 600; }
+        .panel { max-width: 720px; margin: 0 auto; background: rgba(255,255,255,0.9); border: 1.5px solid #fbcfe8; border-radius: 20px; overflow: hidden; box-shadow: 0 8px 28px rgba(244,114,182,0.12); }
+        table { width: 100%; border-collapse: collapse; font-size: 0.92rem; }
+        th, td { padding: 12px 14px; text-align: left; border-bottom: 1px solid var(--soft); }
+        th { background: #fdf2f8; color: var(--mute); font-size: 0.75rem; text-transform: uppercase; letter-spacing: 0.05em; }
+        tr:hover td { background: #fffafd; }
+        .badge { display: inline-block; padding: 4px 10px; border-radius: 999px; font-weight: 800; font-size: 0.78rem; }
+        .b-pending { background: #fef3c7; color: #92400e; }
+        .b-paid { background: #d1fae5; color: #065f46; }
+        .b-ref { background: #fee2e2; color: #991b1b; }
+        .empty { text-align: center; padding: 36px 16px; color: var(--mute); font-weight: 700; }
+    </style>
+</head>
+<body>
+<div class="top">
+    <div>
+        <h1>🛒 Lịch sử mua hàng</h1>
+        <p class="sub">Chỉ hiển thị đơn của tài khoản bạn.</p>
+    </div>
+    <a th:href="@{/}">← Về shop</a>
+</div>
+<p th:if="${errorMessage}" style="color:#b91c1c;font-weight:800;max-width:720px;margin:0 auto 16px;text-align:center" th:text="${errorMessage}"></p>
+<div class="panel">
+    <table th:if="${!#lists.isEmpty(orders)}">
+        <thead>
+        <tr><th>Đơn</th><th>Trạng thái</th><th>Tổng</th><th>Ngày</th></tr>
+        </thead>
+        <tbody>
+        <tr th:each="o : ${orders}">
+            <td><a th:href="@{/my-orders/{id}(id=${o.id})}" th:text="'#' + ${o.id}">#1</a></td>
+            <td>
+                <span th:if="${o.status.name() == 'PENDING_PAYMENT'}" class="badge b-pending">Chờ thanh toán</span>
+                <span th:if="${o.status.name() == 'PAID'}" class="badge b-paid">Đã thanh toán</span>
+                <span th:if="${o.status.name() == 'REFUNDED'}" class="badge b-ref">Hoàn tiền</span>
+            </td>
+            <td th:text="${o.totalAmount} + 'đ'">0đ</td>
+            <td th:text="${#dates.format(o.createdAt, 'dd/MM/yyyy HH:mm')}">-</td>
+        </tr>
+        </tbody>
+    </table>
+    <div th:if="${#lists.isEmpty(orders)}" class="empty">Bạn chưa có đơn nào. Thêm acc vào giỏ và tạo đơn từ trang giỏ hàng nhé.</div>
+</div>
+<p style="text-align:center;margin-top:20px"><a th:href="@{/profile}">Hồ sơ</a> · <a th:href="@{/cart}">Giỏ hàng</a></p>
+</body>
+</html>

@@ -1,0 +1,725 @@
+<!DOCTYPE html>
+<html lang="vi" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gio Hang - Genshin Cute Shop</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=M+PLUS+Rounded+1c:wght@400;500;700;800&family=Nunito:wght@400;600;700;800;900&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --pink: #f472b6;
+            --pink-soft: #fce7f3;
+            --pink-mid: #fbcfe8;
+            --cream: #fff7f9;
+            --text: #4a2040;
+            --text-mute: #9d6580;
+            --card-bg: rgba(255,255,255,0.82);
+            --shadow: 0 16px 40px rgba(244,114,182,0.18);
+        }
+
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+
+        body {
+            min-height: 100vh;
+            font-family: 'Nunito', 'M PLUS Rounded 1c', sans-serif;
+            color: var(--text);
+            background:
+                radial-gradient(ellipse 80% 60% at 10% 0%, #fce7f3 0%, transparent 60%),
+                radial-gradient(ellipse 70% 50% at 90% 100%, #ede9fe 0%, transparent 55%),
+                var(--cream);
+        }
+
+        .header {
+            position: sticky;
+            top: 0;
+            z-index: 20;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0 5vw;
+            height: 64px;
+            background: rgba(255,247,249,0.84);
+            backdrop-filter: blur(14px);
+            border-bottom: 1.5px solid var(--pink-mid);
+        }
+
+        .header-left {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .back-link,
+        .nav a {
+            text-decoration: none;
+            color: var(--text-mute);
+            font-size: 0.88rem;
+            font-weight: 800;
+            padding: 7px 14px;
+            border-radius: 999px;
+        }
+
+        .back-link {
+            background: rgba(255,255,255,0.72);
+            border: 1px solid var(--pink-mid);
+        }
+
+        .brand {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            color: var(--pink);
+            text-decoration: none;
+            font-weight: 800;
+        }
+
+        .nav {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            flex-wrap: wrap;
+        }
+
+        .nav a.active,
+        .nav a:hover,
+        .back-link:hover {
+            background: var(--pink-soft);
+            color: var(--pink);
+        }
+
+        .cart-count-badge {
+            min-width: 22px;
+            height: 22px;
+            padding: 0 6px;
+            border-radius: 999px;
+            background: linear-gradient(135deg, #f472b6, #a855f7);
+            color: #fff;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.72rem;
+            font-weight: 900;
+            margin-left: 6px;
+        }
+
+        main {
+            max-width: 920px;
+            margin: 0 auto;
+            padding: 48px 24px 80px;
+        }
+
+        .hero {
+            text-align: center;
+            margin-bottom: 28px;
+        }
+
+        .hero h1 {
+            font-size: clamp(2rem, 5vw, 3rem);
+            font-weight: 900;
+            background: linear-gradient(135deg, #be185d 0%, #a855f7 60%, #f472b6 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            margin-bottom: 10px;
+        }
+
+        .hero p {
+            color: var(--text-mute);
+            font-weight: 600;
+        }
+
+        .cart-shell {
+            background: var(--card-bg);
+            border: 1.5px solid var(--pink-mid);
+            border-radius: 28px;
+            box-shadow: var(--shadow);
+            padding: 28px;
+            backdrop-filter: blur(12px);
+        }
+
+        .cart-summary {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 18px;
+            flex-wrap: wrap;
+            margin-bottom: 24px;
+            padding-bottom: 18px;
+            border-bottom: 1px solid var(--pink-mid);
+        }
+
+        .cart-summary strong {
+            display: block;
+            font-size: 1.1rem;
+            margin-bottom: 6px;
+        }
+
+        .cart-summary p {
+            color: var(--text-mute);
+            font-weight: 700;
+        }
+
+        .cart-total {
+            font-size: 1.6rem;
+            font-weight: 900;
+            color: #be185d;
+        }
+
+        .empty-state {
+            text-align: center;
+            padding: 36px 12px;
+            color: var(--text-mute);
+            font-weight: 700;
+        }
+
+        .empty-state a {
+            display: inline-block;
+            margin-top: 14px;
+            text-decoration: none;
+            color: #fff;
+            background: linear-gradient(135deg, #f472b6, #a855f7);
+            padding: 11px 22px;
+            border-radius: 999px;
+            font-weight: 800;
+        }
+
+        .cart-list {
+            display: grid;
+            gap: 14px;
+        }
+
+        .cart-item {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 16px;
+            padding: 18px;
+            border-radius: 20px;
+            background: rgba(255,255,255,0.84);
+            border: 1px solid rgba(251,207,232,0.9);
+        }
+
+        .cart-item-left {
+            display: flex;
+            align-items: flex-start;
+            gap: 14px;
+        }
+
+        .select-box {
+            width: 20px;
+            height: 20px;
+            margin-top: 6px;
+            accent-color: #d946ef;
+            cursor: pointer;
+        }
+
+        .cart-item-name {
+            font-size: 1rem;
+            font-weight: 900;
+            color: var(--text);
+            margin-bottom: 6px;
+        }
+
+        .cart-item-meta {
+            color: var(--text-mute);
+            font-size: 0.88rem;
+            font-weight: 700;
+            line-height: 1.6;
+        }
+
+        .cart-item-subtotal {
+            white-space: nowrap;
+            font-size: 1rem;
+            font-weight: 900;
+            color: #be185d;
+        }
+
+        .item-actions {
+            margin-top: 10px;
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+
+        .pay-actions {
+            margin-top: 24px;
+            display: grid;
+            gap: 18px;
+        }
+
+        .pay-toolbar {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 14px;
+            flex-wrap: wrap;
+            padding: 18px;
+            border-radius: 20px;
+            background: rgba(255,255,255,0.78);
+            border: 1px solid rgba(251,207,232,0.9);
+        }
+
+        .pay-select-all {
+            display: inline-flex;
+            align-items: center;
+            gap: 10px;
+            font-weight: 800;
+            color: var(--text);
+        }
+
+        .pay-toolbar-right {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            flex-wrap: wrap;
+        }
+
+        .selected-total {
+            color: #be185d;
+            font-size: 1rem;
+            font-weight: 900;
+        }
+
+        .pay-btn,
+        .item-pay-btn,
+        .remove-btn {
+            border: none;
+            border-radius: 999px;
+            color: #fff;
+            font-weight: 800;
+            cursor: pointer;
+            box-shadow: 0 10px 20px rgba(244,114,182,0.2);
+        }
+
+        .pay-btn,
+        .item-pay-btn {
+            background: linear-gradient(135deg, #f472b6, #a855f7);
+        }
+
+        .remove-btn {
+            background: linear-gradient(135deg, #fb7185, #f43f5e);
+        }
+
+        .pay-btn {
+            padding: 12px 20px;
+            font-size: 0.92rem;
+        }
+
+        .item-pay-btn,
+        .remove-btn {
+            padding: 9px 14px;
+            font-size: 0.8rem;
+        }
+
+        .pay-btn:disabled,
+        .item-pay-btn:disabled,
+        .remove-btn:disabled {
+            opacity: 0.55;
+            cursor: not-allowed;
+            box-shadow: none;
+        }
+
+        .qr-shell {
+            display: grid;
+            grid-template-columns: minmax(0, 1fr) 260px;
+            gap: 20px;
+            align-items: center;
+            padding: 20px;
+            border-radius: 24px;
+            background: linear-gradient(135deg, rgba(255,255,255,0.86), rgba(252,231,243,0.92));
+            border: 1.5px solid var(--pink-mid);
+        }
+
+        .qr-shell[hidden] {
+            display: none;
+        }
+
+        .qr-shell h3 {
+            font-size: 1.2rem;
+            color: var(--text);
+            margin-bottom: 8px;
+        }
+
+        .qr-shell p {
+            color: var(--text-mute);
+            font-weight: 700;
+            line-height: 1.7;
+        }
+
+        .qr-bank {
+            margin-top: 12px;
+            display: grid;
+            gap: 6px;
+            color: var(--text);
+            font-weight: 800;
+        }
+
+        .qr-note {
+            margin-top: 14px;
+            color: #be185d;
+            font-size: 0.88rem;
+            font-weight: 800;
+        }
+
+        .qr-image-wrap {
+            background: #fff;
+            border-radius: 24px;
+            padding: 14px;
+            border: 1px solid rgba(251,207,232,0.9);
+            box-shadow: 0 16px 30px rgba(244,114,182,0.12);
+        }
+
+        .qr-image-wrap img {
+            display: block;
+            width: 100%;
+            height: auto;
+        }
+
+        .cart-message {
+            margin-top: 16px;
+            color: #be185d;
+            font-size: 0.9rem;
+            font-weight: 800;
+        }
+
+        @media (max-width: 720px) {
+            .header {
+                height: auto;
+                padding: 14px 18px;
+                align-items: flex-start;
+                flex-direction: column;
+                gap: 10px;
+            }
+
+            .cart-item {
+                flex-direction: column;
+                align-items: flex-start;
+            }
+
+            .cart-item-subtotal {
+                white-space: normal;
+            }
+
+            .qr-shell {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body th:attr="data-logged-in=${session.userId != null}">
+<header class="header">
+    <div class="header-left">
+        <a class="back-link" th:href="@{/}" onclick="history.back(); return false;">← Back</a>
+        <a class="brand" th:href="@{/}">
+            <span>🌸</span> Genshin Cute Shop
+        </a>
+    </div>
+    <nav class="nav">
+        <a th:href="@{/}">Trang chủ</a>
+        <a th:href="@{/cart}" class="active">Giỏ hàng <span class="cart-count-badge" id="cart-count" th:text="${cartSummary.count}">0</span></a>
+        <a th:href="@{/my-orders}" th:if="${session.userId != null}">Đơn mua</a>
+        <a th:href="@{/auth/login}">Nạp tiền</a>
+        <a th:href="@{/profile}">Profile</a>
+    </nav>
+</header>
+
+<main>
+    <section class="hero">
+        <h1>Giỏ hàng acc của bạn</h1>
+        <p>Xem lại số acc đã thêm trước khi chốt đơn.</p>
+    </section>
+
+    <section class="cart-shell">
+        <div class="cart-summary">
+            <div>
+                <strong th:text="'Tổng sản phẩm: ' + ${cartSummary.count}">Tổng sản phẩm: 0</strong>
+                <p>Mỗi acc chỉ được giữ một lần trong giỏ hàng.</p>
+            </div>
+            <div class="cart-total" th:text="${cartSummary.total}">0đ</div>
+        </div>
+
+        <div th:if="${cartSummary.empty}" class="empty-state">
+            Giỏ hàng đang trống.
+            <a th:href="@{/}">Quay lại mua acc</a>
+        </div>
+
+        <div th:if="${!cartSummary.empty}" class="cart-list">
+            <article class="cart-item" th:each="item : ${cartSummary.items}" th:attr="data-product-id=${item.id},data-subtotal-amount=${item.subtotalAmount},data-item-name=${item.name}">
+                <div class="cart-item-left">
+                    <input class="select-box item-select" type="checkbox" th:id="${'item-' + item.id}" checked>
+                    <div>
+                        <div class="cart-item-name" th:text="${item.name}">Tên acc</div>
+                        <div class="cart-item-meta">
+                            <div th:text="'Đơn giá: ' + ${item.price}">Đơn giá: 199.000đ</div>
+                        </div>
+                        <div class="item-actions">
+                            <button class="item-pay-btn" type="button">Mua acc này</button>
+                            <button class="remove-btn item-remove-btn" type="button">Xóa acc này</button>
+                        </div>
+                    </div>
+                </div>
+                <div class="cart-item-subtotal" th:text="${item.subtotal}">199.000đ</div>
+            </article>
+        </div>
+
+        <div th:if="${!cartSummary.empty}" class="pay-actions">
+            <div class="pay-toolbar">
+                <label class="pay-select-all">
+                    <input id="select-all" class="select-box" type="checkbox" checked>
+                    <span>Chọn tất cả</span>
+                </label>
+                <div class="pay-toolbar-right">
+                    <div class="selected-total">Tổng thanh toán: <span id="selected-total-text" th:text="${cartSummary.total}">0đ</span></div>
+                    <button class="remove-btn" id="clear-cart-btn" type="button">Xóa toàn bộ giỏ</button>
+                    <button class="pay-btn" id="pay-selected-btn" type="button">Thanh toán đã chọn</button>
+                </div>
+            </div>
+
+            <div class="qr-shell" id="qr-shell" hidden>
+                <div>
+                    <h3>Quét QR để thanh toán</h3>
+                    <p id="payment-desc">Chọn acc cần thanh toán rồi quét mã QR với đúng số tiền hệ thống đã tính.</p>
+                    <div class="qr-bank">
+                        <div>Ngân hàng: BIDV</div>
+                        <div>Số tài khoản: 5730278016</div>
+                        <div>Số tiền: <span id="qr-amount-text" th:text="${cartSummary.total}">0đ</span></div>
+                    </div>
+                    <div class="qr-note" id="qr-note">Nội dung: THANH TOAN SHOP ACC</div>
+                </div>
+                <div class="qr-image-wrap">
+                    <img id="payment-qr" alt="QR thanh toán BIDV">
+                </div>
+            </div>
+
+            <p class="cart-message" id="cart-message"></p>
+        </div>
+    </section>
+</main>
+<script>
+    const BANK_CODE = 'BIDV';
+    const ACCOUNT_NO = '5730278016';
+    const ACCOUNT_NAME = 'SHOP ACC';
+    const DEFAULT_NOTE = 'THANH TOAN SHOP ACC';
+    const currencyFormatter = new Intl.NumberFormat('vi-VN');
+
+    const itemCards = Array.from(document.querySelectorAll('.cart-item'));
+    const selectAll = document.getElementById('select-all');
+    const selectedTotalText = document.getElementById('selected-total-text');
+    const qrAmountText = document.getElementById('qr-amount-text');
+    const qrNote = document.getElementById('qr-note');
+    const qrImage = document.getElementById('payment-qr');
+    const paymentDesc = document.getElementById('payment-desc');
+    const paySelectedBtn = document.getElementById('pay-selected-btn');
+    const qrShell = document.getElementById('qr-shell');
+    const clearCartBtn = document.getElementById('clear-cart-btn');
+    const cartMessage = document.getElementById('cart-message');
+    const cartCountNav = document.getElementById('cart-count');
+    const isLoggedIn = document.body.dataset.loggedIn === 'true';
+    let inactivityTimer = null;
+
+    function formatCurrency(amount) {
+        return currencyFormatter.format(amount) + 'đ';
+    }
+
+    function getSelectedCards() {
+        return itemCards.filter(card => card.querySelector('.item-select').checked);
+    }
+
+    function buildQrUrl(amount, note) {
+        const params = new URLSearchParams({
+            amount: String(amount),
+            addInfo: note,
+            accountName: ACCOUNT_NAME
+        });
+        return `https://img.vietqr.io/image/${BANK_CODE}-${ACCOUNT_NO}-compact2.png?${params.toString()}`;
+    }
+
+    function updatePaymentBox(selectedCards, shouldShowQr = false, options = {}) {
+        const total = options.serverTotal != null
+            ? Number(options.serverTotal)
+            : selectedCards.reduce((sum, card) => sum + Number(card.dataset.subtotalAmount || 0), 0);
+        const selectedNames = selectedCards.map(card => card.dataset.itemName);
+        const note = options.paymentNote
+            ? options.paymentNote
+            : (selectedNames.length === 1 ? `MUA ${selectedNames[0].slice(0, 18)}` : DEFAULT_NOTE);
+
+        selectedTotalText.textContent = formatCurrency(total);
+        qrAmountText.textContent = formatCurrency(total);
+        qrNote.textContent = 'Nội dung: ' + note;
+        paySelectedBtn.disabled = selectedCards.length === 0;
+
+        if (selectedCards.length === 0) {
+            paymentDesc.textContent = 'Hãy chọn ít nhất 1 acc để tạo đơn và mã QR thanh toán.';
+            qrImage.removeAttribute('src');
+            qrImage.alt = 'Chưa có sản phẩm được chọn';
+            qrShell.hidden = true;
+            return;
+        }
+
+        paymentDesc.textContent = options.orderId
+            ? `Đơn #${options.orderId} đã tạo. Quét QR với đúng số tiền và nội dung chuyển khoản.`
+            : (selectedCards.length === 1
+                ? 'Bạn đang thanh toán cho 1 acc. Quét mã QR bên phải để chuyển khoản đúng số tiền.'
+                : `Bạn đang thanh toán cho ${selectedCards.length} acc đã chọn.`);
+
+        qrImage.src = buildQrUrl(total, note);
+        qrImage.alt = 'QR thanh toán ' + formatCurrency(total);
+        qrShell.hidden = !shouldShowQr;
+    }
+
+    function createOrderForSelection(selectedCards, thenShowQr) {
+        if (!isLoggedIn) {
+            window.location.href = '/auth/login';
+            return Promise.resolve(null);
+        }
+        const slugs = selectedCards.map(card => card.dataset.productId);
+        return fetch('/orders/create', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ productSlugs: slugs })
+        }).then(async res => {
+            const data = await res.json().catch(() => ({}));
+            if (!res.ok) {
+                throw new Error(data.message || 'Không tạo được đơn.');
+            }
+            return data;
+        }).then(data => {
+            if (cartCountNav && data.cartSummary) {
+                cartCountNav.textContent = data.cartSummary.count;
+            }
+            if (cartMessage) {
+                cartMessage.textContent = data.message || '';
+            }
+            const total = Number(data.totalAmount || 0);
+            const note = data.paymentNote || DEFAULT_NOTE;
+            updatePaymentBox(selectedCards, thenShowQr, {
+                paymentNote: note,
+                orderId: data.orderId,
+                serverTotal: total
+            });
+            return data;
+        });
+    }
+
+    function syncSelectAll() {
+        if (!selectAll) return;
+        selectAll.checked = itemCards.length > 0 && itemCards.every(card => card.querySelector('.item-select').checked);
+    }
+
+    function postJson(url, payload) {
+        return fetch(url, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: payload ? JSON.stringify(payload) : null
+        }).then(async res => {
+            const data = await res.json().catch(() => ({}));
+            if (!res.ok) {
+                throw new Error(data.message || 'Không thể cập nhật giỏ hàng.');
+            }
+            return data;
+        });
+    }
+
+    function logoutForInactivity() {
+        fetch('/auth/logout', { method: 'POST' })
+            .finally(() => {
+                window.location.href = '/auth/login';
+            });
+    }
+
+    function resetInactivityTimer() {
+        if (!isLoggedIn) return;
+        window.clearTimeout(inactivityTimer);
+        inactivityTimer = window.setTimeout(logoutForInactivity, 10 * 60 * 1000);
+    }
+
+    function setupInactivityLogout() {
+        if (!isLoggedIn) return;
+        ['click', 'keydown', 'mousemove', 'scroll', 'touchstart'].forEach(eventName => {
+            window.addEventListener(eventName, resetInactivityTimer, { passive: true });
+        });
+        resetInactivityTimer();
+    }
+
+    selectAll?.addEventListener('change', function () {
+        itemCards.forEach(card => {
+            card.querySelector('.item-select').checked = selectAll.checked;
+        });
+        updatePaymentBox(getSelectedCards());
+    });
+
+    itemCards.forEach(card => {
+        const checkbox = card.querySelector('.item-select');
+        const itemPayBtn = card.querySelector('.item-pay-btn');
+        const removeBtn = card.querySelector('.item-remove-btn');
+
+        checkbox.addEventListener('change', function () {
+            syncSelectAll();
+            updatePaymentBox(getSelectedCards());
+        });
+
+        itemPayBtn.addEventListener('click', function () {
+            itemCards.forEach(otherCard => {
+                otherCard.querySelector('.item-select').checked = otherCard === card;
+            });
+            syncSelectAll();
+            createOrderForSelection([card], true)
+                .catch(err => { if (cartMessage) cartMessage.textContent = err.message; })
+                .finally(() => qrShell?.scrollIntoView({ behavior: 'smooth', block: 'center' }));
+        });
+
+        removeBtn.addEventListener('click', function () {
+            removeBtn.disabled = true;
+            postJson('/cart/remove', { productId: card.dataset.productId })
+                .then(data => {
+                    if (cartMessage) {
+                        cartMessage.textContent = data.message || 'Đã xóa acc khỏi giỏ hàng.';
+                    }
+                    window.location.reload();
+                })
+                .catch(err => {
+                    if (cartMessage) {
+                        cartMessage.textContent = err.message;
+                    }
+                    removeBtn.disabled = false;
+                });
+        });
+    });
+
+    paySelectedBtn?.addEventListener('click', function () {
+        const selectedCards = getSelectedCards();
+        createOrderForSelection(selectedCards, true)
+            .catch(err => { if (cartMessage) cartMessage.textContent = err.message; })
+            .finally(() => qrShell?.scrollIntoView({ behavior: 'smooth', block: 'center' }));
+    });
+
+    clearCartBtn?.addEventListener('click', function () {
+        clearCartBtn.disabled = true;
+        postJson('/cart/clear')
+            .then(data => {
+                if (cartMessage) {
+                    cartMessage.textContent = data.message || 'Đã xóa toàn bộ giỏ hàng.';
+                }
+                window.location.reload();
+            })
+            .catch(err => {
+                if (cartMessage) {
+                    cartMessage.textContent = err.message;
+                }
+                clearCartBtn.disabled = false;
+            });
+    });
+
+    if (itemCards.length > 0) {
+        syncSelectAll();
+        updatePaymentBox(getSelectedCards());
+    }
+
+    setupInactivityLogout();
+</script>
+</body>
+</html>

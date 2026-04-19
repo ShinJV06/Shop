@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html lang="vi" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Chi tiết đơn — Admin</title>
+    <link rel="stylesheet" th:href="@{/css/admin-panel.css}">
+</head>
+<body class="admin-body">
+<div class="admin-app">
+    <aside th:replace="~{admin/fragments :: sidebar (active='accounts')}"></aside>
+    <div class="admin-main">
+        <header class="admin-main-header">
+            <div>
+                <div class="admin-breadcrumb">
+                    <a th:href="@{/admin}">Admin</a> /
+                    <a th:href="@{/admin/orders}">Đơn hàng</a> /
+                    <span th:text="'#' + ${order.id}">#0</span>
+                </div>
+                <h1>Chi tiết đơn</h1>
+                <p>Xác nhận thanh toán để gán acc ngẫu nhiên từ kho; hoàn tiền sẽ thu acc về nếu đã giao.</p>
+            </div>
+        </header>
+        <div class="admin-content">
+            <p th:if="${successMessage}" class="admin-alert admin-alert--ok" th:text="${successMessage}"></p>
+            <p th:if="${errorMessage}" class="admin-alert admin-alert--err" th:text="${errorMessage}"></p>
+
+            <div class="admin-panel" style="padding:20px 22px;margin-bottom:20px">
+                <p style="margin:0 0 8px"><strong>Trạng thái:</strong> <span th:text="${order.status}">-</span></p>
+                <p style="margin:0 0 8px"><strong>Buyer ID:</strong> <span th:text="${order.buyerId}">-</span></p>
+                <p style="margin:0"><strong>Tổng:</strong> <span th:text="${order.totalAmount} + 'đ'">0</span></p>
+            </div>
+
+            <div class="admin-stack" style="margin-bottom:22px">
+                <div th:if="${order.status == T(com.example.demo.entity.Enum.OrderStatus).PENDING_PAYMENT}">
+                    <form class="inline" th:action="@{/admin/orders/{id}/confirm-payment(id=${order.id})}" method="post"
+                          onsubmit="return confirm('Xác nhận đã nhận tiền và giao acc ngẫu nhiên từ kho?');">
+                        <button class="admin-btn admin-btn--green" type="submit">Xác nhận thanh toán + giao acc</button>
+                    </form>
+                </div>
+                <div th:if="${order.status != T(com.example.demo.entity.Enum.OrderStatus).REFUNDED && (order.status == T(com.example.demo.entity.Enum.OrderStatus).PAID || order.status == T(com.example.demo.entity.Enum.OrderStatus).PENDING_PAYMENT)}">
+                    <form class="inline" th:action="@{/admin/orders/{id}/refund(id=${order.id})}" method="post"
+                          onsubmit="return confirm('Hoàn tiền / thu hồi acc về kho?');">
+                        <button class="admin-btn admin-btn--orange" type="submit">Hoàn tiền</button>
+                    </form>
+                </div>
+            </div>
+
+            <h2 style="margin:0 0 12px;font-size:1.05rem;font-weight:800">Dòng đơn & acc đã giao</h2>
+            <div class="admin-panel" th:each="line : ${order.lines}" style="padding:20px 22px;margin-bottom:14px">
+                <h3 style="margin:0 0 10px;font-size:1rem" th:text="${line.productNameSnapshot}">Acc</h3>
+                <p class="admin-muted" style="margin:0 0 8px">Đơn giá: <span th:text="${line.unitPrice} + 'đ'">0</span></p>
+                <p th:if="${line.deliveredCredentials != null}" style="margin:0 0 6px;font-weight:700">Nội dung giao khách:</p>
+                <pre class="admin-pre" th:if="${line.deliveredCredentials != null}" th:text="${line.deliveredCredentials}">-</pre>
+            </div>
+
+            <h2 style="margin:24px 0 12px;font-size:1.05rem;font-weight:800">Log giao dịch</h2>
+            <div class="admin-panel" style="padding:18px 22px">
+                <ul class="admin-log-list">
+                    <li th:each="log : ${logs}">
+                        <span th:text="${log.createdAt}">-</span> —
+                        <strong th:text="${log.action}">-</strong> —
+                        <span th:text="${log.detail}">-</span>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </div>
+</div>
+</body>
+</html>

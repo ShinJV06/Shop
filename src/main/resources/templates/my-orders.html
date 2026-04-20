@@ -44,7 +44,6 @@
         <tr th:each="o : ${orders}">
             <td><a th:href="@{/my-orders/{id}(id=${o.id})}" th:text="'#' + ${o.id}">#1</a></td>
             <td>
-                <span th:if="${o.status.name() == 'PENDING_PAYMENT'}" class="badge b-pending">Chờ thanh toán</span>
                 <span th:if="${o.status.name() == 'PAID'}" class="badge b-paid">Đã thanh toán</span>
                 <span th:if="${o.status.name() == 'REFUNDED'}" class="badge b-ref">Hoàn tiền</span>
             </td>

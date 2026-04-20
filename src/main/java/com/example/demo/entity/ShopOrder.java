@@ -28,6 +28,9 @@ public class ShopOrder {
     @Column(nullable = false)
     private long totalAmount;
 
+    @Column(length = 32)
+    private String paymentMethod;
+
     private Date createdAt;
     private Date paidAt;
 

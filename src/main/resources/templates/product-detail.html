@@ -1,0 +1,355 @@
+<!DOCTYPE html>
+<html lang="vi" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title th:text="${product.name}">Chi tiết sản phẩm</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
+            min-height: 100vh;
+            color: #fff;
+        }
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        .header {
+            background: rgba(30, 30, 63, 0.95);
+            backdrop-filter: blur(10px);
+            border-bottom: 1px solid #3d3d6b;
+            padding: 16px 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .brand {
+            font-size: 1.3rem;
+            font-weight: 800;
+            color: #f472b6;
+            text-decoration: none;
+        }
+        .brand span {
+            font-size: 1.5rem;
+        }
+        .nav {
+            display: flex;
+            gap: 20px;
+            align-items: center;
+        }
+        .nav a {
+            color: #e2e8f0;
+            text-decoration: none;
+            font-weight: 600;
+            font-size: 0.9rem;
+            transition: color 0.2s;
+        }
+        .nav a:hover {
+            color: #f472b6;
+        }
+        .cart-badge {
+            background: #f472b6;
+            color: #fff;
+            padding: 2px 8px;
+            border-radius: 10px;
+            font-size: 0.75rem;
+            font-weight: 700;
+            margin-left: 4px;
+        }
+        .back-btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            color: #a855f7;
+            text-decoration: none;
+            font-weight: 600;
+            margin-bottom: 20px;
+        }
+        .back-btn:hover {
+            color: #c084fc;
+        }
+        .product-header {
+            background: #1e1e3f;
+            border-radius: 20px;
+            padding: 30px;
+            margin-bottom: 30px;
+            border: 1px solid #3d3d6b;
+            text-align: center;
+        }
+        .product-title {
+            font-size: 2rem;
+            font-weight: 800;
+            margin-bottom: 10px;
+            color: #a855f7;
+        }
+        .product-game {
+            color: #94a3b8;
+            font-size: 1rem;
+            margin-bottom: 15px;
+        }
+        .product-price {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: #fbbf24;
+        }
+        .accounts-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+            gap: 20px;
+        }
+        .acc-card {
+            background: #1e1e3f;
+            border-radius: 16px;
+            overflow: hidden;
+            border: 2px solid #3d3d6b;
+            transition: transform 0.2s, border-color 0.2s;
+        }
+        .acc-card:hover {
+            transform: translateY(-4px);
+            border-color: #a855f7;
+        }
+        .acc-card.sold {
+            opacity: 0.6;
+        }
+        .acc-card.sold:hover {
+            transform: none;
+            border-color: #3d3d6b;
+        }
+        .acc-price-bar {
+            background: linear-gradient(135deg, #a855f7, #6366f1);
+            padding: 12px 16px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        .acc-card.sold .acc-price-bar {
+            background: #4b5563;
+        }
+        .acc-price-bar .price {
+            font-size: 1.2rem;
+            font-weight: 800;
+        }
+        .acc-body {
+            padding: 16px;
+        }
+        .acc-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 12px;
+        }
+        .acc-name {
+            font-weight: 700;
+            font-size: 1rem;
+        }
+        .acc-status {
+            font-size: 0.75rem;
+            font-weight: 700;
+            padding: 4px 10px;
+            border-radius: 12px;
+        }
+        .acc-status.available {
+            background: #16a34a;
+            color: #fff;
+        }
+        .acc-status.sold {
+            background: #dc2626;
+            color: #fff;
+        }
+        .acc-tags {
+            display: flex;
+            gap: 8px;
+            flex-wrap: wrap;
+            margin-bottom: 12px;
+        }
+        .acc-tag {
+            background: #2a2a5a;
+            padding: 4px 10px;
+            border-radius: 8px;
+            font-size: 0.8rem;
+            color: #e2e8f0;
+        }
+        .acc-tag.purple {
+            background: #7c3aed;
+            color: #fff;
+        }
+        .acc-price {
+            font-size: 1.1rem;
+            font-weight: 800;
+            color: #fbbf24;
+            margin-bottom: 12px;
+        }
+        .acc-desc {
+            font-size: 0.85rem;
+            color: #94a3b8;
+            margin-bottom: 16px;
+            line-height: 1.5;
+        }
+        .buy-btn {
+            width: 100%;
+            padding: 12px;
+            border: none;
+            border-radius: 10px;
+            font-size: 1rem;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        .buy-btn.available {
+            background: linear-gradient(135deg, #8b5cf6, #6366f1);
+            color: #fff;
+        }
+        .buy-btn.available:hover {
+            transform: scale(1.02);
+            box-shadow: 0 4px 15px rgba(139, 92, 246, 0.4);
+        }
+        .buy-btn.sold {
+            background: #4b5563;
+            color: #fff;
+            cursor: not-allowed;
+        }
+        .empty-state {
+            text-align: center;
+            padding: 60px 20px;
+            background: #1e1e3f;
+            border-radius: 20px;
+            border: 1px solid #3d3d6b;
+        }
+        .empty-state .icon {
+            font-size: 4rem;
+            margin-bottom: 20px;
+        }
+        .empty-state h3 {
+            font-size: 1.5rem;
+            margin-bottom: 10px;
+            color: #a855f7;
+        }
+        .empty-state p {
+            color: #94a3b8;
+        }
+        .count-badge {
+            background: #3b82f6;
+            color: #fff;
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 0.85rem;
+            font-weight: 700;
+            margin-left: 10px;
+        }
+        .footer {
+            text-align: center;
+            padding: 30px;
+            color: #64748b;
+            font-size: 0.85rem;
+        }
+    </style>
+</head>
+<body th:attr="data-logged-in=${session.userId != null}">
+
+<!-- HEADER -->
+<header class="header">
+    <a class="brand" th:href="@{/}">
+        <span>🌸</span> Genshin Cute Shop
+    </a>
+    <nav class="nav">
+        <a th:href="@{/}">Trang chủ</a>
+        <a th:href="@{/cart}">Giỏ hàng <span class="cart-badge" id="cart-count" th:text="${cartSummary.count}">0</span></a>
+        <a th:href="@{/auth/login}" th:if="${session.userId == null}">Đăng nhập</a>
+        <a class="cta" th:href="@{/auth/register}" th:if="${session.userId == null}">Đăng ký</a>
+    </nav>
+</header>
+
+<div class="container">
+        <a class="back-btn" th:href="@{/}">
+            ← Quay lại trang chủ
+        </a>
+
+        <div class="product-header">
+            <h1 class="product-title" th:text="${product.name}">Tên sản phẩm</h1>
+            <p class="product-game" th:if="${product.game != null}" th:text="${product.game.name}">Game</p>
+        </div>
+
+    <!-- Accounts Grid -->
+    <h2 style="margin-bottom: 20px;">
+        Danh sách tài khoản
+        <span class="count-badge" th:text="${accounts.size()} + ' tài khoản'">0 tài khoản</span>
+    </h2>
+
+    <div th:if="${!#lists.isEmpty(accounts)}" class="accounts-grid">
+        <div th:each="acc : ${accounts}" class="acc-card" th:classappend="${acc.hidden ? 'sold' : ''}">
+            <div class="acc-body">
+                <div class="acc-header">
+                    <span class="acc-name" th:text="${acc.product != null ? acc.product.name : 'Acc #'+acc.id}">Tên</span>
+                    <span class="acc-status available" th:if="${!acc.hidden}">Còn hàng</span>
+                    <span class="acc-status sold" th:if="${acc.hidden}">Hết hàng</span>
+                </div>
+                <div class="acc-tags">
+                    <span class="acc-tag" th:if="${acc.rankInfo != null}" th:text="${acc.rankInfo}">AR 58</span>
+                    <span class="acc-tag purple" th:if="${acc.game != null}" th:text="${acc.game}">Asia 1</span>
+                </div>
+                <div class="acc-price" th:text="${accountPrices[acc.id] != null ? accountPrices[acc.id] : 'Liên hệ'}">0đ</div>
+                <p class="acc-desc" th:text="${acc.extraInfo != null ? acc.extraInfo : 'Tài khoản chất lượng, giao ngay'}">Mô tả</p>
+                <button class="buy-btn available" th:if="${!acc.hidden}"
+                        th:attr="data-product-id=${acc.product?.slug}"
+                        onclick="addToCart(this)">
+                    🛒 Mua ngay
+                </button>
+                <button class="buy-btn sold" th:if="${acc.hidden}" disabled>
+                    Đã bán
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Empty State -->
+    <div th:if="${#lists.isEmpty(accounts)}" class="empty-state">
+        <div class="icon">📦</div>
+        <h3>Chưa có tài khoản nào</h3>
+        <p>Hiện tại sản phẩm này chưa có tài khoản nào. Vui lòng quay lại sau.</p>
+    </div>
+</div>
+
+<footer class="footer">
+    © 2026 GenshinCuteShop.com - Chuyên bán acc Genshin, Liên Quân các loại
+</footer>
+
+<script>
+    function addToCart(btn) {
+        const productId = btn.dataset.productId;
+        if (!productId) {
+            alert('Không tìm thấy sản phẩm');
+            return;
+        }
+        fetch('/cart/add', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ productId })
+        })
+        .then(async res => {
+            if (res.status === 401) {
+                window.location.href = '/auth/login';
+                return null;
+            }
+            return res.json();
+        })
+        .then(data => {
+            if (!data) return;
+            if (data.count !== undefined) {
+                document.getElementById('cart-count').textContent = data.count;
+            }
+            alert('Đã thêm vào giỏ hàng!');
+        })
+        .catch(err => {
+            alert('Có lỗi xảy ra!');
+        });
+    }
+</script>
+</body>
+</html>

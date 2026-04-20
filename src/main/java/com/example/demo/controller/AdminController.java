@@ -2,6 +2,7 @@ package com.example.demo.controller;
 
 import com.example.demo.entity.Account;
 import com.example.demo.entity.Enum.InventoryItemStatus;
+import com.example.demo.entity.Enum.OrderStatus;
 import com.example.demo.entity.Enum.Role;
 import com.example.demo.entity.InventoryItem;
 import com.example.demo.entity.Product;
@@ -17,6 +18,8 @@ import com.example.demo.service.OrderFlowService;
 import com.example.demo.service.ShopCatalogService;
 import com.example.demo.web.CurrentUserService;
 import jakarta.servlet.http.HttpSession;
+
+import java.math.BigDecimal;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -102,6 +105,13 @@ public class AdminController {
             priceByProductId.put(p.getId(), shopCatalogService.formatPrice(p.getPrice()));
         }
         model.addAttribute("priceByProductId", priceByProductId);
+
+        // Price for each inventory item (custom price or product price)
+        Map<Long, String> itemPriceMap = new LinkedHashMap<>();
+        for (InventoryItem item : items) {
+            itemPriceMap.put(item.getId(), shopCatalogService.formatItemPrice(item));
+        }
+        model.addAttribute("itemPriceMap", itemPriceMap);
         return "admin/accounts";
     }
 
@@ -120,18 +130,6 @@ public class AdminController {
         }
         model.addAttribute("products", productRepository.findAll());
         return "admin/products";
-    }
-
-    @GetMapping("/orders")
-    public String ordersListPage(HttpSession session, Model model, RedirectAttributes ra) {
-        try {
-            currentUserService.requireAdmin(session);
-        } catch (CurrentUserService.UnauthorizedException ex) {
-            ra.addFlashAttribute("errorMessage", ex.getMessage());
-            return "redirect:/auth/login";
-        }
-        model.addAttribute("orders", shopOrderRepository.findAllByOrderByIdDesc());
-        return "admin/orders-list";
     }
 
     @GetMapping("/stock")
@@ -243,6 +241,7 @@ public class AdminController {
             @RequestParam(required = false) String rankInfo,
             @RequestParam(required = false) String skinInfo,
             @RequestParam(required = false) String extraInfo,
+            @RequestParam(required = false) BigDecimal customPrice,
             @RequestParam String credentials,
             @RequestParam(required = false) MultipartFile listingImage,
             HttpSession session,
@@ -253,7 +252,7 @@ public class AdminController {
             return "redirect:/auth/login";
         }
         try {
-            inventoryAdminService.addSingle(productId, game, rankInfo, skinInfo, extraInfo, credentials, admin, listingImage);
+            inventoryAdminService.addSingle(productId, game, rankInfo, skinInfo, extraInfo, credentials, admin, listingImage, customPrice);
             ra.addFlashAttribute("successMessage", "Đã thêm acc vào kho.");
         } catch (Exception ex) {
             ra.addFlashAttribute("errorMessage", ex.getMessage());
@@ -346,6 +345,58 @@ public class AdminController {
         productRepository.save(p);
         ra.addFlashAttribute("successMessage", "Đã lưu sản phẩm.");
         return "redirect:/admin/products";
+    }
+
+    @PostMapping("/products/{id}/delete")
+    public String deleteProduct(
+            @PathVariable long id,
+            HttpSession session,
+            RedirectAttributes ra
+    ) {
+        if (requireAdmin(session, ra) == null) {
+            return "redirect:/auth/login";
+        }
+        Product p = productRepository.findById(id).orElseThrow();
+        // Xóa các inventory items liên quan trước
+        List<InventoryItem> items = inventoryItemRepository.findAll().stream()
+                .filter(i -> i.getProduct() != null && i.getProduct().getId().equals(id))
+                .toList();
+        inventoryItemRepository.deleteAll(items);
+        // Xóa sản phẩm
+        productRepository.delete(p);
+        ra.addFlashAttribute("successMessage", "Đã xóa sản phẩm và các acc liên quan.");
+        return "redirect:/admin/products";
+    }
+
+    @GetMapping("/orders")
+    public String orders(HttpSession session, Model model, RedirectAttributes ra) {
+        try {
+            currentUserService.requireAdmin(session);
+        } catch (CurrentUserService.UnauthorizedException ex) {
+            ra.addFlashAttribute("errorMessage", ex.getMessage());
+            return "redirect:/auth/login";
+        }
+
+        List<ShopOrder> allOrders = shopOrderRepository.findAllByOrderByIdDesc();
+        List<ShopOrder> pendingOrders = allOrders.stream()
+                .filter(o -> o.getStatus() == OrderStatus.PENDING_PAYMENT)
+                .collect(Collectors.toList());
+        List<ShopOrder> paidOrders = allOrders.stream()
+                .filter(o -> o.getStatus() == OrderStatus.PAID)
+                .collect(Collectors.toList());
+
+        Map<Long, String> buyerNames = new HashMap<>();
+        Set<Long> buyerIds = allOrders.stream()
+                .map(ShopOrder::getBuyerId)
+                .filter(Objects::nonNull)
+                .collect(Collectors.toSet());
+        if (!buyerIds.isEmpty()) {
+            accountRepository.findAllById(buyerIds).forEach(a -> buyerNames.put(a.getId(), a.getUsername()));
+        }
+
+        model.addAttribute("allOrders", allOrders);
+        model.addAttribute("buyerNames", buyerNames);
+        return "admin/orders";
     }
 
     @GetMapping("/orders/{id}")

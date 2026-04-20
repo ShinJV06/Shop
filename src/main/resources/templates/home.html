@@ -35,7 +35,6 @@
             min-height: 100vh;
         }
 
-        /* ── BACKGROUND ── */
         body::before {
             content: '';
             position: fixed;
@@ -48,7 +47,6 @@
             pointer-events: none;
         }
 
-        /* ── FALLING PETALS ── */
         .petals {
             position: fixed;
             top: 0; left: 0;
@@ -81,7 +79,6 @@
             100% { transform: translateY(105vh) rotate(540deg) translateX(60px); opacity: 0; }
         }
 
-        /* ── SIDE GIRLS ── */
         .side-girl {
             position: fixed;
             bottom: 0;
@@ -95,7 +92,6 @@
         .side-girl.right { right: 0;  transform: scaleX(-1); }
         @media (max-width: 1100px) { .side-girl { display: none; } }
 
-        /* ── HEADER ── */
         .header {
             position: sticky;
             top: 0;
@@ -217,7 +213,6 @@
         }
         .nav .cta:hover { transform: translateY(-1px); box-shadow: 0 6px 18px rgba(244,114,182,0.45); background: linear-gradient(135deg, #f472b6, #c084fc); }
 
-        /* ── MAIN ── */
         main {
             position: relative;
             z-index: 2;
@@ -229,69 +224,6 @@
             main { max-width: 900px; padding: 0 24px 100px; }
         }
 
-        /* Đơn / duyệt — admin & user */
-        .home-ops {
-            margin: 28px 0 8px;
-            padding: 22px 24px 26px;
-            background: rgba(255, 255, 255, 0.88);
-            border: 1.5px solid var(--pink-mid);
-            border-radius: var(--radius);
-            box-shadow: var(--shadow);
-            backdrop-filter: blur(12px);
-        }
-        .home-ops h3 {
-            font-size: 1.05rem;
-            font-weight: 900;
-            color: var(--text);
-            margin: 0 0 6px;
-        }
-        .home-ops > p.sub {
-            font-size: 0.88rem;
-            color: var(--text-mute);
-            font-weight: 600;
-            margin: 0 0 16px;
-        }
-        .home-ops-grid {
-            display: grid;
-            gap: 20px;
-        }
-        @media (min-width: 860px) {
-            .home-ops-grid { grid-template-columns: 1fr 1fr; }
-        }
-        .home-ops-block {
-            border: 1px solid rgba(251, 207, 232, 0.95);
-            border-radius: 16px;
-            padding: 14px 16px 16px;
-            background: rgba(255, 247, 249, 0.65);
-        }
-        .home-ops-block h4 {
-            margin: 0 0 10px;
-            font-size: 0.92rem;
-            font-weight: 900;
-            color: #be185d;
-        }
-        .home-ops table {
-            width: 100%;
-            border-collapse: collapse;
-            font-size: 0.82rem;
-            font-weight: 700;
-        }
-        .home-ops th, .home-ops td {
-            padding: 8px 6px;
-            text-align: left;
-            border-bottom: 1px solid rgba(251, 207, 232, 0.7);
-        }
-        .home-ops th { color: var(--text-mute); font-size: 0.75rem; text-transform: uppercase; letter-spacing: 0.04em; }
-        .home-ops a.admin-link {
-            display: inline-block;
-            margin-top: 10px;
-            font-weight: 900;
-            color: #a855f7;
-            text-decoration: none;
-        }
-        .home-ops a.admin-link:hover { text-decoration: underline; }
-
-        /* ── HERO ── */
         .hero {
             text-align: center;
             padding: 70px 0 50px;
@@ -367,7 +299,6 @@
         }
         .btn-outline:hover { background: var(--pink-soft); border-color: var(--pink); }
 
-        /* ── SECTION TITLE ── */
         .section-title {
             text-align: center;
             font-size: 1.5rem;
@@ -390,121 +321,6 @@
         }
         .section-title::after { background: linear-gradient(270deg, transparent, var(--pink-mid)); }
 
-        /* ── POPUP ── */
-        .popup-overlay {
-            position: fixed;
-            inset: 0;
-            background: rgba(74,32,64,0.45);
-            backdrop-filter: blur(4px);
-            display: none;
-            align-items: center;
-            justify-content: center;
-            z-index: 999;
-        }
-        .popup-overlay.open { display: flex; }
-        .popup-box {
-            background: #fff;
-            padding: 40px 36px;
-            border-radius: 24px;
-            text-align: center;
-            width: 320px;
-            box-shadow: 0 24px 60px rgba(244,114,182,0.3);
-            animation: popIn 0.3s cubic-bezier(0.34,1.56,0.64,1);
-        }
-        @keyframes popIn {
-            from { transform: scale(0.75); opacity: 0; }
-            to   { transform: scale(1);    opacity: 1; }
-        }
-        .popup-box .popup-icon { font-size: 3rem; margin-bottom: 12px; }
-        .popup-box h2 { font-size: 1.35rem; font-weight: 900; color: var(--text); margin-bottom: 10px; }
-        .popup-box p  { color: var(--text-mute); font-weight: 600; margin-bottom: 24px; font-size: 1rem; }
-
-        /* ── SPIN SECTION ── */
-        .spin-open-btn {
-            display: block;
-            margin: 0 auto 20px;
-        }
-
-        /* ── SPIN MODAL ── */
-        .spin-modal-overlay {
-            position: fixed;
-            inset: 0;
-            background: rgba(74,32,64,0.5);
-            backdrop-filter: blur(6px);
-            -webkit-backdrop-filter: blur(6px);
-            display: none;
-            align-items: center;
-            justify-content: center;
-            z-index: 998;
-        }
-        .spin-modal-overlay.open { display: flex; }
-        .spin-modal {
-            background: linear-gradient(160deg, #fff7f9 0%, #fce7f3 50%, #ede9fe 100%);
-            border-radius: 28px;
-            border: 2px solid var(--pink-mid);
-            padding: 36px 32px 32px;
-            width: min(480px, 92vw);
-            text-align: center;
-            box-shadow: 0 32px 80px rgba(244,114,182,0.35);
-            animation: popIn 0.35s cubic-bezier(0.34,1.56,0.64,1);
-            position: relative;
-        }
-        .spin-modal-close {
-            position: absolute;
-            top: 14px; right: 16px;
-            background: var(--pink-soft);
-            border: 1.5px solid var(--pink-mid);
-            color: var(--text-mute);
-            width: 32px; height: 32px;
-            border-radius: 50%;
-            font-size: 1rem;
-            line-height: 1;
-            cursor: pointer;
-            display: flex; align-items: center; justify-content: center;
-            transition: background 0.2s, color 0.2s;
-        }
-        .spin-modal-close:hover { background: var(--pink-mid); color: var(--text); }
-        .spin-modal h3 {
-            font-size: 1.3rem;
-            font-weight: 900;
-            background: linear-gradient(135deg, #be185d, #a855f7);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            background-clip: text;
-            margin-bottom: 6px;
-        }
-        .spin-modal .spin-sub {
-            font-size: 0.85rem;
-            color: var(--text-mute);
-            font-weight: 600;
-            margin-bottom: 24px;
-        }
-        .spin-wheel-wrap {
-            width: 240px;
-            height: 240px;
-            margin: 0 auto 24px;
-            position: relative;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-        }
-        .spin-wheel-wrap img {
-            width: 100%;
-            height: 100%;
-            object-fit: contain;
-            transition: transform 5s cubic-bezier(0.33, 1, 0.68, 1);
-            filter: drop-shadow(0 8px 28px rgba(244,114,182,0.4));
-        }
-        .spin-wheel-wrap::after {
-            content: '▼';
-            position: absolute;
-            top: -18px;
-            font-size: 1.6rem;
-            color: var(--rose);
-            filter: drop-shadow(0 2px 4px rgba(244,114,182,0.4));
-        }
-
-        /* ── PRODUCT CARDS ── */
         .cards {
             display: grid;
             grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
@@ -540,32 +356,20 @@
             overflow: hidden;
             border: 1.5px solid rgba(251,207,232,0.9);
             box-shadow: 0 12px 26px rgba(244,114,182,0.16);
-            background: rgba(255,255,255,0.7);
-        }
-        .card-image::before {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: -100%;
-            width: 100%;
-            height: 100%;
-            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.4), transparent);
-            z-index: 2;
-            transition: left 0.5s;
-        }
-        .card-image:hover::before {
-            left: 100%;
+            background: linear-gradient(135deg, #fce7f3, #ede9fe);
+            height: auto;
+            min-height: 200px;
         }
         .card-image img {
             display: block;
             width: 100%;
-            height: clamp(280px, 32vw, 340px);
-            min-height: 280px;
+            height: auto;
+            max-height: 300px;
             object-fit: contain;
             object-position: center center;
             padding: 8px;
             background: transparent;
-            transition: transform 0.4s ease, filter 0.4s ease;
+            transition: transform 0.4s ease;
         }
         .card:hover .card-image img {
             transform: scale(1.08);
@@ -583,107 +387,108 @@
             z-index: 1;
         }
 
-        /* Kho acc nổi bật — 3 cột, ảnh lớn */
         .warehouse-wrap {
-            max-width: min(1320px, calc(100vw - 170px));
+            max-width: 1100px;
             margin: 0 auto;
-            padding: 0 2px;
+            padding: 0 20px;
         }
-        @media (max-width: 1100px) {
+        .cards.cards-center {
+            display: grid;
+            gap: 20px;
+            grid-template-columns: repeat(3, 1fr);
+            justify-content: center;
+        }
+        @media (max-width: 800px) {
+            .cards.cards-center { grid-template-columns: repeat(2, 1fr); }
             .warehouse-wrap { max-width: 100%; }
         }
-        .cards.cards-warehouse {
-            display: grid;
-            gap: 24px;
-            grid-template-columns: repeat(3, minmax(0, 1fr));
+        @media (max-width: 500px) {
+            .cards.cards-center { grid-template-columns: 1fr; }
         }
-        .cards.cards-warehouse { grid-template-columns: repeat(3, 380px); justify-content: center; }
-        @media (max-width: 1200px) {
-            .cards.cards-warehouse { grid-template-columns: repeat(3, minmax(280px, 1fr)); }
-        }
-        @media (max-width: 900px) {
-            .cards.cards-warehouse { grid-template-columns: repeat(2, minmax(0, 1fr)); }
-        }
-        @media (max-width: 600px) {
-            .cards.cards-warehouse { grid-template-columns: 1fr; }
-        }
-        .cards.cards-warehouse .card {
-            padding: 22px 22px 28px;
-            max-width: 100%;
-            min-width: 0;
-        }
-        .cards.cards-warehouse .card-image {
-            margin: -6px -6px 18px;
-            border-radius: 20px;
-            height: 480px;
-            min-height: 480px;
+        .cards.cards-center .card {
+            padding: 0;
+            border-radius: 16px;
             overflow: hidden;
+            background: white;
+            box-shadow: 0 2px 12px rgba(0,0,0,0.08);
+            transition: transform 0.3s, box-shadow 0.3s;
         }
-        .cards.cards-warehouse .card-image img {
+        .cards.cards-center .card:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 8px 24px rgba(168,85,247,0.2);
+        }
+        .cards.cards-center .card-image {
+            margin: 0;
+            border-radius: 16px 16px 0 0;
+            height: 180px;
+            overflow: hidden;
+            background: linear-gradient(135deg, #fce7f3, #ede9fe);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .cards.cards-center .card-image img {
             display: block;
-            width: 100% !important;
-            height: 100% !important;
-            min-height: unset !important;
-            object-fit: contain !important;
-            object-position: center center !important;
-            padding: 12px;
-            background: rgba(255,255,255,0.5);
+            width: 100%;
+            height: 100%;
+            object-fit: contain;
+            padding: 10px;
+        }
+        .cards.cards-center .card-body {
+            padding: 16px;
+            text-align: center;
         }
         .card-tag {
             display: inline-block;
-            font-size: 0.72rem;
+            font-size: 0.7rem;
             font-weight: 800;
-            padding: 3px 10px;
+            padding: 3px 8px;
             border-radius: 20px;
-            margin-bottom: 12px;
-            background: var(--pink-soft);
-            color: #be185d;
+            margin-bottom: 8px;
+            background: #fef2f2;
+            color: #dc2626;
         }
-        .card-tag.purple { background: var(--lavender); color: #6b21a8; }
-        .card-tag.gold   { background: #fef9c3; color: #854d0e; }
-        .card h3 {
-            font-size: 1.1rem;
+        .card-tag.purple { background: #faf5ff; color: #7c3aed; }
+        .card-tag.gold   { background: #fefce8; color: #ca8a04; }
+        .cards.cards-warehouse h3 {
+            font-size: 0.9rem;
             font-weight: 900;
             color: var(--text);
-            margin-bottom: 8px;
+            margin-bottom: 12px;
+            line-height: 1.3;
         }
-        .card p {
-            font-size: 0.88rem;
-            color: var(--text-mute);
-            font-weight: 600;
-            line-height: 1.6;
-            margin-bottom: 20px;
-            flex: 1;
+        .card-explore-btn {
+            background: linear-gradient(135deg, #f472b6, #a855f7);
+            color: #fff;
+            border: none;
+            padding: 10px 28px;
+            border-radius: 25px;
+            font-size: 0.85rem;
+            font-weight: 800;
+            cursor: pointer;
+            transition: all 0.3s;
+            text-decoration: none;
+            display: inline-block;
         }
-        .card-footer {
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            gap: 12px;
-            margin-top: auto;
-        }
-        .price {
-            font-size: 1.25rem;
-            font-weight: 900;
-            background: linear-gradient(135deg, #be185d, #a855f7);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            background-clip: text;
+        .card-explore-btn:hover {
+            transform: scale(1.05);
+            box-shadow: 0 4px 15px rgba(244,114,182,0.4);
         }
         .card-buy {
             background: linear-gradient(135deg, #f472b6, #a855f7);
             color: #fff;
             border: none;
-            padding: 8px 18px;
-            border-radius: 30px;
-            font-size: 0.82rem;
-            font-weight: 800;
-            font-family: inherit;
+            padding: 8px 16px;
+            border-radius: 25px;
+            font-size: 0.78rem;
+            font-weight: 700;
             cursor: pointer;
-            box-shadow: 0 3px 10px rgba(244,114,182,0.35);
-            transition: transform 0.15s, box-shadow 0.15s;
+            transition: all 0.3s;
         }
-        .card-buy:hover { transform: scale(1.05); box-shadow: 0 5px 14px rgba(244,114,182,0.45); }
+        .card-buy:hover {
+            transform: scale(1.05);
+            box-shadow: 0 4px 15px rgba(244,114,182,0.4);
+        }
         .card-actions {
             display: flex;
             gap: 8px;
@@ -702,7 +507,6 @@
         }
         .card-detail-btn:hover { background: var(--pink-soft); border-color: var(--pink); }
 
-        /* ── ACC DETAIL MODAL ── */
         .acc-detail-overlay {
             position: fixed;
             inset: 0;
@@ -871,7 +675,6 @@
             font-size: 0.95rem;
         }
 
-        /* ── FAB ── */
         .chat-fab {
             position: fixed;
             bottom: 28px;
@@ -899,7 +702,6 @@
             }
         }
 
-        /* ── STATS STRIP ── */
         .stats {
             display: flex;
             justify-content: center;
@@ -921,7 +723,6 @@
         }
         .stat-label { font-size: 0.82rem; color: var(--text-mute); font-weight: 700; margin-top: 2px; }
 
-        /* CART SHOWCASE */
         .cart-showcase {
             margin: 34px 0 10px;
             display: grid;
@@ -1023,32 +824,27 @@
                 width: min(100%, 260px);
             }
         }
+
+        @keyframes popIn {
+            from { transform: scale(0.75); opacity: 0; }
+            to   { transform: scale(1);    opacity: 1; }
+        }
     </style>
 </head>
 <body th:attr="data-logged-in=${session.userId != null}">
 
-<!-- POPUP -->
-<div class="popup-overlay" id="popup">
-    <div class="popup-box">
-        <div class="popup-icon">🎉</div>
-        <h2>Chúc mừng!</h2>
-        <p id="popup-text"></p>
-        <button onclick="closePopup()" class="btn-primary">Nhận thưởng!</button>
-    </div>
-</div>
-
 <!-- PETALS -->
 <div class="petals" aria-hidden="true">
-    <span class="petal">🌸</span>
-    <span class="petal">✿</span>
-    <span class="petal">🌸</span>
-    <span class="petal">❀</span>
-    <span class="petal">🌸</span>
-    <span class="petal">✿</span>
-    <span class="petal">🌸</span>
-    <span class="petal">❀</span>
-    <span class="petal">🌸</span>
-    <span class="petal">✿</span>
+    <span class="petal">&#x1F338;</span>
+    <span class="petal">&#x273F;</span>
+    <span class="petal">&#x1F338;</span>
+    <span class="petal">&#x273F;</span>
+    <span class="petal">&#x1F338;</span>
+    <span class="petal">&#x273F;</span>
+    <span class="petal">&#x1F338;</span>
+    <span class="petal">&#x273F;</span>
+    <span class="petal">&#x1F338;</span>
+    <span class="petal">&#x273F;</span>
 </div>
 
 <!-- SIDE GIRLS -->
@@ -1058,27 +854,27 @@
 <!-- HEADER -->
 <header class="header" id="trang-chu">
     <a class="brand" href="#trang-chu">
-        <span>🌸</span> Genshin Cute Shop
+        <span>&#x1F338;</span> Genshin Cute Shop
     </a>
     <nav class="nav">
-        <a href="#trang-chu">Trang chủ</a>
+        <a href="#trang-chu">Trang ch&#x1EE7;</a>
         <a href="#kho-acc">Mua ngay</a>
-        <a th:href="@{/cart}" class="nav-cart">Giỏ hàng <span class="cart-count-badge" id="cart-count" th:text="${cartSummary.count}">0</span></a>
-        <a th:href="@{/wallet}" th:if="${session.userId != null}">💰 Nạp tiền</a>
+        <a th:href="@{/cart}" class="nav-cart">Gi&#x1ECF; h&#xE0;ng <span class="cart-count-badge" id="cart-count" th:text="${cartSummary.count}">0</span></a>
+        <a th:href="@{/wallet}" th:if="${session.userId != null}">&#x1F4B0; N&#x1EA1;p ti&#x1EC1;n</a>
         <a th:href="@{/profile}" th:if="${session.userId != null}">Profile</a>
-        <a th:href="@{/my-orders}" th:if="${session.userId != null}">Đơn mua</a>
+        <a th:href="@{/my-orders}" th:if="${session.userId != null}">&#x110;&#x1A1;n mua</a>
         <a th:href="@{/admin}" th:if="${session.role == 'ADMIN'}">Admin</a>
         <a th:href="@{/ctv/submit}" th:if="${session.role == 'CTV'}">CTV</a>
-        <a href="#lien-he">Liên hệ</a>
-        <a th:href="@{/auth/login}" th:if="${session.userId == null}">Đăng nhập</a>
-        <a class="cta" th:href="@{/auth/register}" th:if="${session.userId == null}">Đăng ký ngay ✨</a>
+        <a href="#lien-he">Li&#xEA;n h&#x1EC7;</a>
+        <a th:href="@{/auth/login}" th:if="${session.userId == null}">&#x110;&#x103;ng nh&#x1EAD;p</a>
+        <a class="cta" th:href="@{/auth/register}" th:if="${session.userId == null}">&#x110;&#x103;ng k&#xFD; ngay &#x2728;</a>
         <div class="user-menu" th:if="${session.userId != null}">
-            <button class="user-trigger" id="userMenuTrigger" type="button" aria-label="Tài khoản">
+            <button class="user-trigger" id="userMenuTrigger" type="button" aria-label="T&#xE0;i kho&#x1EA3;n">
                 <img th:src="@{/images/user-avatar.png}" alt="User avatar" loading="lazy">
             </button>
             <div class="user-dropdown" id="userDropdown">
                 <div class="user-name" th:text="${session.username}">Username</div>
-                <a th:href="@{/my-orders}" style="display:block;padding:8px 0;font-weight:800;color:#a855f7;text-decoration:none;font-size:0.88rem">🛒 Lịch sử mua</a>
+                <a th:href="@{/my-orders}" style="display:block;padding:8px 0;font-weight:800;color:#a855f7;text-decoration:none;font-size:0.88rem">&#x1F6D2; L&#x1ECB;ch s&#x1EED; mua</a>
                 <form th:action="@{/auth/logout}" method="post">
                     <button class="user-logout" type="submit">Logout</button>
                 </form>
@@ -1091,119 +887,75 @@
 
     <!-- HERO -->
     <section class="hero">
-        <div class="hero-badge">🌸 Genshin Impact Account Shop 🌸</div>
-        <h1>Shop Acc Genshin<br>Siêu Cấp Dễ Thương</h1>
-        <p>Nick xịn, giá mềm, giao acc nhanh trong 5 phút. Uy tín hàng đầu, cam kết chất lượng!</p>
+        <div class="hero-badge">&#x1F338; Genshin Impact Account Shop &#x1F338;</div>
+        <h1>Shop Acc Genshin<br>Si&#xEA;u C&#x1EA5;p D&#x1EC5; Th&#x1B0;&#x1A1;ng</h1>
+        <p>Nick x&#x1ECB;n, gi&#xE1; m&#x1EC1;m, giao acc nhanh trong 5 ph&#x00FA;t. Uy t&#xED;n h&#xE0;ng &#x111;&#x1EA7;u, cam k&#x1EBF;t ch&#x1EA5;t l&#x1B0;&#x1EE3;ng!</p>
         <div class="hero-actions">
-            <a href="#kho-acc" class="btn-primary">Xem kho acc ngay ✨</a>
-            <a th:href="@{/auth/register}" class="btn-outline">Đăng ký miễn phí</a>
+            <a href="#kho-acc" class="btn-primary">Xem kho acc ngay &#x2728;</a>
+            <a th:href="@{/auth/register}" class="btn-outline">&#x110;&#x103;ng k&#xFD; mi&#x1EC5;n ph&#xED;</a>
         </div>
-        <!-- TOP NAP TIEN -->
-        <div class="top-deposit-section" th:if="${!#lists.isEmpty(topDepositors)}" style="margin:24px 0;padding:24px;background:linear-gradient(135deg,rgba(255,255,255,0.9),rgba(252,231,243,0.9));border:2px solid #fbcfe8;border-radius:24px;box-shadow:0 8px 32px rgba(244,114,182,0.12)">
-            <div style="text-align:center;margin-bottom:20px">
-                <div style="display:inline-flex;align-items:center;gap:8px;background:#fef9c3;border:1.5px solid #fde047;border-radius:999px;padding:6px 16px;margin-bottom:12px">
-                    <span style="font-size:1.2rem">🏆</span>
-                    <span style="font-weight:800;font-size:0.82rem;color:#854d0e">Top Nạp Tiền</span>
-                </div>
-                <h3 style="font-size:1.1rem;font-weight:900;color:#4a2040;margin:0">Những khách hàng nạp nhiều nhất</h3>
-                <p style="font-size:0.82rem;color:#9d6580;font-weight:600;margin:4px 0 0">Cảm ơn các bạn đã tin tưởng shop!</p>
-            </div>
-            <div class="top-deposit-grid" style="display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:14px">
-                <div th:each="td,stat : ${topDepositors}" style="background:rgba(255,255,255,0.8);border:1.5px solid #fbcfe8;border-radius:16px;padding:16px 14px;text-align:center;transition:transform 0.2s;position:relative;overflow:hidden" th:styleappend="${stat.index == 0} ? 'border-color:#facc15;border-width:2px' : ''">
-                    <div th:if="${stat.index == 0}" style="position:absolute;top:8px;right:8px;font-size:1.1rem">👑</div>
-                    <div th:if="${stat.index == 1}" style="position:absolute;top:8px;right:8px;font-size:1rem">🥈</div>
-                    <div th:if="${stat.index == 2}" style="position:absolute;top:8px;right:8px;font-size:1rem">🥉</div>
-                    <div style="width:48px;height:48px;border-radius:50%;margin:0 auto 10px;display:flex;align-items:center;justify-content:center;font-weight:900;font-size:1.1rem"
-                         th:styleappend="${stat.index == 0} ? 'background:linear-gradient(135deg,#facc15,#f59e0b);color:#fff' : 'background:linear-gradient(135deg,#f472b6,#a855f7);color:#fff'"
-                         th:text="${td.avatar}">U</div>
-                    <div style="font-weight:800;font-size:0.9rem;color:#4a2040;margin-bottom:4px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis" th:text="${td.username}">Username</div>
-                    <div style="font-weight:900;font-size:0.85rem;background:linear-gradient(135deg,#be185d,#a855f7);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text" th:text="${td.total}">0đ</div>
-                </div>
-            </div>
-        </div>
-
     </section>
 
     <!-- STATS -->
     <div class="stats">
         <div class="stat">
             <div class="stat-num">2,400+</div>
-            <div class="stat-label">Acc đã bán</div>
+            <div class="stat-label">Acc &#x111;&#xE3; b&#xE1;n</div>
         </div>
         <div class="stat">
             <div class="stat-num">99%</div>
-            <div class="stat-label">Khách hài lòng</div>
+            <div class="stat-label">Kh&#xE1;ch h&#xE0;i l&#xF2;ng</div>
         </div>
         <div class="stat">
-            <div class="stat-num">5 phút</div>
-            <div class="stat-label">Giao acc tức thì</div>
+            <div class="stat-num">5 ph&#x00FA;t</div>
+            <div class="stat-label">Giao acc t&#x1EE9;c th&#xEC;</div>
         </div>
         <div class="stat">
             <div class="stat-num">24/7</div>
-            <div class="stat-label">Hỗ trợ online</div>
+            <div class="stat-label">H&#x1ED7; tr&#x1EE3; online</div>
         </div>
     </div>
 
     <section class="cart-showcase" id="gio-hang" aria-labelledby="gio-hang-title">
         <div class="cart-copy">
-            <span class="cart-kicker">🛒 Giỏ hàng nổi bật</span>
-            <h3 id="gio-hang-title">Thêm vào giỏ nhanh, chốt acc đẹp trong vài phút</h3>
+            <span class="cart-kicker">&#x1F6D2; Gi&#x1ECF; h&#xE0;ng n&#x1ED5;i b&#x1EAD;t</span>
+            <h3 id="gio-hang-title">Th&#xEA;m v&#xE0;o gi&#x1ECF; nhanh, ch&#x1ED1;t acc &#x111;&#x1EB9;p trong v&#xE0;i ph&#x00FA;t</h3>
             <p>
-                Khu vực giỏ hàng trên trang chủ giờ có ảnh minh họa riêng để nổi bật hơn.
-                Bạn có thể dùng block này như điểm nhấn cho acc hot, flash sale hoặc danh sách chuẩn bị mua.
+                Khu v&#x1EF1;c gi&#x1ECF; h&#xE0;ng tr&#xEA;n trang ch&#x1EE7; gi&#x1EDF; c&#xF3; &#x1EA3;nh minh h&#x1ECD;a ri&#xEA;ng &#x111;&#x1EC3; n&#x1ED5;i b&#x1EAD;t h&#x1A1;n.
+                B&#x1EA1;n c&#xF3; th&#x1EC3; d&#xF9;ng block n&#xE0;y nh&#x1B0; &#x111;i&#x1EC3;m nh&#x1EA5;n cho acc hot, flash sale ho&#x1EB7;c danh s&#xE1;ch chu&#x1EA9;n b&#x1ECB; mua.
             </p>
             <div class="cart-meta">
                 <span class="cart-chip">Flash sale 20%</span>
-                <span class="cart-chip">Acc giao trong 5 phút</span>
-                <span class="cart-chip">Bảo hành đổi lỗi</span>
+                <span class="cart-chip">Acc giao trong 5 ph&#x00FA;t</span>
+                <span class="cart-chip">B&#x1EA3;o h&#xE0;nh &#x111;&#x1ED5;i l&#x1ED7;i</span>
             </div>
             <div class="hero-actions">
-                <a href="#kho-acc" class="btn-primary">Thêm vào giỏ ngay</a>
-                <a th:href="@{/cart}" class="btn-outline">Xem giỏ hàng</a>
+                <a href="#kho-acc" class="btn-primary">Th&#xEA;m v&#xE0;o gi&#x1ECF; ngay</a>
+                <a th:href="@{/cart}" class="btn-outline">Xem gi&#x1ECF; h&#xE0;ng</a>
             </div>
             <p class="cart-status" id="cart-status"></p>
         </div>
         <div class="cart-art">
-            <img th:src="@{/images/home-cart-banner.png}" alt="Minh họa giỏ hàng trang chủ" loading="lazy">
+            <img th:src="@{/images/home-cart-banner.png}" alt="Minh h&#x1ECD;a gi&#x1ECF; h&#xE0;ng trang ch&#x1EE7;" loading="lazy">
         </div>
     </section>
 
-    <!-- SPIN -->
-    <h2 class="section-title">🎡 Vòng quay may mắn</h2>
-    <button onclick="openSpinModal()" class="btn-primary spin-open-btn">🎰 Thử vận may ngay!</button>
-
-    <!-- SPIN MODAL -->
-    <div class="spin-modal-overlay" id="spinModal">
-        <div class="spin-modal">
-            <button class="spin-modal-close" onclick="closeSpinModal()" title="Đóng">✕</button>
-            <h3>🎡 Vòng Quay May Mắn</h3>
-            <p class="spin-sub">Mỗi ngày 1 lần quay miễn phí — chúc bạn may mắn!</p>
-            <div class="spin-wheel-wrap">
-                <img id="wheel-image" th:src="@{/images/spin.png}" alt="Vòng quay">
-            </div>
-            <button onclick="startSpin()" id="spinBtn" class="btn-primary">🎰 Quay ngay!</button>
-        </div>
-    </div>
-
     <!-- CARDS -->
     <div class="warehouse-wrap" id="kho-acc">
-    <h2 class="section-title">Kho Acc Nổi Bật ✨</h2>
-    <p th:if="${#lists.isEmpty(visibleAccounts)}" style="text-align:center;color:var(--text-mute);font-weight:700">Chưa có acc trong kho — hãy thêm acc để hiển thị.</p>
-    <section class="cards cards-warehouse" th:if="${!#lists.isEmpty(visibleAccounts)}">
+    <h2 class="section-title">Kho Acc N&#x1ED4;i B&#x1EAD;t &#x2728;</h2>
+    <p th:if="${#lists.isEmpty(visibleAccounts)}" style="text-align:center;color:var(--text-mute);font-weight:700">Ch&#x1B0;a c&#xF3; acc trong kho - h&#xE3;y th&#xEA;m acc &#x111;&#x1EC3; hi&#x1EC3;n th&#x1ECB;.</p>
+    <section class="cards cards-center" th:if="${!#lists.isEmpty(visibleAccounts)}">
         <article class="card" th:each="acc : ${visibleAccounts}" th:with="imgSrc=${(acc.listingImagePath != null && !#strings.isEmpty(acc.listingImagePath)) ? acc.listingImagePath : (acc.product != null ? acc.product.imagePath : '')}">
-            <div class="card-image" style="cursor:pointer" th:attr="onclick=|openAccDetail(${acc.id})|">
-                <img th:src="${imgSrc}" th:alt="${acc.product != null ? acc.product.name : 'Acc'}" loading="lazy">
-            </div>
-            <span th:class="${'card-tag' + (acc.product != null && #strings.contains(acc.product.slug,'premium') ? ' purple' : (acc.product != null && #strings.contains(acc.product.slug,'vip') ? ' gold' : ''))}">Acc</span>
-            <h3 th:text="${acc.product != null ? acc.product.name : 'Acc Genshin'}">Acc</h3>
-            <p th:text="${acc.rankInfo != null ? acc.rankInfo : (acc.product != null ? acc.product.description : 'Tài khoản Genshin Impact')}">Mô tả</p>
-            <div class="card-footer">
-                <div class="price" th:text="${accountPriceFormatted[acc.id]}">0đ</div>
-                <div class="card-actions">
-                    <button type="button" class="card-detail-btn" th:attr="onclick=|openAccDetail(${acc.id})|">Chi tiết</button>
-                    <button type="button" class="card-buy" th:attr="data-product-id=${acc.product != null ? acc.product.slug : ''}">Mua</button>
+            <a th:href="@{'/account/' + ${acc.id}}" style="text-decoration:none;color:inherit">
+                <div class="card-image" style="background: linear-gradient(135deg, #5B8DEE, #2E5BB8);">
+                    <img th:src="${imgSrc}" th:alt="${acc.product != null ? acc.product.name : 'Acc'}" loading="lazy">
                 </div>
-            </div>
+                <div class="card-body">
+                    <span th:class="${'card-tag' + (acc.product != null && #strings.contains(acc.product.slug,'premium') ? ' purple' : (acc.product != null && #strings.contains(acc.product.slug,'vip') ? ' gold' : ''))}">Acc</span>
+                    <h3 th:text="${acc.product != null ? acc.product.name : 'Acc Genshin'}">Acc</h3>
+                    <span class="card-explore-btn">Kh&#xE1;m ph&#xE1;</span>
+                </div>
+            </a>
         </article>
     </section>
     </div>
@@ -1211,7 +963,7 @@
     <!-- ACC DETAIL MODAL -->
     <div class="acc-detail-overlay" id="accDetailModal">
         <div class="acc-detail-modal">
-            <button class="acc-detail-close" onclick="closeAccDetail()" title="Đóng">✕</button>
+            <button class="acc-detail-close" onclick="closeAccDetail()" title="&#x110;&#xF3;ng">&#x2715;</button>
             <div class="acc-detail-image">
                 <img id="accDetailImage" src="" alt="Acc detail">
             </div>
@@ -1220,7 +972,7 @@
                 <h2 id="accDetailName">-</h2>
                 <div class="acc-detail-meta">
                     <div class="acc-detail-row" th:if="false"><span>ID:</span> <span id="accDetailId">-</span></div>
-                    <div class="acc-detail-row" th:if="false"><span>Gói:</span> <span id="accDetailProduct">-</span></div>
+                    <div class="acc-detail-row" th:if="false"><span>G&#xF3;i:</span> <span id="accDetailProduct">-</span></div>
                 </div>
                 <div class="acc-detail-specs">
                     <div class="acc-detail-spec" id="accDetailRank">
@@ -1237,11 +989,11 @@
                     </div>
                 </div>
                 <div class="acc-detail-desc" id="accDetailExtra">
-                    <h4>Thông tin thêm</h4>
+                    <h4>Th&#xF4;ng tin th&#xEA;m</h4>
                     <p>-</p>
                 </div>
                 <div class="acc-detail-footer">
-                    <div class="acc-detail-price" id="accDetailPrice">0đ</div>
+                    <div class="acc-detail-price" id="accDetailPrice">0&#x111;</div>
                     <button type="button" class="card-buy" id="accDetailBuyBtn">Mua ngay</button>
                 </div>
             </div>
@@ -1252,11 +1004,10 @@
 
 <!-- FAB -->
 <a class="chat-fab" href="https://www.facebook.com/utaitejapan?locale=vi_VN" target="_blank">
-    💬 Chat Facebook ngay
+    &#x1F4AC; Chat Facebook ngay
 </a>
 
 <script th:inline="javascript">
-    /* Account data for detail modal */
     const accountData = /*[[${accountJson}]]*/ {};
 
     function openAccDetail(id) {
@@ -1297,82 +1048,11 @@
         if (e.target === this) closeAccDetail();
     });
 
-    let isSpinning = false;
-    let currentRotation = 0;
     const cartCountEl = document.getElementById('cart-count');
     const cartStatusEl = document.getElementById('cart-status');
     const isLoggedIn = document.body.dataset.loggedIn === 'true';
     const userMenuTrigger = document.getElementById('userMenuTrigger');
     const userDropdown = document.getElementById('userDropdown');
-    let inactivityTimer = null;
-
-    function openSpinModal() {
-        document.getElementById('spinModal').classList.add('open');
-    }
-
-    function closeSpinModal() {
-        if (isSpinning) return;
-        document.getElementById('spinModal').classList.remove('open');
-    }
-
-
-    document.getElementById('spinModal').addEventListener('click', function(e) {
-        if (e.target === this) closeSpinModal();
-    });
-
-    function startSpin() {
-        if (isSpinning) return;
-        const wheel = document.getElementById('wheel-image');
-        const btn = document.getElementById('spinBtn');
-
-        isSpinning = true;
-        btn.disabled = true;
-        btn.textContent = '🔄 Đang quay...';
-
-        fetch('/auth/spin')
-            .then(res => {
-                if (res.status === 401) {
-                    alert('Bạn chưa đăng nhập!');
-                    reset(); return null;
-                }
-                if (!res.ok) {
-                    alert('Lỗi server!');
-                    reset(); return null;
-                }
-                return res.json();
-            })
-            .then(data => {
-                if (!data) return;
-                const finalRotation = currentRotation + 360 * 5 + data.degree;
-                wheel.style.transform = `rotate(${finalRotation}deg)`;
-                currentRotation = finalRotation;
-                setTimeout(() => {
-                    showPopup(data.prize);
-                    reset();
-                }, 5000);
-            })
-            .catch(() => {
-                alert('Không kết nối được server!');
-                reset();
-            });
-    }
-
-    function reset() {
-        isSpinning = false;
-        const btn = document.getElementById('spinBtn');
-        btn.disabled = false;
-        btn.textContent = '🎰 Quay ngay!';
-    }
-
-    function showPopup(prize) {
-        closeSpinModal();
-        document.getElementById('popup-text').innerText = 'Bạn nhận được: ' + prize;
-        document.getElementById('popup').classList.add('open');
-    }
-
-    function closePopup() {
-        document.getElementById('popup').classList.remove('open');
-    }
 
     function setupUserMenu() {
         if (!userMenuTrigger || !userDropdown) return;
@@ -1389,27 +1069,6 @@
         });
     }
 
-    function logoutForInactivity() {
-        fetch('/auth/logout', { method: 'POST' })
-            .finally(() => {
-                window.location.href = '/auth/login';
-            });
-    }
-
-    function resetInactivityTimer() {
-        if (!isLoggedIn) return;
-        window.clearTimeout(inactivityTimer);
-        inactivityTimer = window.setTimeout(logoutForInactivity, 10 * 60 * 1000);
-    }
-
-    function setupInactivityLogout() {
-        if (!isLoggedIn) return;
-        ['click', 'keydown', 'mousemove', 'scroll', 'touchstart'].forEach(eventName => {
-            window.addEventListener(eventName, resetInactivityTimer, { passive: true });
-        });
-        resetInactivityTimer();
-    }
-
     function updateCartUi(cartSummary) {
         cartCountEl.textContent = cartSummary.count;
         if (cartSummary.message) {
@@ -1421,48 +1080,35 @@
         const productId = button.dataset.productId;
         const originalText = button.textContent;
         button.disabled = true;
-        button.textContent = 'Đang thêm...';
+        button.textContent = '&#x110;ang th&#xEA;m...';
 
         fetch('/cart/add', {
             method: 'POST',
-            headers: {
-                'Content-Type': 'application/json'
-            },
+            headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ productId })
         })
-            .then(async res => {
-                const data = await res.json().catch(() => ({}));
-                if (res.status === 401) {
-                    window.location.href = '/auth/login';
-                    return null;
-                }
-                if (!res.ok) {
-                    throw new Error(data.message || 'Không thể thêm sản phẩm vào giỏ hàng.');
-                }
-                return data;
-            })
-            .then(data => {
-                if (!data) return;
-                updateCartUi(data);
-                if (data.message && data.message.includes('giỏ hàng')) {
-                    button.textContent = 'Đã có trong giỏ';
-                    button.disabled = true;
-                }
-            })
-            .catch(err => {
-                cartStatusEl.textContent = err.message;
-            })
-            .finally(() => {
-                if (button.textContent === 'Đang thêm...' || button.textContent === originalText) {
-                    button.disabled = false;
-                    button.textContent = originalText;
-                }
-            });
+        .then(async res => {
+            if (res.status === 401) { window.location.href = '/auth/login'; return null; }
+            return res.json();
+        })
+        .then(data => {
+            if (!data) return;
+            updateCartUi(data);
+            button.textContent = '&#x110;&#xE3; c&#xF3; trong gi&#x1ECF;';
+        })
+        .catch(err => {
+            cartStatusEl.textContent = err.message;
+        })
+        .finally(() => {
+            setTimeout(() => {
+                button.disabled = false;
+                button.textContent = originalText;
+            }, 1500);
+        });
     }
 
     document.querySelectorAll('.card-buy').forEach(button => {
         button.addEventListener('click', function () {
-            const originalText = this.textContent;
             addToCart(this);
         });
     });
@@ -1476,7 +1122,6 @@
     });
 
     setupUserMenu();
-    setupInactivityLogout();
 </script>
 </body>
 </html>

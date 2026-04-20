@@ -4,46 +4,451 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>CTV — Đăng acc</title>
-    <link rel="stylesheet" th:href="@{/css/admin-panel.css}">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800;900&display=swap" rel="stylesheet">
+    <style>
+        *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+        body {
+            font-family: 'Nunito', sans-serif;
+            background: linear-gradient(135deg, #1a1a2e 0%, #16213e 50%, #0f0f23 100%);
+            color: #fff; min-height: 100vh; padding: 24px;
+        }
+        .container { max-width: 720px; margin: 0 auto; }
+
+        .page-header { text-align: center; margin-bottom: 24px; }
+        .page-header h1 {
+            font-size: 1.8rem; font-weight: 900;
+            background: linear-gradient(135deg, #f472b6, #a855f7, #60a5fa);
+            -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;
+        }
+        .page-header p { color: #94a3b8; font-weight: 600; margin-top: 6px; }
+
+        .alert { padding: 12px 18px; border-radius: 14px; font-weight: 700; font-size: 0.9rem; margin-bottom: 16px; }
+        .alert-ok { background: #064e3b; color: #6ee7b7; border: 1px solid #065f46; }
+        .alert-err { background: #7f1d1d; color: #fca5a5; border: 1px solid #991b1b; }
+
+        .card {
+            background: rgba(30, 30, 63, 0.95);
+            border: 1.5px solid rgba(139, 92, 246, 0.4);
+            border-radius: 24px; padding: 28px;
+            box-shadow: 0 8px 40px rgba(0,0,0,0.4);
+        }
+
+        /* Game Tabs */
+        .game-tabs { display: flex; gap: 8px; margin-bottom: 20px; }
+        .game-tab {
+            flex: 1; padding: 14px 12px; border-radius: 14px;
+            border: 2px solid rgba(99,102,241,0.3);
+            background: rgba(26,26,62,0.6); cursor: pointer; text-align: center;
+            transition: all 0.2s;
+        }
+        .game-tab:hover { border-color: #6366f1; transform: translateY(-2px); }
+        .game-tab.active { border-color: #8b5cf6; background: rgba(139,92,246,0.15); }
+        .game-tab input { display: none; }
+        .game-tab .tab-icon { font-size: 2rem; margin-bottom: 4px; }
+        .game-tab .tab-name { font-size: 0.8rem; font-weight: 800; color: #e2e8f0; }
+
+        /* Section */
+        .form-section {
+            background: rgba(26,26,62,0.5);
+            border: 1px solid rgba(99,102,241,0.2);
+            border-radius: 16px; padding: 18px; margin-bottom: 16px;
+        }
+        .form-section-title {
+            font-size: 0.8rem; font-weight: 800; color: #8b5cf6;
+            text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 14px;
+            display: flex; align-items: center; gap: 6px;
+        }
+
+        /* Form */
+        .form-group { margin-bottom: 14px; }
+        .form-label {
+            display: block; font-size: 0.78rem; font-weight: 800;
+            color: #94a3b8; text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 6px;
+        }
+        .form-label .required { color: #f87171; }
+        .form-input, .form-select, .form-textarea {
+            width: 100%; padding: 11px 14px; border-radius: 12px;
+            border: 1.5px solid rgba(99,102,241,0.4);
+            background: rgba(26,26,62,0.8); font-size: 0.92rem; font-family: inherit; color: #f1f5f9;
+            transition: border-color 0.2s, box-shadow 0.2s;
+        }
+        .form-input:focus, .form-select:focus, .form-textarea:focus {
+            outline: none; border-color: #8b5cf6;
+            box-shadow: 0 0 0 3px rgba(139,92,246,0.15);
+        }
+        .form-input::placeholder, .form-textarea::placeholder { color: #475569; }
+        .form-textarea { resize: vertical; min-height: 70px; }
+        .form-hint { font-size: 0.75rem; color: #64748b; margin-top: 4px; font-weight: 600; }
+        .form-select option { background: #1e1e3f; color: #f1f5f9; }
+
+        /* Price Input */
+        .price-wrap { position: relative; }
+        .price-wrap .form-input { padding-right: 50px; }
+        .price-wrap::after {
+            content: 'đ'; position: absolute; right: 14px; top: 50%;
+            transform: translateY(-50%); color: #94a3b8; font-weight: 800; font-size: 1rem;
+        }
+
+        /* Package Select */
+        .pkg-section { margin-bottom: 16px; }
+        .pkg-grid {
+            display: grid; grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); gap: 10px;
+        }
+        .pkg-card {
+            border: 2px solid rgba(99,102,241,0.3); border-radius: 12px; padding: 14px;
+            cursor: pointer; background: rgba(26,26,62,0.5); transition: all 0.2s; position: relative;
+        }
+        .pkg-card:hover { border-color: #6366f1; transform: translateY(-2px); }
+        .pkg-card.selected { border-color: #8b5cf6; background: rgba(139,92,246,0.15); }
+        .pkg-card input { display: none; }
+        .pkg-card .pkg-name { font-size: 0.88rem; font-weight: 800; color: #f1f5f9; text-align: center; }
+        .pkg-card .pkg-check {
+            position: absolute; top: 6px; right: 6px; width: 18px; height: 18px;
+            border-radius: 50%; background: #8b5cf6; color: #fff;
+            display: none; align-items: center; justify-content: center;
+            font-size: 0.65rem; font-weight: 900;
+        }
+        .pkg-card.selected .pkg-check { display: flex; }
+
+        /* Info Box */
+        .info-box {
+            background: rgba(74,144,217,0.1); border: 1px solid rgba(74,144,217,0.3);
+            border-radius: 12px; padding: 12px 14px;
+            font-size: 0.82rem; font-weight: 600; color: #93c5fd; margin-bottom: 16px;
+        }
+
+        /* Hidden */
+        #productId { display: none; }
+
+        /* Image */
+        .image-upload {
+            border: 2px dashed rgba(99,102,241,0.4); border-radius: 16px;
+            padding: 24px; text-align: center; cursor: pointer;
+            transition: all 0.2s; background: rgba(26,26,62,0.4);
+        }
+        .image-upload:hover { border-color: #8b5cf6; background: rgba(139,92,246,0.08); }
+        .image-upload input { display: none; }
+        .image-upload .upload-icon { font-size: 2.2rem; margin-bottom: 8px; }
+        .image-upload .upload-text { font-size: 0.88rem; font-weight: 700; color: #94a3b8; }
+        .image-upload .upload-sub { font-size: 0.75rem; color: #475569; margin-top: 4px; }
+        #previewImg { display: none; max-width: 180px; max-height: 130px; margin: 12px auto 0; border-radius: 12px; }
+
+        .btn-submit {
+            width: 100%; padding: 14px; border: none; border-radius: 14px;
+            background: linear-gradient(135deg, #8b5cf6, #6366f1);
+            color: #fff; font-size: 1rem; font-weight: 800; font-family: inherit;
+            cursor: pointer; box-shadow: 0 4px 18px rgba(139,92,246,0.4);
+            transition: transform 0.15s, box-shadow 0.15s; margin-top: 8px;
+        }
+        .btn-submit:hover { transform: translateY(-2px); box-shadow: 0 8px 24px rgba(139,92,246,0.5); }
+
+        /* Game sections */
+        .game-section { display: none; }
+        .game-section.active { display: block; }
+
+        /* Row */
+        .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+
+        @media (max-width: 500px) {
+            .game-tabs { flex-direction: column; }
+            .pkg-grid { grid-template-columns: 1fr 1fr; }
+            .form-row { grid-template-columns: 1fr; }
+        }
+    </style>
 </head>
-<body class="admin-body">
-<div class="admin-app">
-    <aside th:replace="~{ctv/fragments :: ctvSidebar}"></aside>
-    <div class="admin-main">
-        <header class="admin-main-header">
-            <div>
-                <div class="admin-breadcrumb"><a th:href="@{/}">Shop</a> / CTV</div>
-                <h1>Đăng acc lên kho</h1>
-                <p>Chọn đúng <strong>gói acc</strong>, đính kèm <strong>ảnh minh hoạ</strong> (bắt buộc), dán <strong>nội dung acc</strong>. Ghi chú tuỳ chọn. Admin duyệt xong acc mới được bán.</p>
-            </div>
-        </header>
-        <div class="admin-content">
-            <p th:if="${successMessage}" class="admin-alert admin-alert--ok" th:text="${successMessage}"></p>
-            <p th:if="${errorMessage}" class="admin-alert admin-alert--err" th:text="${errorMessage}"></p>
+<body>
+<div class="container">
+    <div class="page-header">
+        <h1>⚔️ Đăng tài khoản bán</h1>
+        <p>Điền đầy đủ thông tin acc — giá đặt riêng</p>
+    </div>
 
-            <div class="admin-panel" style="padding:22px 24px;max-width:520px">
-                <form class="admin-form-grid" th:action="@{/ctv/submit}" method="post" enctype="multipart/form-data">
-                    <label>Gói acc &amp; giá bán trên shop</label>
-                    <select name="productId" required>
-                        <option th:each="p : ${products}" th:value="${p.id}" th:text="|${p.name} — ${productPriceFormatted[p.id]}|"></option>
-                    </select>
-                    <p class="admin-muted" style="grid-column:1/-1;margin:0;font-size:0.85rem">Giá theo gói — khách mua đúng mức này sau khi admin duyệt acc.</p>
-                    <label>Ảnh minh hoạ acc (bắt buộc)</label>
-                    <input type="file" name="listingImage" accept="image/jpeg,image/png,image/webp,image/gif" required>
-                    <label>Nội dung acc (bắt buộc)</label>
-                    <textarea name="credentials" required rows="5" placeholder="Ví dụ: user:password hoặc toàn bộ chuỗi giao khách…"></textarea>
-                    <label>Ghi chú (không bắt buộc)</label>
-                    <input name="ghiChu" placeholder="AR, nhân vật nổi bật…">
-                    <button class="admin-btn admin-btn--primary" style="margin-top:16px" type="submit">Gửi duyệt</button>
-                </form>
+    <div class="card">
+        <div th:if="${successMessage}" class="alert alert-ok" th:text="${successMessage}"></div>
+        <div th:if="${errorMessage}" class="alert alert-err" th:text="${errorMessage}"></div>
+
+        <form th:action="@{/ctv/submit}" method="post" enctype="multipart/form-data" id="submitForm">
+            <input type="hidden" name="productId" id="productId" value="">
+
+            <!-- Game Tabs -->
+            <div class="form-group">
+                <label class="form-label">Chọn game <span class="required">*</span></label>
+                <div class="game-tabs">
+                    <label class="game-tab active" id="tab-genshin">
+                        <input type="radio" name="gameTab" value="Genshin Impact" checked onchange="switchGame('genshin')">
+                        <div class="tab-icon">⚔️</div>
+                        <div class="tab-name">Genshin Impact</div>
+                    </label>
+                    <label class="game-tab" id="tab-lienquan">
+                        <input type="radio" name="gameTab" value="Liên Quân Mobile" onchange="switchGame('lienquan')">
+                        <div class="tab-icon">🎮</div>
+                        <div class="tab-name">Liên Quân Mobile</div>
+                    </label>
+                </div>
             </div>
 
-            <p class="admin-muted" style="margin-top:20px">
-                Acc đang chờ duyệt của bạn: <strong th:text="${myPendingCount}">0</strong> —
-                <a th:href="@{/admin/accounts}">Admin xem trong bảng kho acc</a>.
-            </p>
-        </div>
+            <!-- Genshin Package -->
+            <div class="game-section active" id="pkg-genshin">
+                <div class="info-box">⚔️ Chọn gói acc Genshin</div>
+                <div class="pkg-grid">
+                    <label class="pkg-card" th:each="p : ${products}" th:if="${p.game != null and p.game.name == 'Genshin Impact'}">
+                        <input type="radio" name="pkgGenshin" th:value="${p.id}" onchange="selectPackage(this)">
+                        <div class="pkg-check">✓</div>
+                        <div class="pkg-name" th:text="${p.name}">Gói acc</div>
+                    </label>
+                </div>
+            </div>
+
+            <!-- Liên Quân Package -->
+            <div class="game-section" id="pkg-lienquan">
+                <div class="info-box">🎮 Chọn gói acc Liên Quân</div>
+                <div class="pkg-grid">
+                    <label class="pkg-card" th:each="p : ${products}" th:if="${p.game != null and p.game.name == 'Liên Quân Mobile'}">
+                        <input type="radio" name="pkgLienquan" th:value="${p.id}" onchange="selectPackage(this)">
+                        <div class="pkg-check">✓</div>
+                        <div class="pkg-name" th:text="${p.name}">Gói acc</div>
+                    </label>
+                </div>
+            </div>
+
+            <!-- Genshin Fields -->
+            <div class="game-section active" id="fields-genshin">
+                <div class="form-section">
+                    <div class="form-section-title">⚔️ Thông tin acc Genshin</div>
+
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label class="form-label">Họ Tên ACC</label>
+                            <input type="text" class="form-input" name="accountName" placeholder="Tên nhân vật">
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Mô tả tên ACC</label>
+                            <input type="text" class="form-input" name="accountDesc" placeholder="Mô tả ngắn">
+                        </div>
+                    </div>
+
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label class="form-label">Địa chỉ (UID)</label>
+                            <input type="text" class="form-input" name="uid" placeholder="UID tài khoản">
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Loại ACC</label>
+                            <select class="form-select" name="accountType">
+                                <option value="">-- Chọn loại --</option>
+                                <option>Tài Khoản Thường</option>
+                                <option>Tài Khoản Google</option>
+                                <option>Tài Khoản Apple</option>
+                                <option>Tài Khoản Facebook</option>
+                                <option>Tài Khoản Hoyoverse</option>
+                                <option>Tài Khoản Thương Mại</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label class="form-label">Máy chủ</label>
+                            <select class="form-select" name="server">
+                                <option value="">-- Chọn server --</option>
+                                <option>Vietnam</option>
+                                <option>Singapore</option>
+                                <option>Malaysia</option>
+                                <option>Thailand</option>
+                                <option>Philippines</option>
+                                <option>Indonesia</option>
+                                <option>Japan</option>
+                                <option>Korea</option>
+                                <option>America</option>
+                                <option>Europe</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">AR Level</label>
+                            <select class="form-select" name="rankInfo">
+                                <option value="">-- Chọn AR --</option>
+                                <option>AR 1-10</option>
+                                <option>AR 11-20</option>
+                                <option>AR 21-30</option>
+                                <option>AR 31-40</option>
+                                <option>AR 41-50</option>
+                                <option>AR 51-55</option>
+                                <option>AR 56-59</option>
+                                <option>AR 60</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label class="form-label">Thiên kiếm</label>
+                        <input type="text" class="form-input" name="swordOfSky" placeholder="Số lượng thiên kiếm">
+                    </div>
+
+                    <div class="form-group">
+                        <label class="form-label">Cảnh giới (Constellation)</label>
+                        <input type="text" class="form-input" name="constellation" placeholder="Constellation nhân vật chính">
+                    </div>
+
+                    <div class="form-group">
+                        <label class="form-label">Nhân vật (5★)</label>
+                        <textarea class="form-textarea" name="skinInfo" placeholder="Liệt kê các nhân vật 5★ có trong acc"></textarea>
+                    </div>
+
+                    <div class="form-group">
+                        <label class="form-label">Đội hình / Nhân vật 4★</label>
+                        <textarea class="form-textarea" name="teamInfo" placeholder="Đội hình sử dụng, nhân vật 4★ nổi bật"></textarea>
+                    </div>
+
+                    <div class="form-group">
+                        <label class="form-label">Thông tin khác</label>
+                        <textarea class="form-textarea" name="extraInfo" placeholder="Nguyên liệu stockpiles, mora, vật phẩm quý..."></textarea>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Liên Quân Fields -->
+            <div class="game-section" id="fields-lienquan">
+                <div class="form-section">
+                    <div class="form-section-title">🎮 Thông tin acc Liên Quân</div>
+
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label class="form-label">Tên acc</label>
+                            <input type="text" class="form-input" name="accountName" placeholder="Tên tài khoản">
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Nickname</label>
+                            <input type="text" class="form-input" name="accountDesc" placeholder="Nickname trong game">
+                        </div>
+                    </div>
+
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label class="form-label">UID</label>
+                            <input type="text" class="form-input" name="uid" placeholder="UID tài khoản">
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Loại ACC</label>
+                            <select class="form-select" name="accountType">
+                                <option value="">-- Chọn loại --</option>
+                                <option>Garena</option>
+                                <option>Facebook</option>
+                                <option>Google</option>
+                                <option>Apple</option>
+                                <option>Zalo</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label class="form-label">Rank</label>
+                        <select class="form-select" name="rankInfo">
+                            <option value="">-- Chọn Rank --</option>
+                            <option>Đồng</option>
+                            <option>Bạc</option>
+                            <option>Vàng</option>
+                            <option>Bạch Kim</option>
+                            <option>Kim Cương</option>
+                            <option>Kim Loại</option>
+                            <option>Cao Thủ</option>
+                            <option>Tinh Anh</option>
+                            <option>Chiến Tướng</option>
+                        </select>
+                    </div>
+
+                    <div class="form-group">
+                        <label class="form-label">Tướng / Skin nổi bật</label>
+                        <textarea class="form-textarea" name="skinInfo" placeholder="Các skin S+ có trong acc"></textarea>
+                    </div>
+
+                    <div class="form-group">
+                        <label class="form-label">Thông tin khác</label>
+                        <textarea class="form-textarea" name="extraInfo" placeholder="Rank solo, tướng S+, acc vecay, vé, kim cương..."></textarea>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Giá tiền - RIÊNG -->
+            <div class="form-section">
+                <div class="form-section-title">💰 Giá bán</div>
+                <div class="form-group">
+                    <label class="form-label">Giá bán</label>
+                    <div class="price-wrap">
+                        <input type="number" class="form-input" name="price" placeholder="Để trống = giá gói" min="1000" step="1000">
+                    </div>
+                    <p class="form-hint">Đặt giá riêng cho acc. Bỏ trống sẽ dùng giá gói mặc định.</p>
+                </div>
+            </div>
+
+            <!-- Login Info -->
+            <div class="form-section">
+                <div class="form-section-title">🔐 Thông tin đăng nhập</div>
+                <div class="form-group">
+                    <label class="form-label">Tên tài khoản quản trị</label>
+                    <input type="text" class="form-input" name="adminUser" placeholder="Email / Username tài khoản">
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Mật khẩu <span class="required">*</span></label>
+                    <input type="text" class="form-input" name="credentials" required placeholder="Mật khẩu đăng nhập">
+                </div>
+            </div>
+
+            <!-- Image -->
+            <div class="form-group">
+                <label class="form-label">Ảnh minh hoạ acc <span class="required">*</span></label>
+                <div class="image-upload" onclick="document.getElementById('listingImage').click()">
+                    <input type="file" id="listingImage" name="listingImage" accept="image/jpeg,image/png,image/webp" required onchange="previewImage(this)">
+                    <div class="upload-icon">📸</div>
+                    <div class="upload-text">Click để chọn ảnh</div>
+                    <div class="upload-sub">JPG, PNG, WEBP — Tối đa 5MB</div>
+                    <img id="previewImg" alt="Preview">
+                </div>
+            </div>
+
+            <button type="submit" class="btn-submit" onclick="return validateForm()">🚀 Gửi duyệt ngay</button>
+        </form>
     </div>
 </div>
+
+<script>
+    function switchGame(game) {
+        document.querySelectorAll('.game-tab').forEach(el => el.classList.remove('active'));
+        document.getElementById('tab-' + game).classList.add('active');
+
+        document.querySelectorAll('.game-section').forEach(el => el.classList.remove('active'));
+        document.getElementById('pkg-' + game).classList.add('active');
+        document.getElementById('fields-' + game).classList.add('active');
+
+        document.getElementById('productId').value = '';
+        document.querySelectorAll('.pkg-card').forEach(el => el.classList.remove('selected'));
+    }
+
+    function selectPackage(radio) {
+        document.querySelectorAll('.pkg-card').forEach(el => el.classList.remove('selected'));
+        radio.closest('.pkg-card').classList.add('selected');
+        document.getElementById('productId').value = radio.value;
+    }
+
+    function previewImage(input) {
+        if (input.files && input.files[0]) {
+            var reader = new FileReader();
+            reader.onload = function(e) {
+                var preview = document.getElementById('previewImg');
+                preview.src = e.target.result;
+                preview.style.display = 'block';
+            };
+            reader.readAsDataURL(input.files[0]);
+        }
+    }
+
+    function validateForm() {
+        if (!document.getElementById('productId').value) {
+            alert('Vui lòng chọn gói acc!');
+            return false;
+        }
+        return true;
+    }
+</script>
 </body>
 </html>

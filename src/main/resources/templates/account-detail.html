@@ -1,0 +1,279 @@
+<!DOCTYPE html>
+<html lang="vi" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title th:text="${acc.product != null ? acc.product.name : 'Chi tiết tài khoản'}">Chi tiết tài khoản</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800;900&display=swap" rel="stylesheet">
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: 'Nunito', sans-serif;
+            background: linear-gradient(135deg, #1a1a2e 0%, #16213e 50%, #0f0f23 100%);
+            min-height: 100vh; color: #fff;
+        }
+        .container { max-width: 900px; margin: 0 auto; padding: 24px; }
+
+        .back-btn {
+            display: inline-flex; align-items: center; gap: 6px;
+            color: #8b5cf6; text-decoration: none; font-weight: 700;
+            margin-bottom: 20px; transition: color 0.2s; font-size: 0.9rem;
+        }
+        .back-btn:hover { color: #a78bfa; }
+
+        .detail-card {
+            background: rgba(30, 30, 63, 0.95);
+            border: 1.5px solid rgba(139, 92, 246, 0.4);
+            border-radius: 24px; overflow: hidden;
+            box-shadow: 0 8px 40px rgba(0,0,0,0.4);
+        }
+
+        /* Header */
+        .detail-header {
+            padding: 24px 30px;
+            background: linear-gradient(135deg, rgba(139,92,246,0.3), rgba(99,102,241,0.2));
+            border-bottom: 1px solid rgba(139,92,246,0.2);
+            display: flex; justify-content: space-between; align-items: center;
+        }
+        .header-left { display: flex; align-items: center; gap: 16px; }
+        .game-badge {
+            display: inline-flex; align-items: center; gap: 6px;
+            padding: 6px 14px; border-radius: 20px;
+            font-size: 0.78rem; font-weight: 700;
+            background: rgba(139,92,246,0.2); color: #c4b5fd;
+        }
+        .header-right { text-align: right; }
+        .detail-price {
+            font-size: 2rem; font-weight: 900;
+            background: linear-gradient(135deg, #f472b6, #a855f7);
+            -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+        }
+        .detail-status {
+            display: inline-block; margin-top: 4px;
+            padding: 4px 14px; border-radius: 20px;
+            font-size: 0.78rem; font-weight: 700;
+            background: #16a34a; color: #fff;
+        }
+        .detail-status.sold { background: #dc2626; }
+
+        /* Body */
+        .detail-body { padding: 30px; }
+
+        .detail-title {
+            font-size: 1.5rem; font-weight: 900; margin-bottom: 20px;
+            color: #f1f5f9; line-height: 1.3;
+        }
+
+        /* Info Grid */
+        .info-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+            gap: 12px; margin-bottom: 20px;
+        }
+        .info-card {
+            background: rgba(26,26,62,0.6);
+            border: 1px solid rgba(99,102,241,0.2);
+            border-radius: 14px; padding: 14px;
+        }
+        .info-label {
+            font-size: 0.7rem; font-weight: 800; color: #64748b;
+            text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 6px;
+        }
+        .info-value {
+            font-size: 0.95rem; font-weight: 800; color: #e2e8f0;
+        }
+        .info-value.highlight {
+            color: #a855f7; font-size: 1.05rem;
+        }
+
+        /* Sections */
+        .detail-section {
+            background: rgba(26,26,62,0.5);
+            border: 1px solid rgba(99,102,241,0.2);
+            border-radius: 16px; padding: 18px; margin-bottom: 16px;
+        }
+        .section-title {
+            font-size: 0.8rem; font-weight: 800; color: #8b5cf6;
+            text-transform: uppercase; letter-spacing: 0.05em;
+            margin-bottom: 12px; display: flex; align-items: center; gap: 6px;
+        }
+        .section-text {
+            color: #e2e8f0; line-height: 1.7; font-size: 0.9rem;
+            white-space: pre-line; font-weight: 600;
+        }
+
+        /* Image Gallery */
+        .acc-image {
+            width: 100%; max-height: 400px; object-fit: cover;
+            border-radius: 16px; margin-bottom: 20px;
+            border: 1px solid rgba(139,92,246,0.3);
+        }
+
+        /* Buy Section */
+        .buy-section { text-align: center; padding-top: 10px; }
+        .buy-btn {
+            background: linear-gradient(135deg, #8b5cf6, #6366f1);
+            color: #fff; border: none; padding: 16px 60px;
+            border-radius: 30px; font-size: 1.1rem; font-weight: 800;
+            font-family: inherit; cursor: pointer;
+            box-shadow: 0 4px 18px rgba(139,92,246,0.4);
+            transition: transform 0.15s, box-shadow 0.15s;
+        }
+        .buy-btn:hover { transform: translateY(-2px); box-shadow: 0 8px 24px rgba(139,92,246,0.5); }
+        .buy-btn.sold {
+            background: #4b5563; cursor: not-allowed;
+            box-shadow: none;
+        }
+        .buy-btn.sold:hover { transform: none; }
+
+        /* Header nav */
+        .header-nav {
+            background: rgba(30,30,63,0.95); backdrop-filter: blur(10px);
+            border-bottom: 1px solid rgba(139,92,246,0.2);
+            padding: 14px 24px;
+            display: flex; justify-content: space-between; align-items: center;
+        }
+        .nav-brand {
+            font-size: 1.2rem; font-weight: 900; color: #f472b6; text-decoration: none;
+        }
+        .nav-brand span { font-size: 1.4rem; }
+        .nav-links { display: flex; gap: 20px; align-items: center; }
+        .nav-links a {
+            color: #e2e8f0; text-decoration: none; font-weight: 700;
+            font-size: 0.9rem; transition: color 0.2s;
+        }
+        .nav-links a:hover { color: #f472b6; }
+        .nav-cta {
+            background: linear-gradient(135deg, #f472b6, #a855f7);
+            color: #fff; padding: 8px 20px; border-radius: 20px;
+            text-decoration: none; font-weight: 700; font-size: 0.85rem;
+        }
+        .cart-badge {
+            background: #f472b6; color: #fff; padding: 2px 8px;
+            border-radius: 10px; font-size: 0.75rem; font-weight: 700; margin-left: 4px;
+        }
+        .page-footer {
+            text-align: center; padding: 30px; color: #475569;
+            font-size: 0.85rem;
+        }
+
+        @media (max-width: 600px) {
+            .detail-header { flex-direction: column; gap: 12px; align-items: flex-start; }
+            .header-right { text-align: left; }
+            .info-grid { grid-template-columns: 1fr 1fr; }
+        }
+    </style>
+</head>
+<body data-logged-in="${session.userId != null}">
+
+<!-- NAV -->
+<nav class="header-nav">
+    <a class="nav-brand" th:href="@{/}"><span>🌸</span> Shop</a>
+    <div class="nav-links">
+        <a th:href="@{/}">Trang chủ</a>
+        <a th:href="@{/cart}">Giỏ hàng <span class="cart-badge" id="cart-count" th:text="${cartSummary.count}">0</span></a>
+        <a th:href="@{/auth/login}" th:if="${session.userId == null}">Đăng nhập</a>
+        <a class="nav-cta" th:href="@{/auth/register}" th:if="${session.userId == null}">Đăng ký</a>
+    </div>
+</nav>
+
+<div class="container">
+    <a class="back-btn" th:href="@{'/explore/' + ${acc.product?.game?.slug}}">
+        ← Quay lại danh sách acc
+    </a>
+
+    <div class="detail-card">
+        <!-- Header -->
+        <div class="detail-header">
+            <div class="header-left">
+                <span class="game-badge" th:if="${acc.game != null}">⚔️ <span th:text="${acc.game}">Genshin</span></span>
+                <span class="detail-title" th:text="${acc.product != null ? acc.product.name : 'Tài khoản #'+acc.id}" style="margin:0;font-size:1.3rem">Tên</span>
+            </div>
+            <div class="header-right">
+                <div class="detail-price" th:text="${formattedPrice != null ? formattedPrice : 'Liên hệ'}">0đ</div>
+                <div class="detail-status" th:classappend="${acc.hidden ? 'sold' : ''}" th:text="${acc.hidden ? 'Đã bán' : 'Còn hàng'}">Còn hàng</div>
+            </div>
+        </div>
+
+        <div class="detail-body">
+            <!-- Image -->
+            <img th:if="${acc.listingImagePath != null}" class="acc-image" th:src="@{${acc.listingImagePath}}" alt="Acc">
+            <img th:unless="${acc.listingImagePath != null}" class="acc-image" th:src="@{${acc.product?.imagePath}}" alt="Acc">
+
+            <!-- Info Grid -->
+            <div class="info-grid">
+                <div class="info-card" th:if="${acc.rankInfo != null}">
+                    <div class="info-label">Rank / AR Level</div>
+                    <div class="info-value highlight" th:text="${acc.rankInfo}">AR 58</div>
+                </div>
+                <div class="info-card" th:if="${acc.game != null}">
+                    <div class="info-label">Máy chủ</div>
+                    <div class="info-value" th:text="${acc.game}">Asia</div>
+                </div>
+                <div class="info-card" th:if="${acc.product?.game != null}">
+                    <div class="info-label">Game</div>
+                    <div class="info-value" th:text="${acc.product.game.name}">Genshin Impact</div>
+                </div>
+                <div class="info-card" th:if="${acc.product != null}">
+                    <div class="info-label">Gói acc</div>
+                    <div class="info-value" th:text="${acc.product.name}">Gói acc</div>
+                </div>
+            </div>
+
+            <!-- Nhân vật 5★ -->
+            <div class="detail-section" th:if="${acc.skinInfo != null and !acc.skinInfo.isEmpty()}">
+                <div class="section-title">⭐ Nhân vật nổi bật</div>
+                <div class="section-text" th:text="${acc.skinInfo}">Danh sách nhân vật</div>
+            </div>
+
+            <!-- Thông tin chi tiết (từ extraInfo) -->
+            <div class="detail-section" th:if="${acc.extraInfo != null and !acc.extraInfo.isEmpty()}">
+                <div class="section-title">📋 Thông tin chi tiết</div>
+                <div class="section-text" th:text="${acc.extraInfo}">Thông tin chi tiết</div>
+            </div>
+
+            <!-- Buy -->
+            <div class="buy-section">
+                <button class="buy-btn" th:if="${!acc.hidden}"
+                        th:attr="data-product-id=${acc.product?.slug}"
+                        onclick="buyNow(this)">
+                    🛒 Mua ngay — <span th:text="${formattedPrice}">0đ</span>
+                </button>
+                <button class="buy-btn sold" th:if="${acc.hidden}" disabled>
+                    Đã bán
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<footer class="page-footer">
+    © 2026 ShopAccGame — Chuyên bán acc Genshin, Liên Quân các loại
+</footer>
+
+<script>
+    function buyNow(btn) {
+        var productId = btn.dataset.productId;
+        if (!productId) { alert('Không tìm thấy sản phẩm'); return; }
+        fetch('/cart/add', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ productId: productId })
+        })
+        .then(function(res) {
+            if (res.status === 401) { window.location.href = '/auth/login'; return null; }
+            return res.json();
+        })
+        .then(function(data) {
+            if (!data) return;
+            if (data.count !== undefined) {
+                document.getElementById('cart-count').textContent = data.count;
+            }
+            window.location.href = '/cart';
+        })
+        .catch(function() { alert('Có lỗi xảy ra!'); });
+    }
+</script>
+</body>
+</html>

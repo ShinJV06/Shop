@@ -1,6 +1,7 @@
 package com.example.demo.service;
 
 import com.example.demo.entity.Account;
+import com.example.demo.entity.Enum.OrderStatus;
 import com.example.demo.entity.Enum.Role;
 import com.example.demo.entity.Enum.TransactionAction;
 import com.example.demo.entity.ShopOrder;
@@ -75,7 +76,7 @@ public class AdminUserService {
     }
 
     public List<ShopOrder> purchaseHistory(long userId) {
-        return shopOrderRepository.findByBuyerIdOrderByIdDesc(userId);
+        return shopOrderRepository.findByBuyerIdAndStatusOrderByIdDesc(userId, OrderStatus.PAID);
     }
 
     private void log(Long orderId, Long actor, TransactionAction action, String detail) {

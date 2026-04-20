@@ -25,20 +25,46 @@
             <p th:if="${successMessage}" class="admin-alert admin-alert--ok" th:text="${successMessage}"></p>
             <p th:if="${errorMessage}" class="admin-alert admin-alert--err" th:text="${errorMessage}"></p>
 
-            <div class="admin-panel" style="padding:20px 22px;margin-bottom:20px">
-                <p style="margin:0 0 8px"><strong>Trạng thái:</strong> <span th:text="${order.status}">-</span></p>
-                <p style="margin:0 0 8px"><strong>Buyer ID:</strong> <span th:text="${order.buyerId}">-</span></p>
-                <p style="margin:0"><strong>Tổng:</strong> <span th:text="${order.totalAmount} + 'đ'">0</span></p>
+            <div class="admin-panel" style="padding:20px 22px;margin-bottom:20px;display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:16px">
+                <div>
+                    <p style="margin:0 0 6px;font-size:0.75rem;color:var(--admin-text-muted);text-transform:uppercase;font-weight:700">Trạng thái</p>
+                    <span class="badge"
+                          th:classappend="${order.status.name() == 'PENDING_PAYMENT'} ? 'badge-pending' : 'badge-paid'"
+                          th:text="${order.status.name() == 'PENDING_PAYMENT'} ? '⏳ Chờ thanh toán' : '✅ Đã thanh toán'"
+                          style="font-size:0.85rem">-</span>
+                </div>
+                <div>
+                    <p style="margin:0 0 6px;font-size:0.75rem;color:var(--admin-text-muted);text-transform:uppercase;font-weight:700">Hình thức thanh toán</p>
+                    <span th:if="${order.paymentMethod == 'WALLET'}" style="font-size:0.9rem;font-weight:800;color:#7c3aed">💰 Thanh toán qua Ví</span>
+                    <span th:if="${order.paymentMethod == 'BANK'}" style="font-size:0.9rem;font-weight:800;color:#0369a1">🏦 Chuyển khoản ngân hàng</span>
+                    <span th:if="${order.paymentMethod == null or (order.paymentMethod != 'WALLET' and order.paymentMethod != 'BANK')}" style="color:#6b7280">-</span>
+                </div>
+                <div>
+                    <p style="margin:0 0 6px;font-size:0.75rem;color:var(--admin-text-muted);text-transform:uppercase;font-weight:700">Tổng tiền</p>
+                    <span style="font-size:1.1rem;font-weight:800;color:var(--admin-purple)" th:text="${order.totalAmount} + 'đ'">0đ</span>
+                </div>
+                <div>
+                    <p style="margin:0 0 6px;font-size:0.75rem;color:var(--admin-text-muted);text-transform:uppercase;font-weight:700">Ngày tạo</p>
+                    <span style="font-weight:600" th:text="${#dates.format(order.createdAt, 'dd/MM/yyyy HH:mm')}">-</span>
+                </div>
+            </div>
+
+            <!-- Hướng dẫn xử lý -->
+            <div th:if="${order.status.name() == 'PENDING_PAYMENT'}" class="admin-panel" style="padding:16px 20px;margin-bottom:20px;background:#fef3c7;border-color:#f59e0b">
+                <p style="margin:0;font-weight:800;color:#92400e;font-size:0.9rem">
+                    <span th:if="${order.paymentMethod == 'WALLET'}">📌 Đơn này thanh toán qua VÍ - hệ thống sẽ tự động xử lý khi khách thanh toán.</span>
+                    <span th:if="${order.paymentMethod == 'BANK' or order.paymentMethod == null}">📌 Đơn này chưa thanh toán qua ngân hàng. Vui lòng xác nhận khi nhận được tiền.</span>
+                </p>
             </div>
 
             <div class="admin-stack" style="margin-bottom:22px">
-                <div th:if="${order.status == T(com.example.demo.entity.Enum.OrderStatus).PENDING_PAYMENT}">
+                <div th:if="${order.status.name() == 'PENDING_PAYMENT' && order.paymentMethod != 'WALLET'}">
                     <form class="inline" th:action="@{/admin/orders/{id}/confirm-payment(id=${order.id})}" method="post"
-                          onsubmit="return confirm('Xác nhận đã nhận tiền và giao acc ngẫu nhiên từ kho?');">
-                        <button class="admin-btn admin-btn--green" type="submit">Xác nhận thanh toán + giao acc</button>
+                          onsubmit="return confirm('Xác nhận đã nhận tiền chuyển khoản và giao acc ngẫu nhiên?');">
+                        <button class="admin-btn admin-btn--green" type="submit">Xác nhận chuyển khoản + giao acc</button>
                     </form>
                 </div>
-                <div th:if="${order.status != T(com.example.demo.entity.Enum.OrderStatus).REFUNDED && (order.status == T(com.example.demo.entity.Enum.OrderStatus).PAID || order.status == T(com.example.demo.entity.Enum.OrderStatus).PENDING_PAYMENT)}">
+                <div th:if="${order.status.name() != 'REFUNDED' && (order.status.name() == 'PAID' || order.status.name() == 'PENDING_PAYMENT')}">
                     <form class="inline" th:action="@{/admin/orders/{id}/refund(id=${order.id})}" method="post"
                           onsubmit="return confirm('Hoàn tiền / thu hồi acc về kho?');">
                         <button class="admin-btn admin-btn--orange" type="submit">Hoàn tiền</button>

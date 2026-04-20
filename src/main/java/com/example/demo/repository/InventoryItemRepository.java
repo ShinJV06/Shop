@@ -38,6 +38,16 @@ public interface InventoryItemRepository extends JpaRepository<InventoryItem, Lo
     List<InventoryItem> findByModerationStatusAndHiddenFalseOrderByIdDesc(ModerationStatus moderationStatus);
 
     @Query(value = """
+            SELECT i.* FROM inventory_items i
+            INNER JOIN shop_products p ON i.product_id = p.id
+            WHERE p.game_id = :gameId
+              AND i.moderation_status = 'APPROVED'
+              AND i.hidden = false
+            ORDER BY i.id DESC
+            """, nativeQuery = true)
+    List<InventoryItem> findByGameIdAndModerationStatusAndHiddenFalse(@Param("gameId") Long gameId);
+
+    @Query(value = """
             SELECT * FROM inventory_items i
             WHERE i.product_id = :productId
               AND i.status = 'AVAILABLE'

@@ -35,7 +35,11 @@
                         <label>Game</label><input name="game" placeholder="Genshin Impact">
                         <label>Rank / AR</label><input name="rankInfo">
                         <label>Skin</label><input name="skinInfo">
-                        <label>Mô tả thêm</label><textarea name="extraInfo"></textarea>
+                        <label>Giá riêng (tuỳ chọn)</label>
+                        <div style="display:flex;gap:8px;align-items:center">
+                            <input type="number" name="customPrice" placeholder="Bỏ trống = giá gói" min="1000" step="1000" style="flex:1">
+                            <span style="color:var(--admin-text-muted);font-weight:700;font-size:0.85rem">đ</span>
+                        </div>
                         <label>Credentials</label><textarea name="credentials" required></textarea>
                         <button class="admin-btn admin-btn--primary" style="margin-top:14px" type="submit">Lưu acc</button>
                     </form>

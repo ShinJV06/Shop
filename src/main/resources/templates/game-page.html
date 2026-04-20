@@ -1,0 +1,868 @@
+<!DOCTYPE html>
+<html lang="vi" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title th:text="${currentGame.name} + ' - Shop Acc Game'">Game Shop</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=M+PLUS+Rounded+1c:wght@400;500;700;800&family=Nunito:wght@400;600;700;800;900&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --pink:      #f472b6;
+            --pink-soft: #fce7f3;
+            --pink-mid:  #fbcfe8;
+            --rose:      #fb7185;
+            --lavender:  #e9d5ff;
+            --purple:    #a855f7;
+            --cream:     #fff7f9;
+            --text:      #4a2040;
+            --text-mute: #9d6580;
+            --card-bg:   rgba(255,255,255,0.72);
+            --shadow:    0 8px 32px rgba(244,114,182,0.18);
+            --radius:    20px;
+        }
+
+        *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+        html { scroll-behavior: smooth; }
+
+        body {
+            font-family: 'Nunito', 'M PLUS Rounded 1c', sans-serif;
+            background: var(--cream);
+            color: var(--text);
+            overflow-x: hidden;
+            min-height: 100vh;
+        }
+
+        body::before {
+            content: '';
+            position: fixed;
+            inset: 0;
+            background:
+                radial-gradient(ellipse 80% 60% at 10% 0%,   #fce7f3 0%, transparent 60%),
+                radial-gradient(ellipse 70% 50% at 90% 100%, #ede9fe 0%, transparent 55%),
+                radial-gradient(ellipse 60% 40% at 50% 50%,  #fff0f6 0%, transparent 70%);
+            z-index: -2;
+            pointer-events: none;
+        }
+
+        .petals {
+            position: fixed;
+            top: 0; left: 0;
+            width: 100%; height: 100%;
+            pointer-events: none;
+            z-index: 0;
+            overflow: hidden;
+        }
+        .petal {
+            position: absolute;
+            top: -40px;
+            font-size: 18px;
+            opacity: 0;
+            animation: fall linear infinite;
+        }
+        .petal:nth-child(1)  { left:  5%; animation-duration: 7s;  animation-delay: 0s;   font-size: 14px; }
+        .petal:nth-child(2)  { left: 15%; animation-duration: 9s;  animation-delay: 1.5s; }
+        .petal:nth-child(3)  { left: 25%; animation-duration: 6s;  animation-delay: 3s;   font-size: 22px; }
+        .petal:nth-child(4)  { left: 35%; animation-duration: 8s;  animation-delay: 0.5s; font-size: 12px; }
+        .petal:nth-child(5)  { left: 50%; animation-duration: 10s; animation-delay: 2s;   font-size: 20px; }
+        .petal:nth-child(6)  { left: 60%; animation-duration: 7.5s;animation-delay: 4s;   font-size: 16px; }
+        .petal:nth-child(7)  { left: 70%; animation-duration: 8.5s;animation-delay: 1s;   }
+        .petal:nth-child(8)  { left: 80%; animation-duration: 6.5s;animation-delay: 3.5s; font-size: 14px; }
+        .petal:nth-child(9)  { left: 90%; animation-duration: 9.5s;animation-delay: 0.8s; font-size: 24px; }
+        .petal:nth-child(10) { left: 45%; animation-duration: 7s;  animation-delay: 5s;   font-size: 12px; }
+        @keyframes fall {
+            0%   { transform: translateY(0) rotate(0deg) translateX(0);   opacity: 0; }
+            10%  { opacity: 0.85; }
+            80%  { opacity: 0.7; }
+            100% { transform: translateY(105vh) rotate(540deg) translateX(60px); opacity: 0; }
+        }
+
+        .header {
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0 5vw;
+            height: 64px;
+            background: rgba(255, 247, 249, 0.82);
+            backdrop-filter: blur(14px);
+            -webkit-backdrop-filter: blur(14px);
+            border-bottom: 1.5px solid var(--pink-mid);
+        }
+        .brand {
+            font-size: 1.25rem;
+            font-weight: 800;
+            color: var(--pink);
+            text-decoration: none;
+            letter-spacing: -0.3px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        .brand span { font-size: 1.4rem; }
+        .nav {
+            display: flex;
+            align-items: center;
+            gap: 4px;
+        }
+        .nav a {
+            text-decoration: none;
+            color: var(--text-mute);
+            font-size: 0.85rem;
+            font-weight: 700;
+            padding: 6px 12px;
+            border-radius: 30px;
+            transition: background 0.2s, color 0.2s;
+        }
+        .nav .nav-cart {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+        }
+        .user-menu {
+            position: relative;
+        }
+        .user-trigger {
+            width: 42px;
+            height: 42px;
+            border: 2px solid var(--pink-mid);
+            border-radius: 50%;
+            padding: 0;
+            background: rgba(255,255,255,0.86);
+            cursor: pointer;
+            box-shadow: 0 8px 20px rgba(244,114,182,0.15);
+            overflow: hidden;
+        }
+        .user-trigger img {
+            display: block;
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+        .user-dropdown {
+            position: absolute;
+            top: calc(100% + 10px);
+            right: 0;
+            min-width: 180px;
+            background: rgba(255,255,255,0.95);
+            border: 1.5px solid var(--pink-mid);
+            border-radius: 18px;
+            padding: 12px;
+            box-shadow: 0 18px 36px rgba(244,114,182,0.16);
+            display: none;
+        }
+        .user-dropdown.open {
+            display: block;
+        }
+        .user-name {
+            color: var(--text);
+            font-size: 0.88rem;
+            font-weight: 900;
+            margin-bottom: 10px;
+        }
+        .user-logout {
+            width: 100%;
+            border: none;
+            border-radius: 999px;
+            padding: 10px 14px;
+            background: linear-gradient(135deg, #f472b6, #a855f7);
+            color: #fff;
+            font-weight: 800;
+            cursor: pointer;
+        }
+        .cart-count-badge {
+            min-width: 22px;
+            height: 22px;
+            padding: 0 6px;
+            border-radius: 999px;
+            background: linear-gradient(135deg, #f472b6, #a855f7);
+            color: #fff;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.72rem;
+            font-weight: 900;
+            box-shadow: 0 3px 10px rgba(244,114,182,0.25);
+        }
+        .nav a:hover { background: var(--pink-soft); color: var(--pink); }
+        .nav .cta {
+            background: linear-gradient(135deg, #f472b6, #c084fc);
+            color: #fff !important;
+            padding: 7px 18px;
+            border-radius: 30px;
+            font-weight: 800;
+            box-shadow: 0 3px 12px rgba(244,114,182,0.4);
+            transition: transform 0.15s, box-shadow 0.15s;
+        }
+        .nav .cta:hover { transform: translateY(-1px); box-shadow: 0 6px 18px rgba(244,114,182,0.45); background: linear-gradient(135deg, #f472b6, #c084fc); }
+
+        main {
+            position: relative;
+            z-index: 2;
+            max-width: min(1180px, calc(100vw - 220px));
+            margin: 0 auto;
+            padding: 0 clamp(20px, 4vw, 48px) 140px;
+        }
+        @media (max-width: 1100px) {
+            main { max-width: 900px; padding: 0 24px 100px; }
+        }
+
+        .section-title {
+            text-align: center;
+            font-size: 1.5rem;
+            font-weight: 900;
+            color: var(--text);
+            margin: 50px 0 28px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+        }
+        .section-title::before,
+        .section-title::after {
+            content: '';
+            flex: 1;
+            height: 2px;
+            background: linear-gradient(90deg, transparent, var(--pink-mid));
+            max-width: 100px;
+            border-radius: 2px;
+        }
+        .section-title::after { background: linear-gradient(270deg, transparent, var(--pink-mid)); }
+
+        .acc-detail-overlay {
+            position: fixed;
+            inset: 0;
+            background: rgba(74,32,64,0.6);
+            backdrop-filter: blur(8px);
+            -webkit-backdrop-filter: blur(8px);
+            display: none;
+            align-items: center;
+            justify-content: center;
+            z-index: 998;
+            padding: 20px;
+        }
+        .acc-detail-overlay.open { display: flex; }
+        .acc-detail-modal {
+            background: linear-gradient(160deg, #fff7f9 0%, #fce7f3 50%, #ede9fe 100%);
+            border-radius: 28px;
+            border: 2px solid var(--pink-mid);
+            width: min(900px, 95vw);
+            max-height: 90vh;
+            overflow-y: auto;
+            box-shadow: 0 32px 80px rgba(244,114,182,0.35);
+            animation: popIn 0.35s cubic-bezier(0.34,1.56,0.64,1);
+            position: relative;
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+        }
+        @media (max-width: 700px) {
+            .acc-detail-modal { grid-template-columns: 1fr; }
+        }
+        .acc-detail-close {
+            position: absolute;
+            top: 14px; right: 16px;
+            background: rgba(255,255,255,0.9);
+            border: 1.5px solid var(--pink-mid);
+            color: var(--text-mute);
+            width: 36px; height: 36px;
+            border-radius: 50%;
+            font-size: 1.1rem;
+            line-height: 1;
+            cursor: pointer;
+            display: flex; align-items: center; justify-content: center;
+            transition: background 0.2s, color 0.2s;
+            z-index: 10;
+        }
+        .acc-detail-close:hover { background: var(--pink-mid); color: var(--text); }
+        .acc-detail-image {
+            padding: 24px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: rgba(255,255,255,0.5);
+            border-radius: 26px 0 0 26px;
+        }
+        @media (max-width: 700px) {
+            .acc-detail-image { border-radius: 26px 26px 0 0; }
+        }
+        .acc-detail-image img {
+            width: 100%;
+            max-height: 400px;
+            object-fit: contain;
+            border-radius: 16px;
+            box-shadow: 0 12px 32px rgba(168,85,247,0.2);
+        }
+        .acc-detail-info {
+            padding: 32px 28px 28px;
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
+        }
+        .acc-detail-tag {
+            display: inline-block;
+            font-size: 0.78rem;
+            font-weight: 800;
+            padding: 4px 12px;
+            border-radius: 20px;
+            background: var(--pink-soft);
+            color: #be185d;
+            width: fit-content;
+        }
+        .acc-detail-tag.purple { background: var(--lavender); color: #6b21a8; }
+        .acc-detail-tag.gold { background: #fef9c3; color: #854d0e; }
+        .acc-detail-info h2 {
+            font-size: 1.5rem;
+            font-weight: 900;
+            color: var(--text);
+            margin: 0;
+        }
+        .acc-detail-meta {
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+        }
+        .acc-detail-row {
+            display: flex;
+            gap: 8px;
+            font-size: 0.88rem;
+            color: var(--text-mute);
+            font-weight: 600;
+        }
+        .acc-detail-row span:first-child { font-weight: 700; }
+        .acc-detail-specs {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 12px;
+        }
+        .acc-detail-spec {
+            background: rgba(255,255,255,0.7);
+            border: 1px solid var(--pink-mid);
+            border-radius: 14px;
+            padding: 12px;
+            text-align: center;
+        }
+        .spec-label {
+            display: block;
+            font-size: 0.72rem;
+            font-weight: 700;
+            color: var(--text-mute);
+            text-transform: uppercase;
+            letter-spacing: 0.04em;
+            margin-bottom: 4px;
+        }
+        .spec-value {
+            display: block;
+            font-size: 0.92rem;
+            font-weight: 800;
+            color: var(--text);
+        }
+        .acc-detail-desc {
+            background: rgba(255,255,255,0.6);
+            border: 1px solid rgba(251,207,232,0.8);
+            border-radius: 14px;
+            padding: 14px 16px;
+        }
+        .acc-detail-desc h4 {
+            margin: 0 0 6px;
+            font-size: 0.88rem;
+            font-weight: 800;
+            color: var(--text);
+        }
+        .acc-detail-desc p {
+            margin: 0;
+            font-size: 0.88rem;
+            color: var(--text-mute);
+            font-weight: 600;
+            line-height: 1.5;
+        }
+        .acc-detail-footer {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 16px;
+            margin-top: auto;
+            padding-top: 16px;
+            border-top: 1px solid rgba(251,207,232,0.7);
+        }
+        .acc-detail-price {
+            font-size: 1.6rem;
+            font-weight: 900;
+            background: linear-gradient(135deg, #be185d, #a855f7);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+        .card-buy {
+            background: linear-gradient(135deg, #f472b6, #a855f7);
+            color: #fff;
+            border: none;
+            padding: 12px 28px;
+            border-radius: 30px;
+            font-size: 0.95rem;
+            font-weight: 800;
+            font-family: inherit;
+            cursor: pointer;
+            box-shadow: 0 3px 10px rgba(244,114,182,0.35);
+            transition: transform 0.15s, box-shadow 0.15s;
+        }
+        .card-buy:hover { transform: scale(1.05); box-shadow: 0 5px 14px rgba(244,114,182,0.45); }
+        .card-detail-btn {
+            background: rgba(255,255,255,0.9);
+            color: var(--pink);
+            border: 1.5px solid var(--pink-mid);
+            padding: 8px 14px;
+            border-radius: 30px;
+            font-size: 0.82rem;
+            font-weight: 800;
+            font-family: inherit;
+            cursor: pointer;
+            transition: background 0.15s, border-color 0.15s;
+        }
+        .card-detail-btn:hover { background: var(--pink-soft); border-color: var(--pink); }
+
+        @keyframes popIn {
+            from { transform: scale(0.75); opacity: 0; }
+            to   { transform: scale(1);    opacity: 1; }
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, #f472b6, #a855f7);
+            color: #fff;
+            border: none;
+            padding: 13px 32px;
+            border-radius: 50px;
+            font-size: 0.95rem;
+            font-weight: 800;
+            font-family: inherit;
+            cursor: pointer;
+            text-decoration: none;
+            box-shadow: 0 4px 18px rgba(244,114,182,0.4);
+            transition: transform 0.15s, box-shadow 0.15s;
+            display: inline-block;
+        }
+        .btn-primary:hover { transform: translateY(-2px); box-shadow: 0 8px 24px rgba(244,114,182,0.45); }
+
+        /* GAME LIST SIDEBAR */
+        .game-sidebar {
+            position: fixed;
+            left: 20px;
+            top: 50%;
+            transform: translateY(-50%);
+            z-index: 50;
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+        .game-sidebar-item {
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            border: 2px solid var(--pink-mid);
+            background: rgba(255,255,255,0.9);
+            overflow: hidden;
+            transition: transform 0.2s, border-color 0.2s, box-shadow 0.2s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .game-sidebar-item:hover {
+            transform: scale(1.1);
+            border-color: var(--pink);
+            box-shadow: 0 4px 16px rgba(244,114,182,0.3);
+        }
+        .game-sidebar-item.active {
+            border-color: var(--pink);
+            box-shadow: 0 0 0 3px rgba(244,114,182,0.3);
+        }
+        .game-sidebar-item img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+        @media (max-width: 1100px) {
+            .game-sidebar { display: none; }
+        }
+
+        /* GAME HERO */
+        .game-hero {
+            text-align: center;
+            padding: 50px 0 30px;
+        }
+        .game-hero-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            background: var(--pink-soft);
+            border: 1.5px solid var(--pink-mid);
+            color: #be185d;
+            font-size: 0.8rem;
+            font-weight: 700;
+            padding: 6px 18px;
+            border-radius: 30px;
+            margin-bottom: 16px;
+        }
+        .game-hero h1 {
+            font-size: clamp(2rem, 5vw, 3rem);
+            font-weight: 900;
+            line-height: 1.2;
+            background: linear-gradient(135deg, #be185d 0%, #a855f7 60%, #f472b6 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            margin-bottom: 12px;
+        }
+        .game-hero p {
+            font-size: 1.05rem;
+            color: var(--text-mute);
+            font-weight: 600;
+            max-width: 480px;
+            margin: 0 auto 24px;
+        }
+
+        /* ACCOUNTS GRID */
+        .cards {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+            gap: 24px;
+        }
+        .card {
+            background: var(--card-bg);
+            border-radius: var(--radius);
+            border: 1.5px solid var(--pink-mid);
+            padding: 18px 18px 24px;
+            display: flex;
+            flex-direction: column;
+            box-shadow: var(--shadow);
+            backdrop-filter: blur(10px);
+            transition: transform 0.2s, box-shadow 0.2s;
+            position: relative;
+            overflow: hidden;
+        }
+        .card::before {
+            content: '';
+            position: absolute;
+            top: -30px; right: -30px;
+            width: 90px; height: 90px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, var(--pink-soft), var(--lavender));
+            opacity: 0.7;
+        }
+        .card:hover { transform: translateY(-5px); box-shadow: 0 16px 48px rgba(244,114,182,0.24); }
+        .card-image {
+            position: relative;
+            margin: -4px -4px 16px;
+            border-radius: 18px;
+            overflow: hidden;
+            border: 1.5px solid rgba(251,207,232,0.9);
+            box-shadow: 0 12px 26px rgba(244,114,182,0.16);
+            background: linear-gradient(135deg, #fce7f3, #ede9fe);
+            height: auto;
+            min-height: 200px;
+        }
+        .card-image img {
+            display: block;
+            width: 100%;
+            height: auto;
+            max-height: 300px;
+            object-fit: contain;
+            object-position: center center;
+            padding: 8px;
+            background: transparent;
+            transition: transform 0.4s ease;
+        }
+        .card:hover .card-image img {
+            transform: scale(1.08);
+        }
+        .card-tag {
+            display: inline-block;
+            font-size: 0.72rem;
+            font-weight: 800;
+            padding: 3px 10px;
+            border-radius: 20px;
+            margin-bottom: 12px;
+            background: var(--pink-soft);
+            color: #be185d;
+        }
+        .card-tag.purple { background: var(--lavender); color: #6b21a8; }
+        .card-tag.gold   { background: #fef9c3; color: #854d0e; }
+        .card h3 {
+            font-size: 1.1rem;
+            font-weight: 900;
+            color: var(--text);
+            margin-bottom: 8px;
+        }
+        .card p {
+            font-size: 0.88rem;
+            color: var(--text-mute);
+            font-weight: 600;
+            line-height: 1.6;
+            margin-bottom: 20px;
+            flex: 1;
+        }
+        .card-footer {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 12px;
+            margin-top: auto;
+        }
+        .price {
+            font-size: 1.25rem;
+            font-weight: 900;
+            background: linear-gradient(135deg, #be185d, #a855f7);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+        .card-actions {
+            display: flex;
+            gap: 8px;
+        }
+        .chat-fab {
+            position: fixed;
+            bottom: 28px;
+            right: 28px;
+            background: linear-gradient(135deg, #f472b6, #a855f7);
+            color: #fff;
+            font-size: 0.88rem;
+            font-weight: 800;
+            padding: 13px 22px;
+            border-radius: 50px;
+            text-decoration: none;
+            box-shadow: 0 6px 24px rgba(244,114,182,0.45);
+            z-index: 50;
+            transition: transform 0.2s, box-shadow 0.2s;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        .chat-fab:hover { transform: translateY(-3px) scale(1.04); box-shadow: 0 12px 32px rgba(244,114,182,0.5); }
+    </style>
+</head>
+<body th:attr="data-logged-in=${session.userId != null}">
+
+<!-- PETALS -->
+<div class="petals" aria-hidden="true">
+    <span class="petal">🌸</span>
+    <span class="petal">✿</span>
+    <span class="petal">🌸</span>
+    <span class="petal">❀</span>
+    <span class="petal">🌸</span>
+    <span class="petal">✿</span>
+    <span class="petal">🌸</span>
+    <span class="petal">❀</span>
+    <span class="petal">🌸</span>
+    <span class="petal">✿</span>
+</div>
+
+<!-- HEADER -->
+<header class="header">
+    <a class="brand" th:href="@{/}">
+        <span>🌸</span> <span th:text="${currentGame.name}">Game</span> Shop
+    </a>
+    <nav class="nav">
+        <a th:href="@{/}">Trang chủ</a>
+        <a th:href="@{/#{gameSlug}}" th:href="@{/} + '/' + ${currentGame.slug} + '#kho-acc'">Mua ngay</a>
+        <a th:href="@{/cart}" class="nav-cart">Giỏ hàng <span class="cart-count-badge" id="cart-count" th:text="${cartSummary.count}">0</span></a>
+        <a th:href="@{/wallet}" th:if="${session.userId != null}">💰 Nạp tiền</a>
+        <a th:href="@{/my-orders}" th:if="${session.userId != null}">Đơn mua</a>
+        <a th:href="@{/admin}" th:if="${session.role == 'ADMIN'}">Admin</a>
+        <a th:href="@{/auth/login}" th:if="${session.userId == null}">Đăng nhập</a>
+        <a class="cta" th:href="@{/auth/register}" th:if="${session.userId == null}">Đăng ký ngay ✨</a>
+        <div class="user-menu" th:if="${session.userId != null}">
+            <button class="user-trigger" id="userMenuTrigger" type="button">
+                <img th:src="@{/images/user-avatar.png}" alt="User avatar">
+            </button>
+            <div class="user-dropdown" id="userDropdown">
+                <div class="user-name" th:text="${session.username}">Username</div>
+                <form th:action="@{/auth/logout}" method="post">
+                    <button class="user-logout" type="submit">Logout</button>
+                </form>
+            </div>
+        </div>
+    </nav>
+</header>
+
+<!-- GAME SIDEBAR -->
+<nav class="game-sidebar" th:if="${!#lists.isEmpty(games)}">
+    <a th:each="game : ${games}" 
+       th:href="@{'/' + ${game.slug}}"
+       th:class="${'game-sidebar-item' + (game.slug == currentGame.slug ? ' active' : '')}"
+       th:title="${game.name}">
+        <img th:src="${game.imagePath}" th:alt="${game.name}"
+             onerror="this.src='/images/game-placeholder.svg'">
+    </a>
+</nav>
+
+<main>
+    <!-- HERO -->
+    <section class="game-hero">
+        <div class="game-hero-badge" th:text="${currentGame.name}">Game Name</div>
+        <h1 th:text="${currentGame.description != null ? currentGame.description : 'Mua acc ' + currentGame.name + ' giá rẻ'}">Acc Game Giá Rẻ</h1>
+        <p>Nick xịn, giá mềm, giao acc nhanh trong 5 phút. Uy tín hàng đầu!</p>
+    </section>
+
+    <!-- ACCOUNTS -->
+    <div id="kho-acc">
+    <h2 class="section-title">Kho Acc Nổi Bật ✨</h2>
+    <p th:if="${#lists.isEmpty(gameAccounts)}" style="text-align:center;color:var(--text-mute);font-weight:700;padding:40px">
+        Chưa có acc nào cho game này.
+    </p>
+    <section class="cards" th:if="${!#lists.isEmpty(gameAccounts)}">
+        <article class="card" th:each="acc : ${gameAccounts}" th:with="imgSrc=${(acc.listingImagePath != null && !#strings.isEmpty(acc.listingImagePath)) ? acc.listingImagePath : (acc.product != null ? acc.product.imagePath : '')}">
+            <div class="card-image" style="cursor:pointer" th:attr="onclick=|openAccDetail(${acc.id})|">
+                <img th:src="${imgSrc}" th:alt="${acc.product != null ? acc.product.name : 'Acc'}" loading="lazy">
+            </div>
+            <span th:class="${'card-tag' + (acc.product != null && #strings.contains(acc.product.slug,'premium') ? ' purple' : (acc.product != null && #strings.contains(acc.product.slug,'vip') ? ' gold' : ''))}">Acc</span>
+            <h3 th:text="${acc.product != null ? acc.product.name : 'Acc'}">Acc</h3>
+            <p th:text="${acc.rankInfo != null ? acc.rankInfo : (acc.product != null ? acc.product.description : 'Tài khoản game')}">Mô tả</p>
+            <div class="card-footer">
+                <div class="price" th:text="${accountPriceFormatted[acc.id]}">0đ</div>
+                <div class="card-actions">
+                    <button type="button" class="card-detail-btn" th:attr="onclick=|openAccDetail(${acc.id})|">Chi tiết</button>
+                    <button type="button" class="card-buy" th:attr="data-product-id=${acc.product != null ? acc.product.slug : ''}">Mua</button>
+                </div>
+            </div>
+        </article>
+    </section>
+    </div>
+
+    <!-- ACC DETAIL MODAL -->
+    <div class="acc-detail-overlay" id="accDetailModal">
+        <div class="acc-detail-modal">
+            <button class="acc-detail-close" onclick="closeAccDetail()">✕</button>
+            <div class="acc-detail-image">
+                <img id="accDetailImage" src="" alt="Acc detail">
+            </div>
+            <div class="acc-detail-info">
+                <span class="acc-detail-tag" id="accDetailTag">Acc</span>
+                <h2 id="accDetailName">-</h2>
+                <div class="acc-detail-specs">
+                    <div class="acc-detail-spec" id="accDetailRank">
+                        <span class="spec-label">Rank</span>
+                        <span class="spec-value">-</span>
+                    </div>
+                    <div class="acc-detail-spec" id="accDetailSkin">
+                        <span class="spec-label">Skin</span>
+                        <span class="spec-value">-</span>
+                    </div>
+                    <div class="acc-detail-spec" id="accDetailGame">
+                        <span class="spec-label">Server</span>
+                        <span class="spec-value">-</span>
+                    </div>
+                </div>
+                <div class="acc-detail-desc" id="accDetailExtra">
+                    <h4>Thông tin thêm</h4>
+                    <p>-</p>
+                </div>
+                <div class="acc-detail-footer">
+                    <div class="acc-detail-price" id="accDetailPrice">0đ</div>
+                    <button type="button" class="card-buy" id="accDetailBuyBtn">Mua ngay</button>
+                </div>
+            </div>
+        </div>
+    </div>
+</main>
+
+<!-- FAB -->
+<a class="chat-fab" href="https://www.facebook.com/utaitejapan?locale=vi_VN" target="_blank">
+    💬 Chat Facebook ngay
+</a>
+
+<script th:inline="javascript">
+    const accountData = /*[[${accountJson}]]*/ {};
+    const cartCountEl = document.getElementById('cart-count');
+    const userMenuTrigger = document.getElementById('userMenuTrigger');
+    const userDropdown = document.getElementById('userDropdown');
+
+    function openAccDetail(id) {
+        const data = accountData[id];
+        if (!data) return;
+        document.getElementById('accDetailImage').src = data.image || '/images/placeholder.png';
+        document.getElementById('accDetailName').textContent = data.name;
+        document.getElementById('accDetailPrice').textContent = data.price;
+        const tagEl = document.getElementById('accDetailTag');
+        tagEl.textContent = 'Acc';
+        tagEl.className = 'acc-detail-tag' + (data.tagClass ? ' ' + data.tagClass : '');
+        document.querySelector('#accDetailRank .spec-value').textContent = data.rank;
+        document.querySelector('#accDetailSkin .spec-value').textContent = data.skin;
+        document.querySelector('#accDetailGame .spec-value').textContent = data.game;
+        const extraEl = document.getElementById('accDetailExtra');
+        if (data.extra) {
+            extraEl.querySelector('p').textContent = data.extra;
+            extraEl.style.display = 'block';
+        } else {
+            extraEl.style.display = 'none';
+        }
+        const buyBtn = document.getElementById('accDetailBuyBtn');
+        buyBtn.setAttribute('data-product-id', data.priceSlug);
+        document.getElementById('accDetailModal').classList.add('open');
+    }
+
+    function closeAccDetail() {
+        document.getElementById('accDetailModal').classList.remove('open');
+    }
+
+    document.getElementById('accDetailModal').addEventListener('click', function(e) {
+        if (e.target === this) closeAccDetail();
+    });
+
+    function setupUserMenu() {
+        if (!userMenuTrigger || !userDropdown) return;
+        userMenuTrigger.addEventListener('click', function(e) {
+            e.stopPropagation();
+            userDropdown.classList.toggle('open');
+        });
+        document.addEventListener('click', function(e) {
+            if (!userDropdown.contains(e.target) && !userMenuTrigger.contains(e.target)) {
+                userDropdown.classList.remove('open');
+            }
+        });
+    }
+
+    function updateCartUi(cartSummary) {
+        if (cartCountEl) cartCountEl.textContent = cartSummary.count;
+    }
+
+    function addToCart(button) {
+        const productId = button.dataset.productId;
+        button.disabled = true;
+        button.textContent = 'Đang thêm...';
+        fetch('/cart/add', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ productId })
+        })
+        .then(async res => {
+            if (res.status === 401) { window.location.href = '/auth/login'; return null; }
+            return res.json();
+        })
+        .then(data => {
+            if (!data) return;
+            updateCartUi(data);
+            button.textContent = 'Đã có trong giỏ';
+        })
+        .catch(() => { button.textContent = 'Lỗi'; })
+        .finally(() => { setTimeout(() => { button.disabled = false; button.textContent = 'Mua'; }, 1500); });
+    }
+
+    document.querySelectorAll('.card-buy').forEach(btn => {
+        btn.addEventListener('click', function() { addToCart(this); });
+    });
+
+    document.getElementById('accDetailBuyBtn').addEventListener('click', function() {
+        const productId = this.dataset.productId;
+        if (productId) {
+            addToCart(this);
+            setTimeout(closeAccDetail, 500);
+        }
+    });
+
+    setupUserMenu();
+</script>
+</body>
+</html>

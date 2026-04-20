@@ -1,0 +1,235 @@
+<!DOCTYPE html>
+<html lang="vi" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title th:text="${pkg.id != null ? 'Sửa gói acc' : 'Tạo gói acc'}">Gói acc</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800;900&display=swap" rel="stylesheet">
+    <style>
+        *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+        body {
+            font-family: 'Nunito', sans-serif;
+            background: #0f0f23; color: #fff; min-height: 100vh;
+        }
+        .admin-layout { display: flex; min-height: 100vh; }
+
+        /* Sidebar */
+        .admin-sidebar {
+            width: 240px; background: rgba(20,20,50,0.98);
+            border-right: 1px solid rgba(139,92,246,0.2);
+            display: flex; flex-direction: column; flex-shrink: 0;
+        }
+        .admin-sidebar-brand { padding: 20px; border-bottom: 1px solid rgba(139,92,246,0.2); }
+        .admin-sidebar-brand a {
+            display: flex; align-items: center; gap: 10px;
+            color: #f472b6; text-decoration: none; font-weight: 800; font-size: 1rem;
+        }
+        .admin-sidebar-brand .logo { font-size: 1.8rem; }
+        .admin-sidebar-brand small { display: block; color: #64748b; font-size: 0.7rem; font-weight: 600; }
+        .admin-nav { padding: 16px 12px; flex: 1; }
+        .admin-nav-section {
+            font-size: 0.7rem; font-weight: 800; color: #475569;
+            text-transform: uppercase; letter-spacing: 0.08em; padding: 8px 8px 4px; margin-bottom: 4px;
+        }
+        .admin-nav a {
+            display: flex; align-items: center; gap: 10px;
+            padding: 10px 12px; border-radius: 10px;
+            color: #94a3b8; text-decoration: none; font-weight: 700;
+            font-size: 0.88rem; transition: all 0.2s; margin-bottom: 2px;
+        }
+        .admin-nav a:hover { background: rgba(139,92,246,0.1); color: #e2e8f0; }
+        .admin-nav a.is-active { background: rgba(139,92,246,0.2); color: #a855f7; }
+        .admin-nav .ic { font-size: 1.1rem; }
+        .admin-sidebar-footer { padding: 16px; border-top: 1px solid rgba(139,92,246,0.2); }
+        .admin-sidebar-footer a { color: #64748b; text-decoration: none; font-weight: 700; font-size: 0.85rem; }
+        .admin-sidebar-footer a:hover { color: #94a3b8; }
+
+        /* Main */
+        .admin-main { flex: 1; padding: 28px 32px; overflow-y: auto; }
+        .page-header { margin-bottom: 28px; }
+        .page-header h1 {
+            font-size: 1.6rem; font-weight: 900;
+            background: linear-gradient(135deg, #f472b6, #a855f7);
+            -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+        }
+        .page-header a { color: #94a3b8; text-decoration: none; font-weight: 700; font-size: 0.88rem; }
+        .page-header a:hover { color: #e2e8f0; }
+
+        /* Card */
+        .form-card {
+            background: rgba(30,30,63,0.8);
+            border: 1px solid rgba(139,92,246,0.3);
+            border-radius: 20px; padding: 28px;
+            max-width: 600px;
+        }
+
+        .form-group { margin-bottom: 20px; }
+        .form-label {
+            display: block; font-size: 0.8rem; font-weight: 800;
+            color: #94a3b8; text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 8px;
+        }
+        .form-input, .form-select, .form-textarea {
+            width: 100%; padding: 12px 14px; border-radius: 12px;
+            border: 1.5px solid rgba(99,102,241,0.4);
+            background: rgba(15,15,35,0.8); font-size: 0.92rem; font-family: inherit; color: #f1f5f9;
+            transition: border-color 0.2s, box-shadow 0.2s;
+        }
+        .form-input:focus, .form-select:focus, .form-textarea:focus {
+            outline: none; border-color: #8b5cf6;
+            box-shadow: 0 0 0 3px rgba(139,92,246,0.15);
+        }
+        .form-input::placeholder { color: #475569; }
+        .form-textarea { resize: vertical; min-height: 100px; }
+        .form-hint { font-size: 0.75rem; color: #64748b; margin-top: 6px; font-weight: 600; }
+        .form-select option { background: #1e1e3f; color: #f1f5f9; }
+
+        .price-wrap { position: relative; }
+        .price-wrap .form-input { padding-right: 50px; }
+        .price-wrap::after {
+            content: 'đ'; position: absolute; right: 14px; top: 50%;
+            transform: translateY(-50%); color: #94a3b8; font-weight: 800; font-size: 1rem;
+        }
+
+        .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+
+        /* Toggle */
+        .toggle-wrap { display: flex; align-items: center; gap: 12px; }
+        .toggle {
+            position: relative; width: 48px; height: 26px;
+        }
+        .toggle input { opacity: 0; width: 0; height: 0; }
+        .toggle-slider {
+            position: absolute; cursor: pointer; inset: 0;
+            background: rgba(100,116,139,0.4);
+            border-radius: 26px; transition: 0.3s;
+        }
+        .toggle-slider::before {
+            content: ''; position: absolute; height: 20px; width: 20px;
+            left: 3px; bottom: 3px;
+            background: #fff; border-radius: 50%; transition: 0.3s;
+        }
+        .toggle input:checked + .toggle-slider { background: #8b5cf6; }
+        .toggle input:checked + .toggle-slider::before { transform: translateX(22px); }
+        .toggle-label { font-weight: 700; color: #e2e8f0; }
+
+        /* Buttons */
+        .btn-group { display: flex; gap: 12px; margin-top: 24px; }
+        .btn {
+            padding: 12px 24px; border-radius: 12px;
+            font-size: 0.92rem; font-weight: 800; font-family: inherit;
+            cursor: pointer; transition: all 0.15s;
+        }
+        .btn-primary {
+            background: linear-gradient(135deg, #8b5cf6, #6366f1);
+            color: #fff; border: none;
+            box-shadow: 0 4px 14px rgba(139,92,246,0.4);
+        }
+        .btn-primary:hover { transform: translateY(-2px); box-shadow: 0 6px 20px rgba(139,92,246,0.5); }
+        .btn-secondary {
+            background: transparent; color: #94a3b8;
+            border: 1.5px solid rgba(99,102,241,0.3);
+            text-decoration: none; display: inline-flex; align-items: center;
+        }
+        .btn-secondary:hover { border-color: #8b5cf6; color: #e2e8f0; }
+
+        @media (max-width: 800px) {
+            .admin-sidebar { width: 60px; }
+            .admin-sidebar-brand div, .admin-nav a span:not(.ic), .admin-sidebar-footer span { display: none; }
+            .admin-nav a { justify-content: center; }
+            .admin-main { padding: 20px; }
+            .form-row { grid-template-columns: 1fr; }
+        }
+    </style>
+</head>
+<body>
+<div class="admin-layout">
+    <!-- Sidebar -->
+    <aside class="admin-sidebar">
+        <div class="admin-sidebar-brand">
+            <a th:href="@{/admin}">
+                <span class="logo">🌸</span>
+                <div>
+                    Genshin Shop
+                    <small>Administration</small>
+                </div>
+            </a>
+        </div>
+        <nav class="admin-nav">
+            <div class="admin-nav-section">Menu</div>
+            <a th:href="@{/admin}" th:classappend="${active == 'dashboard'} ? ' is-active'">
+                <span class="ic">📊</span> <span>Tổng quan</span>
+            </a>
+            <a th:href="@{/admin/users}" th:classappend="${active == 'users'} ? ' is-active'">
+                <span class="ic">👤</span> <span>Người dùng</span>
+            </a>
+            <a th:href="@{/admin/accounts}" th:classappend="${active == 'accounts'} ? ' is-active'">
+                <span class="ic">🎮</span> <span>Quản lý acc</span>
+            </a>
+            <a th:href="@{/admin/packages}" th:classappend="${active == 'packages'} ? ' is-active'">
+                <span class="ic">📦</span> <span>Gói acc</span>
+            </a>
+            <a th:href="@{/admin/orders}" th:classappend="${active == 'orders'} ? ' is-active'">
+                <span class="ic">🧾</span> <span>Quản lý mua hàng</span>
+            </a>
+        </nav>
+        <div class="admin-sidebar-footer">
+            <a th:href="@{/}"><span>←</span> Về cửa hàng</a>
+        </div>
+    </aside>
+
+    <!-- Main -->
+    <main class="admin-main">
+        <div class="page-header">
+            <a th:href="@{/admin/packages}">← Quay lại danh sách gói acc</a>
+            <h1 style="margin-top:8px" th:text="${pkg.id != null} ? 'Sửa gói acc' : 'Tạo gói acc mới'">Tạo gói acc</h1>
+        </div>
+
+        <form th:action="@{/admin/packages/save}" method="post" class="form-card">
+            <input type="hidden" name="id" th:value="${pkg.id}">
+
+            <div class="form-group">
+                <label class="form-label">Tên gói acc <span style="color:#f87171">*</span></label>
+                <input type="text" class="form-input" name="name" th:value="${pkg.name}" placeholder="Ví dụ: Gói AR55 Có Raiden" required>
+            </div>
+
+            <div class="form-group">
+                <label class="form-label">Game <span style="color:#f87171">*</span></label>
+                <select class="form-select" name="gameId" required>
+                    <option value="">-- Chọn game --</option>
+                    <option th:each="g : ${games}" th:value="${g.id}" th:text="${g.name}" th:selected="${pkg.game != null and pkg.game.id == g.id}">Game</option>
+                </select>
+                <p class="form-hint">Bắt buộc - Chọn game cho gói acc này</p>
+            </div>
+
+            <div class="form-group">
+                <label class="form-label">Slug</label>
+                <input type="text" class="form-input" name="slug" th:value="${pkg.slug}" placeholder="tu-dong-tao-neu-trong">
+                <p class="form-hint">Đường dẫn URL (ví dụ: ar55-raiden). Để trống sẽ tự tạo từ tên.</p>
+            </div>
+
+            <div class="form-group">
+                <label class="form-label">Mô tả</label>
+                <textarea class="form-textarea" name="description" th:text="${pkg.description}" placeholder="Mô tả chi tiết về gói acc này..."></textarea>
+            </div>
+
+            <div class="form-group">
+                <label class="form-label">Hiển thị</label>
+                <div class="toggle-wrap">
+                    <label class="toggle">
+                        <input type="checkbox" name="visible" th:checked="${pkg.visible || pkg.id == null}">
+                        <span class="toggle-slider"></span>
+                    </label>
+                    <span class="toggle-label">Cho phép hiển thị trên cửa hàng</span>
+                </div>
+            </div>
+
+            <div class="btn-group">
+                <button type="submit" class="btn btn-primary">💾 Lưu gói acc</button>
+                <a th:href="@{/admin/packages}" class="btn btn-secondary">Hủy</a>
+            </div>
+        </form>
+    </main>
+</div>
+</body>
+</html>

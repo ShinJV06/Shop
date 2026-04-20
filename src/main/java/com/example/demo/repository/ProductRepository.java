@@ -9,5 +9,7 @@ import java.util.Optional;
 public interface ProductRepository extends JpaRepository<Product, Long> {
     Optional<Product> findBySlug(String slug);
 
+    Optional<Product> findBySlugIgnoreCase(String slug);
+
     List<Product> findByVisibleTrueOrderByIdAsc();
 }

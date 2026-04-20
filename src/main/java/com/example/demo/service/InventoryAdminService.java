@@ -13,6 +13,8 @@ import com.example.demo.repository.ProductRepository;
 import com.example.demo.repository.TransactionLogEntryRepository;
 import com.example.demo.util.CredentialHasher;
 import org.springframework.beans.factory.annotation.Autowired;
+
+import java.math.BigDecimal;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
@@ -48,7 +50,8 @@ public class InventoryAdminService {
             String extraInfo,
             String credentials,
             Account actor,
-            MultipartFile listingImage
+            MultipartFile listingImage,
+            BigDecimal customPrice
     ) {
         Product product = productRepository.findById(productId)
                 .orElseThrow(() -> new IllegalArgumentException("Sản phẩm không tồn tại."));
@@ -63,6 +66,7 @@ public class InventoryAdminService {
         item.setRankInfo(rankInfo);
         item.setSkinInfo(skinInfo);
         item.setExtraInfo(extraInfo);
+        item.setPrice(customPrice);
         item.setCredentials(credentials.trim());
         item.setCredentialHash(hash);
         item.setListingImagePath(imagePath);
@@ -75,7 +79,7 @@ public class InventoryAdminService {
             item.setSubmittedById(actor.getId());
         }
         InventoryItem saved = inventoryItemRepository.save(item);
-        log(null, actor.getId(), TransactionAction.INVENTORY_IMPORTED, "Thêm acc id=" + saved.getId() + " cho SP " + product.getSlug());
+        log(null, actor.getId(), TransactionAction.INVENTORY_IMPORTED, "Thêm acc id=" + saved.getId() + " cho SP " + product.getSlug() + (customPrice != null ? " giá " + customPrice : ""));
         return saved;
     }
 

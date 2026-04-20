@@ -1,0 +1,279 @@
+<!DOCTYPE html>
+<html lang="vi" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Quản lý gói acc - Admin</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800;900&display=swap" rel="stylesheet">
+    <style>
+        *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+        body {
+            font-family: 'Nunito', sans-serif;
+            background: #0f0f23; color: #fff; min-height: 100vh;
+        }
+        .admin-layout { display: flex; min-height: 100vh; }
+
+        .admin-sidebar {
+            width: 240px; background: rgba(20,20,50,0.98);
+            border-right: 1px solid rgba(139,92,246,0.2);
+            display: flex; flex-direction: column; flex-shrink: 0;
+        }
+        .admin-sidebar-brand { padding: 20px; border-bottom: 1px solid rgba(139,92,246,0.2); }
+        .admin-sidebar-brand a {
+            display: flex; align-items: center; gap: 10px;
+            color: #f472b6; text-decoration: none; font-weight: 800; font-size: 1rem;
+        }
+        .admin-sidebar-brand .logo { font-size: 1.8rem; }
+        .admin-sidebar-brand small { display: block; color: #64748b; font-size: 0.7rem; font-weight: 600; }
+        .admin-nav { padding: 16px 12px; flex: 1; }
+        .admin-nav-section {
+            font-size: 0.7rem; font-weight: 800; color: #475569;
+            text-transform: uppercase; letter-spacing: 0.08em;
+            padding: 8px 8px 4px; margin-bottom: 4px;
+        }
+        .admin-nav a {
+            display: flex; align-items: center; gap: 10px;
+            padding: 10px 12px; border-radius: 10px;
+            color: #94a3b8; text-decoration: none; font-weight: 700;
+            font-size: 0.88rem; transition: all 0.2s; margin-bottom: 2px;
+        }
+        .admin-nav a:hover { background: rgba(139,92,246,0.1); color: #e2e8f0; }
+        .admin-nav a.is-active { background: rgba(139,92,246,0.2); color: #a855f7; }
+        .admin-nav .ic { font-size: 1.1rem; }
+        .admin-sidebar-footer { padding: 16px; border-top: 1px solid rgba(139,92,246,0.2); }
+        .admin-sidebar-footer a { color: #64748b; text-decoration: none; font-weight: 700; font-size: 0.85rem; }
+        .admin-sidebar-footer a:hover { color: #94a3b8; }
+
+        .admin-main { flex: 1; padding: 28px 32px; overflow-y: auto; }
+        .page-header {
+            display: flex; justify-content: space-between; align-items: center;
+            margin-bottom: 28px;
+        }
+        .page-header h1 {
+            font-size: 1.6rem; font-weight: 900;
+            background: linear-gradient(135deg, #f472b6, #a855f7);
+            -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+        }
+        .btn-add {
+            display: inline-flex; align-items: center; gap: 6px;
+            background: linear-gradient(135deg, #8b5cf6, #6366f1);
+            color: #fff; padding: 10px 20px; border-radius: 12px;
+            text-decoration: none; font-weight: 800; font-size: 0.88rem;
+            box-shadow: 0 4px 14px rgba(139,92,246,0.4);
+            transition: transform 0.15s, box-shadow 0.15s;
+        }
+        .btn-add:hover { transform: translateY(-2px); box-shadow: 0 6px 20px rgba(139,92,246,0.5); }
+
+        .alert { padding: 12px 18px; border-radius: 12px; font-weight: 700; font-size: 0.88rem; margin-bottom: 20px; }
+        .alert-ok { background: rgba(34,197,94,0.15); color: #6ee7b7; border: 1px solid rgba(34,197,94,0.3); }
+        .alert-err { background: rgba(239,68,68,0.15); color: #fca5a5; border: 1px solid rgba(239,68,68,0.3); }
+
+        .game-section { margin-bottom: 32px; }
+        .game-title {
+            font-size: 1.1rem; font-weight: 800; color: #a855f7;
+            margin-bottom: 14px; display: flex; align-items: center; gap: 8px;
+        }
+        .game-title .game-icon { font-size: 1.4rem; }
+
+        .data-table {
+            width: 100%; border-collapse: collapse;
+            background: rgba(30,30,63,0.6);
+            border-radius: 14px; overflow: hidden;
+            border: 1px solid rgba(139,92,246,0.2);
+        }
+        .data-table th {
+            background: rgba(99,102,241,0.15);
+            padding: 12px 16px; text-align: left;
+            font-size: 0.75rem; font-weight: 800; color: #64748b;
+            text-transform: uppercase; letter-spacing: 0.05em;
+        }
+        .data-table td {
+            padding: 14px 16px; border-top: 1px solid rgba(99,102,241,0.1);
+            font-size: 0.9rem; color: #e2e8f0;
+        }
+        .data-table tr:hover td { background: rgba(99,102,241,0.05); }
+        .pkg-name { font-weight: 700; color: #f1f5f9; }
+        .pkg-count { color: #94a3b8; font-size: 0.85rem; }
+        .badge {
+            display: inline-block; padding: 3px 10px; border-radius: 20px;
+            font-size: 0.72rem; font-weight: 700;
+        }
+        .badge-active { background: rgba(34,197,94,0.15); color: #6ee7b7; }
+        .badge-hidden { background: rgba(100,116,139,0.15); color: #94a3b8; }
+        .action-btns { display: flex; gap: 8px; }
+        .btn-sm {
+            padding: 6px 12px; border-radius: 8px; font-size: 0.78rem;
+            font-weight: 700; text-decoration: none; transition: all 0.15s;
+        }
+        .btn-create-acc {
+            background: rgba(34,197,94,0.15); color: #6ee7b7;
+            border: 1px solid rgba(34,197,94,0.3);
+        }
+        .btn-create-acc:hover { background: rgba(34,197,94,0.25); }
+        .btn-create-acc.disabled {
+            opacity: 0.5; cursor: not-allowed;
+        }
+        .btn-edit {
+            background: rgba(99,102,241,0.2); color: #a5b4fc;
+            border: 1px solid rgba(99,102,241,0.3);
+        }
+        .btn-edit:hover { background: rgba(99,102,241,0.3); }
+        .btn-del {
+            background: rgba(239,68,68,0.15); color: #fca5a5;
+            border: 1px solid rgba(239,68,68,0.3); cursor: pointer; font-family: inherit;
+        }
+        .btn-del:hover { background: rgba(239,68,68,0.25); }
+
+        .empty-state { text-align: center; padding: 40px; color: #475569; font-weight: 700; }
+
+        @media (max-width: 800px) {
+            .admin-sidebar { width: 60px; }
+            .admin-sidebar-brand div, .admin-nav a span:not(.ic), .admin-sidebar-footer span { display: none; }
+            .admin-nav a { justify-content: center; }
+            .admin-main { padding: 20px; }
+        }
+    </style>
+</head>
+<body>
+<div class="admin-layout">
+    <aside class="admin-sidebar">
+        <div class="admin-sidebar-brand">
+            <a th:href="@{/admin}">
+                <span class="logo">🌸</span>
+                <div>
+                    Genshin Shop
+                    <small>Administration</small>
+                </div>
+            </a>
+        </div>
+        <nav class="admin-nav">
+            <div class="admin-nav-section">Menu</div>
+            <a th:href="@{/admin}" th:classappend="${active == 'dashboard'} ? ' is-active'">
+                <span class="ic">📊</span> <span>Tổng quan</span>
+            </a>
+            <a th:href="@{/admin/users}" th:classappend="${active == 'users'} ? ' is-active'">
+                <span class="ic">👤</span> <span>Người dùng</span>
+            </a>
+            <a th:href="@{/admin/accounts}" th:classappend="${active == 'accounts'} ? ' is-active'">
+                <span class="ic">🎮</span> <span>Quản lý acc</span>
+            </a>
+            <a th:href="@{/admin/packages}" th:classappend="${active == 'packages'} ? ' is-active'">
+                <span class="ic">📦</span> <span>Gói acc</span>
+            </a>
+            <a th:href="@{/admin/orders}" th:classappend="${active == 'orders'} ? ' is-active'">
+                <span class="ic">🧾</span> <span>Quản lý mua hàng</span>
+            </a>
+        </nav>
+        <div class="admin-sidebar-footer">
+            <a th:href="@{/}"><span>←</span> Về cửa hàng</a>
+        </div>
+    </aside>
+
+    <main class="admin-main">
+        <div class="page-header">
+            <h1>📦 Quản lý gói acc</h1>
+            <a th:href="@{/admin/packages/create}" class="btn-add">+ Tạo gói mới</a>
+        </div>
+
+        <div th:if="${successMessage}" class="alert alert-ok" th:text="${successMessage}"></div>
+        <div th:if="${errorMessage}" class="alert alert-err" th:text="${errorMessage}"></div>
+
+        <!-- By Game -->
+        <th:block th:each="entry : ${byGame}">
+            <div class="game-section">
+                <h2 class="game-title">
+                    <span class="game-icon" th:switch="${entry.key.slug}">
+                        <span th:case="'genshin'">⚔️</span>
+                        <span th:case="'lien-quan'">🎮</span>
+                        <span th:case="*">🎯</span>
+                    </span>
+                    <span th:text="${entry.key.name}">Game</span>
+                    <span style="color:#475569;font-size:0.85rem;font-weight:600">(<span th:text="${entry.value.size()}">0</span> gói)</span>
+                </h2>
+                <table class="data-table">
+                    <thead>
+                        <tr>
+                            <th>Tên gói</th>
+                            <th>Số acc</th>
+                            <th>Trạng thái</th>
+                            <th>Thao tác</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr th:each="p : ${entry.value}">
+                            <td class="pkg-name" th:text="${p.name}">Gói acc</td>
+                            <td class="pkg-count">
+                                <span th:if="${accCountByProduct[p.id] != null and accCountByProduct[p.id] > 0}" th:text="${accCountByProduct[p.id]} + ' acc'">0 acc</span>
+                                <span th:unless="${accCountByProduct[p.id] != null and accCountByProduct[p.id] > 0}" style="color:#f87171">Chưa có acc</span>
+                            </td>
+                            <td>
+                                <span class="badge" th:classappend="${p.visible} ? 'badge-active' : 'badge-hidden'" th:text="${p.visible} ? 'Hiển thị' : 'Ẩn'">Hiển thị</span>
+                            </td>
+                            <td>
+                                <div class="action-btns">
+                                    <!-- Tạo acc - chỉ hiện nếu chưa có acc -->
+                                    <th:block th:if="${accCountByProduct[p.id] == null or accCountByProduct[p.id] == 0}">
+                                        <a th:href="@{/ctv/submit(productId=${p.id})}" class="btn-sm btn-create-acc">+ Tạo acc</a>
+                                    </th:block>
+                                    <!-- Sửa/Xóa - chỉ Admin -->
+                                    <a th:href="@{/admin/packages/edit/{id}(id=${p.id})}" class="btn-sm btn-edit">Sửa</a>
+                                    <form th:action="@{/admin/packages/delete/{id}(id=${p.id})}" method="post" style="display:inline" onsubmit="return confirm('Xóa gói này?')">
+                                        <button type="submit" class="btn-sm btn-del">Xóa</button>
+                                    </form>
+                                </div>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </th:block>
+
+        <!-- Packages without game -->
+        <th:block th:if="${not #lists.isEmpty(packages.?[game == null])}">
+            <div class="game-section">
+                <h2 class="game-title">⚔️ Genshin Impact</h2>
+                <table class="data-table">
+                    <thead>
+                        <tr>
+                            <th>Tên gói</th>
+                            <th>Số acc</th>
+                            <th>Trạng thái</th>
+                            <th>Thao tác</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr th:each="p : ${packages}" th:if="${p.game == null}">
+                            <td class="pkg-name" th:text="${p.name}">Gói acc</td>
+                            <td class="pkg-count">
+                                <span th:if="${accCountByProduct[p.id] != null and accCountByProduct[p.id] > 0}" th:text="${accCountByProduct[p.id]} + ' acc'">0 acc</span>
+                                <span th:unless="${accCountByProduct[p.id] != null and accCountByProduct[p.id] > 0}" style="color:#f87171">Chưa có acc</span>
+                            </td>
+                            <td>
+                                <span class="badge" th:classappend="${p.visible} ? 'badge-active' : 'badge-hidden'" th:text="${p.visible} ? 'Hiển thị' : 'Ẩn'">Hiển thị</span>
+                            </td>
+                            <td>
+                                <div class="action-btns">
+                                    <th:block th:if="${accCountByProduct[p.id] == null or accCountByProduct[p.id] == 0}">
+                                        <a th:href="@{/ctv/submit(productId=${p.id})}" class="btn-sm btn-create-acc">+ Tạo acc</a>
+                                    </th:block>
+                                    <a th:href="@{/admin/packages/edit/{id}(id=${p.id})}" class="btn-sm btn-edit">Sửa</a>
+                                    <form th:action="@{/admin/packages/delete/{id}(id=${p.id})}" method="post" style="display:inline" onsubmit="return confirm('Xóa gói này?')">
+                                        <button type="submit" class="btn-sm btn-del">Xóa</button>
+                                    </form>
+                                </div>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </th:block>
+
+        <!-- Empty -->
+        <div class="empty-state" th:if="${packages.isEmpty()}">
+            Chưa có gói acc nào. <a th:href="@{/admin/packages/create}" style="color:#a855f7">Tạo gói đầu tiên</a>
+        </div>
+    </main>
+</div>
+</body>
+</html>

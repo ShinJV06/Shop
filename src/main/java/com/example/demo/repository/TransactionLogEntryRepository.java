@@ -13,4 +13,11 @@ public interface TransactionLogEntryRepository extends JpaRepository<Transaction
 
     @Query("SELECT SUM(t.amount) FROM TransactionLogEntry t WHERE t.actorAccountId = :accountId AND t.type = 'DEPOSIT'")
     Double totalDepositsByAccountId(Long accountId);
+
+    List<TransactionLogEntry> findByAction(com.example.demo.entity.Enum.TransactionAction action);
+
+    List<TransactionLogEntry> findByActionAndCreatedAtBetween(
+            com.example.demo.entity.Enum.TransactionAction action,
+            java.util.Date from,
+            java.util.Date to);
 }

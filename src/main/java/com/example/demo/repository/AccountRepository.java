@@ -24,6 +24,8 @@ public interface AccountRepository extends JpaRepository<Account, Long> {
         SELECT a.* FROM account a
         INNER JOIN transaction_logs t ON a.id = t.actor_account_id
         WHERE t.type = 'DEPOSIT'
+        AND MONTH(t.created_at) = MONTH(CURRENT_DATE)
+        AND YEAR(t.created_at) = YEAR(CURRENT_DATE)
         GROUP BY a.id
         ORDER BY COALESCE(SUM(t.amount), 0) DESC
         LIMIT :limit

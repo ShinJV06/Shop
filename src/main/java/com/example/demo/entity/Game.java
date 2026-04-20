@@ -9,8 +9,8 @@ import java.util.Date;
 @Getter
 @Setter
 @Entity
-@Table(name = "shop_products")
-public class Product {
+@Table(name = "shop_games")
+public class Game {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
@@ -21,21 +21,17 @@ public class Product {
     @Column(nullable = false, length = 200)
     private String name;
 
-    @Column(nullable = false)
-    private long price;
-
-    @Column(length = 4000)
-    private String description;
-
     @Column(length = 255)
     private String imagePath;
 
+    @Column(length = 1000)
+    private String description;
+
+    @Column(nullable = false)
+    private int displayOrder = 0;
+
     @Column(nullable = false)
     private boolean visible = true;
-
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "game_id")
-    private Game game;
 
     private Date createdAt;
 

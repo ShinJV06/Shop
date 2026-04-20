@@ -5,6 +5,87 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Quản lý acc — Admin</title>
     <link rel="stylesheet" th:href="@{/css/admin-panel.css}">
+    <style>
+        body.admin-body { background: #f8fafc; }
+        .filters-bar {
+            display: flex; gap: 8px; margin-bottom: 16px; flex-wrap: wrap;
+        }
+        .filter-btn {
+            padding: 7px 16px; border-radius: 30px;
+            border: 1.5px solid #e2e8f0;
+            background: #fff;
+            font-size: 0.82rem; font-weight: 700; font-family: inherit;
+            cursor: pointer; transition: all 0.2s;
+            color: #64748b;
+        }
+        .filter-btn:hover { border-color: #a855f7; background: #faf5ff; color: #7c3aed; }
+        .filter-btn.active { border-color: #7c3aed; background: #7c3aed; color: #fff; }
+
+        .acc-row td { vertical-align: middle; }
+        .acc-row:hover td { background: #fafbff; }
+        .acc-row.dimmed td { opacity: 0.5; }
+
+        .acc-thumb {
+            width: 52px; height: 38px; object-fit: cover;
+            border-radius: 6px; background: linear-gradient(135deg, #fce7f3, #ede9fe);
+            border: 1px solid #e9d5ff;
+        }
+
+        .acc-info-name { font-weight: 800; font-size: 0.88rem; color: #1e293b; }
+        .acc-info-game {
+            display: inline-flex; align-items: center;
+            padding: 2px 8px; border-radius: 20px;
+            font-size: 0.7rem; font-weight: 700; margin-top: 2px;
+        }
+        .acc-info-game.genshin { background: #dbeafe; color: #1e40af; }
+        .acc-info-game.lienquan { background: #fee2e2; color: #991b1b; }
+        .acc-info-game.other { background: #f3e8ff; color: #6b21a8; }
+        .acc-rank { font-size: 0.75rem; color: #64748b; font-weight: 600; margin-top: 2px; }
+
+        .price-cell .price-main { font-weight: 800; font-size: 0.9rem; color: #16a34a; }
+        .price-cell .price-tag {
+            display: inline-block; font-size: 0.65rem; font-weight: 700;
+            padding: 1px 6px; border-radius: 6px; margin-top: 2px;
+        }
+        .price-tag.custom { background: #dcfce7; color: #16a34a; }
+        .price-tag.package { background: #f1f5f9; color: #64748b; }
+        .price-cell .price-old { font-size: 0.75rem; color: #94a3b8; text-decoration: line-through; font-weight: 600; }
+
+        .submitter-cell { font-size: 0.82rem; font-weight: 600; }
+        .submitter-ctv { color: #7c3aed; font-weight: 700; }
+        .submitter-admin { color: #0891b2; font-weight: 700; }
+
+        .mod-badge {
+            display: inline-flex; align-items: center; gap: 4px;
+            padding: 3px 10px; border-radius: 20px;
+            font-size: 0.75rem; font-weight: 700;
+        }
+        .mod-pending { background: #fff7ed; color: #ea580c; }
+        .mod-approved { background: #ecfdf5; color: #16a34a; }
+        .mod-rejected { background: #fef2f2; color: #dc2626; }
+
+        .status-dot {
+            display: inline-block; width: 8px; height: 8px;
+            border-radius: 50%; margin-right: 4px;
+        }
+        .dot-available { background: #22c55e; }
+        .dot-sold { background: #dc2626; }
+        .dot-error { background: #f97316; }
+
+        .admin-btn-sm {
+            padding: 5px 10px; border-radius: 8px;
+            border: none; font-size: 0.75rem; font-weight: 700;
+            cursor: pointer; font-family: inherit; transition: all 0.2s;
+        }
+        .btn-green { background: #dcfce7; color: #16a34a; }
+        .btn-green:hover { background: #bbf7d0; }
+        .btn-red { background: #fee2e2; color: #dc2626; }
+        .btn-red:hover { background: #fecaca; }
+        .btn-orange { background: #ffedd5; color: #ea580c; }
+        .btn-orange:hover { background: #fed7aa; }
+
+        .action-form { display: inline; }
+    </style>
 </head>
 <body class="admin-body">
 <div class="admin-app">
@@ -14,74 +95,121 @@
             <div>
                 <div class="admin-breadcrumb"><a th:href="@{/admin}">Admin</a> / Quản lý acc</div>
                 <h1>Quản lý kho acc</h1>
-                <p class="admin-muted">Chỉ danh sách và thao tác — nhập acc tại <a th:href="@{/admin/stock}">Nhập kho</a>, giá gói tại <a th:href="@{/admin/products}">Sản phẩm</a>, đơn tại <a th:href="@{/admin/orders}">Đơn hàng</a>.</p>
+                <p class="admin-muted">Xem, duyệt, từ chối acc. Nhập kho tại <a th:href="@{/admin/stock}">Nhập kho</a>.</p>
             </div>
         </header>
         <div class="admin-content">
             <p th:if="${successMessage}" class="admin-alert admin-alert--ok" th:text="${successMessage}"></p>
             <p th:if="${errorMessage}" class="admin-alert admin-alert--err" th:text="${errorMessage}"></p>
 
+            <!-- Filters -->
+            <div class="filters-bar">
+                <button class="filter-btn active" onclick="filterGame('all', this)">Tất cả</button>
+                <button class="filter-btn" onclick="filterGame('genshin', this)">⚔️ Genshin</button>
+                <button class="filter-btn" onclick="filterGame('lienquan', this)">🎮 Liên Quân</button>
+                <button class="filter-btn" onclick="filterGame('pending', this)">⏳ Chờ duyệt</button>
+                <button class="filter-btn" onclick="filterGame('approved', this)">✅ Đã duyệt</button>
+            </div>
+
             <div class="admin-panel admin-table-wrap">
                 <table class="admin-table">
                     <thead>
                     <tr>
-                        <th>Ảnh</th>
-                        <th>ID</th>
-                        <th>Sản phẩm</th>
-                        <th>Giá gói</th>
+                        <th style="width:56px">Ảnh</th>
+                        <th>Thông tin acc</th>
+                        <th>Giá bán</th>
                         <th>Người đăng</th>
-                        <th>Duyệt</th>
-                        <th>Bán</th>
-                        <th>Ẩn</th>
-                        <th>Preview acc</th>
-                        <th>Hành động</th>
+                        <th>Trạng thái</th>
+                        <th>Hiện</th>
+                        <th>Thao tác</th>
                     </tr>
                     </thead>
                     <tbody>
-                    <tr th:each="it : ${items}" th:with="imgSrc=${(it.listingImagePath != null && !#strings.isEmpty(it.listingImagePath)) ? it.listingImagePath : it.product.imagePath}">
-                        <td>
-                            <img class="admin-inv-thumb" th:src="${imgSrc}" alt="">
+                    <tr th:each="it : ${items}" class="acc-row"
+                        th:data-game="${it.game != null ? it.game.toLowerCase() : ''}"
+                        th:data-mod="${it.moderationStatus.name()}"
+                        th:classappend="${it.moderationStatus.name() == 'REJECTED' || it.status.name() == 'SOLD'} ? 'dimmed' : ''">
+
+                        <!-- Ảnh -->
+                        <td th:with="imgSrc=${(it.listingImagePath != null && !#strings.isEmpty(it.listingImagePath)) ? it.listingImagePath : (it.product != null ? it.product.imagePath : '')}">
+                            <img th:if="${!#strings.isEmpty(imgSrc)}" class="acc-thumb" th:src="${imgSrc}" alt="">
+                            <div th:if="${#strings.isEmpty(imgSrc)}" class="acc-thumb" style="display:flex;align-items:center;justify-content:center;font-size:1rem">🎮</div>
                         </td>
-                        <td th:text="${it.id}">1</td>
-                        <td th:text="${it.product.name}">-</td>
-                        <td th:text="${priceByProductId[it.product.id]}">0đ</td>
-                        <td th:with="sid=${it.submittedById}">
-                            <span th:if="${sid == null}">—</span>
-                            <span th:if="${sid != null and submitterNames.containsKey(sid)}" th:text="${submitterNames.get(sid)}">ctv1</span>
-                            <span th:if="${sid != null and !submitterNames.containsKey(sid)}" th:text="'#' + ${sid}">#1</span>
-                        </td>
+
+                        <!-- Thông tin -->
                         <td>
-                            <span th:if="${it.moderationStatus.name() == 'PENDING'}" class="admin-moderation-badge admin-moderation-badge--pending">Chờ duyệt</span>
-                            <span th:if="${it.moderationStatus.name() == 'APPROVED'}" class="admin-moderation-badge admin-moderation-badge--approved">Đã duyệt</span>
-                            <span th:if="${it.moderationStatus.name() == 'REJECTED'}" class="admin-moderation-badge admin-moderation-badge--rejected">Từ chối</span>
+                            <div class="acc-info-name" th:text="${it.product?.name ?: 'Acc #' + it.id}">-</div>
+                            <div class="acc-info-game"
+                                 th:classappend="${it.game != null and it.game.toLowerCase().contains('genshin')} ? 'genshin' : (${it.game != null and (it.game.toLowerCase().contains('liên') or it.game.toLowerCase().contains('lien'))} ? 'lienquan' : 'other')"
+                                 th:text="${it.game ?: '-'}">-</div>
+                            <div class="acc-rank" th:if="${it.rankInfo != null}" th:text="${it.rankInfo}">-</div>
+                            <div class="acc-rank" th:if="${it.extraInfo != null}" th:text="${it.extraInfo}" style="max-width:200px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">-</div>
                         </td>
-                        <td th:text="${it.status}">-</td>
-                        <td th:text="${it.hidden} ? 'Có' : 'Không'">-</td>
-                        <td><code th:text="${#strings.abbreviate(it.credentials, 36)}">-</code></td>
+
+                        <!-- Giá -->
+                        <td class="price-cell">
+                            <th:block th:if="${it.price != null}">
+                                <div class="price-main" th:text="${#numbers.formatDecimal(it.price, 0, 'COMMA', 0, 'POINT')} + 'đ'">0đ</div>
+                                <div th:if="${it.product?.price != null && it.product.price > 0 && it.product.price != it.price.longValue()}" class="price-old" th:text="${#numbers.formatDecimal(it.product.price, 0, 'COMMA', 0, 'POINT')} + 'đ'">0đ</div>
+                                <span class="price-tag custom">Giá riêng</span>
+                            </th:block>
+                            <th:block th:if="${it.price == null}">
+                                <div class="price-main" th:text="${itemPriceMap[it.id] ?: priceByProductId[it.product.id] ?: 'Liên hệ'}">0đ</div>
+                                <span class="price-tag package">Giá gói</span>
+                            </th:block>
+                        </td>
+
+                        <!-- Người đăng -->
+                        <td class="submitter-cell">
+                            <th:block th:with="sid=${it.submittedById}">
+                                <span th:if="${sid == null}" class="submitter-admin">System</span>
+                                <span th:if="${sid != null and submitterNames.containsKey(sid)}" class="submitter-ctv" th:text="${submitterNames.get(sid)}">-</span>
+                                <span th:if="${sid != null and !submitterNames.containsKey(sid)}" th:text="'#' + ${sid}">#1</span>
+                            </th:block>
+                        </td>
+
+                        <!-- Trạng thái duyệt -->
                         <td>
-                            <div class="admin-stack">
-                                <form class="inline" th:if="${it.moderationStatus.name() == 'PENDING'}" th:action="@{/admin/pending/{id}/approve(id=${it.id})}" method="post">
-                                    <button class="admin-btn admin-btn--green" type="submit">Duyệt</button>
+                            <span class="mod-badge mod-pending" th:if="${it.moderationStatus.name() == 'PENDING'}">⏳ Chờ duyệt</span>
+                            <span class="mod-badge mod-approved" th:if="${it.moderationStatus.name() == 'APPROVED'}">✅ Đã duyệt</span>
+                            <span class="mod-badge mod-rejected" th:if="${it.moderationStatus.name() == 'REJECTED'}">❌ Từ chối</span>
+                            <div style="margin-top:4px">
+                                <span class="status-dot" th:classappend="${it.status.name() == 'AVAILABLE'} ? 'dot-available' : (${it.status.name() == 'SOLD'} ? 'dot-sold' : 'dot-error')"></span>
+                                <span style="font-size:0.75rem;font-weight:600" th:text="${it.status.name()}">-</span>
+                            </div>
+                        </td>
+
+                        <!-- Hiện/Ẩn -->
+                        <td>
+                            <form class="action-form" th:action="@{/admin/inventory/{id}/hidden(id=${it.id})}" method="post">
+                                <input type="hidden" name="hidden" th:value="${!it.hidden}">
+                                <button class="admin-btn-sm btn-orange" type="submit" th:text="${it.hidden ? 'Hiện' : 'Ẩn'}">-</button>
+                            </form>
+                        </td>
+
+                        <!-- Thao tác -->
+                        <td>
+                            <div style="display:flex;flex-direction:column;gap:4px;min-width:120px">
+                                <form class="action-form" th:if="${it.moderationStatus.name() == 'PENDING'}" th:action="@{/admin/pending/{id}/approve(id=${it.id})}" method="post">
+                                    <button class="admin-btn-sm btn-green" type="submit">✅ Duyệt</button>
                                 </form>
-                                <form class="inline" th:if="${it.moderationStatus.name() == 'PENDING'}" th:action="@{/admin/pending/{id}/reject(id=${it.id})}" method="post">
-                                    <button class="admin-btn admin-btn--rose" type="submit">Từ chối</button>
+                                <form class="action-form" th:if="${it.moderationStatus.name() == 'PENDING'}" th:action="@{/admin/pending/{id}/reject(id=${it.id})}" method="post">
+                                    <button class="admin-btn-sm btn-red" type="submit">❌ Từ chối</button>
                                 </form>
-                                <form class="inline" th:action="@{/admin/inventory/{id}/hidden(id=${it.id})}" method="post">
-                                    <input type="hidden" name="hidden" th:value="${!it.hidden}">
-                                    <button class="admin-btn admin-btn--rose" type="submit" th:text="${it.hidden} ? 'Hiện' : 'Ẩn'">Ẩn</button>
-                                </form>
-                                <form class="inline" th:action="@{/admin/inventory/{id}/status(id=${it.id})}" method="post">
-                                    <select name="status" onchange="this.form.submit()" style="padding:8px;border-radius:10px;border:1px solid #ddd6e6;font:inherit;max-width:130px">
+                                <form class="action-form" th:action="@{/admin/inventory/{id}/status(id=${it.id})}" method="post">
+                                    <select name="status" onchange="this.form.submit()" style="padding:4px 6px;border-radius:6px;border:1px solid #e2e8f0;font:inherit;font-size:0.75rem">
                                         <option th:each="s : ${T(com.example.demo.entity.Enum.InventoryItemStatus).values()}"
                                                 th:value="${s.name()}" th:text="${s.name()}"
-                                                th:selected="${it.status == s}"></option>
+                                                th:selected="${it.status.name() == s.name()}"></option>
                                     </select>
                                 </form>
                             </div>
                         </td>
                     </tr>
                     <tr th:if="${#lists.isEmpty(items)}">
-                        <td colspan="10" class="admin-muted" style="padding:20px">Chưa có acc trong kho.</td>
+                        <td colspan="8" style="padding:24px;text-align:center;color:#94a3b8;font-weight:700">
+                            Chưa có acc trong kho.
+                        </td>
                     </tr>
                     </tbody>
                 </table>
@@ -89,5 +217,33 @@
         </div>
     </div>
 </div>
+
+<script>
+    function filterGame(filter, btn) {
+        document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
+        btn.classList.add('active');
+
+        const rows = document.querySelectorAll('.acc-row');
+        rows.forEach(row => {
+            const game = row.dataset.game || '';
+            const mod = row.dataset.mod || '';
+
+            let show = false;
+            if (filter === 'all') {
+                show = true;
+            } else if (filter === 'genshin') {
+                show = game.includes('genshin');
+            } else if (filter === 'lienquan') {
+                show = game.includes('liên') || game.includes('lien');
+            } else if (filter === 'pending') {
+                show = mod === 'PENDING';
+            } else if (filter === 'approved') {
+                show = mod === 'APPROVED';
+            }
+
+            row.style.display = show ? '' : 'none';
+        });
+    }
+</script>
 </body>
 </html>

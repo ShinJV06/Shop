@@ -439,6 +439,12 @@
     border: 1px solid #a7f3d0;
 }
 
+.admin-btn--danger {
+    background: #fee2e2;
+    color: #dc2626;
+    border: 1px solid #fca5a5;
+}
+
 form.inline {
     display: inline;
 }

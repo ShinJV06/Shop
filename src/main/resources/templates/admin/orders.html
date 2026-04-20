@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Đơn hàng — Admin</title>
+    <title>Quản lý mua hàng — Admin</title>
     <link rel="stylesheet" th:href="@{/css/admin-panel.css}">
 </head>
 <body class="admin-body">
@@ -12,30 +12,48 @@
     <div class="admin-main">
         <header class="admin-main-header">
             <div>
-                <div class="admin-breadcrumb"><a th:href="@{/admin}">Admin</a> / Đơn hàng</div>
-                <h1>Đơn hàng</h1>
-                <p>Chọn đơn để xem chi tiết, xác nhận thanh toán và acc đã giao.</p>
+                <div class="admin-breadcrumb"><a th:href="@{/admin}">Admin</a> / Quản lý mua hàng</div>
+                <h1>Quản lý mua hàng</h1>
+                <p>Xem đơn hàng theo tài khoản — Pending = chưa thanh toán, Đã thanh toán = đã hoàn tất</p>
             </div>
         </header>
         <div class="admin-content">
+            <p th:if="${successMessage}" class="admin-alert admin-alert--ok" th:text="${successMessage}"></p>
+            <p th:if="${errorMessage}" class="admin-alert admin-alert--err" th:text="${errorMessage}"></p>
             <div class="admin-panel admin-table-wrap">
                 <table class="admin-table">
                     <thead>
                     <tr>
                         <th>ID</th>
-                        <th>Khách (user id)</th>
+                        <th>Tài khoản</th>
+                        <th>Tổng tiền</th>
+                        <th>Thanh toán</th>
                         <th>Trạng thái</th>
-                        <th>Tổng</th>
                         <th>Ngày tạo</th>
+                        <th>Ngày thanh toán</th>
+                        <th>Hành động</th>
                     </tr>
                     </thead>
                     <tbody>
-                    <tr th:each="o : ${orders}">
-                        <td><a th:href="@{/admin/orders/{id}(id=${o.id})}" th:text="${o.id}">1</a></td>
-                        <td th:text="${o.buyerId}">1</td>
-                        <td><span class="admin-muted" th:text="${o.status}">-</span></td>
-                        <td th:text="${o.totalAmount} + 'đ'">0</td>
-                        <td th:text="${o.createdAt}">-</td>
+                    <tr th:each="o : ${allOrders}">
+                        <td th:text="${o.id}">1</td>
+                        <td th:text="${buyerNames[o.buyerId] ?: 'Không rõ'}">User</td>
+                        <td th:text="${o.totalAmount} + 'đ'">0đ</td>
+                        <td>
+                            <span th:if="${o.paymentMethod == 'WALLET'}" style="color:#7c3aed;font-size:0.8rem;font-weight:700">💰 Ví</span>
+                            <span th:if="${o.paymentMethod == 'BANK'}" style="color:#0369a1;font-size:0.8rem;font-weight:700">🏦 Ngân hàng</span>
+                            <span th:if="${o.paymentMethod == null or (o.paymentMethod != 'WALLET' and o.paymentMethod != 'BANK')}" style="color:#6b7280;font-size:0.8rem">-</span>
+                        </td>
+                        <td>
+                            <span class="badge"
+                                  th:classappend="${o.status.name() == 'PENDING_PAYMENT'} ? 'badge-pending' : 'badge-paid'"
+                                  th:text="${o.status.name() == 'PENDING_PAYMENT'} ? '⏳ Pending' : '✅ Đã thanh toán'">-</span>
+                        </td>
+                        <td th:text="${#dates.format(o.createdAt, 'dd/MM/yyyy HH:mm')}">-</td>
+                        <td th:text="${o.paidAt != null ? #dates.format(o.paidAt, 'dd/MM/yyyy HH:mm') : '-'}">-</td>
+                        <td>
+                            <a class="admin-btn admin-btn--purple" th:href="@{/admin/orders/{id}(id=${o.id})}" style="font-size:0.8rem;text-decoration:none">Xem chi tiết</a>
+                        </td>
                     </tr>
                     </tbody>
                 </table>
@@ -43,5 +61,10 @@
         </div>
     </div>
 </div>
+<style>
+    .badge { padding: 4px 10px; border-radius: 20px; font-size: 0.75rem; font-weight: 700; }
+    .badge-pending { background: #fef3c7; color: #92400e; }
+    .badge-paid { background: #d1fae5; color: #065f46; }
+</style>
 </body>
 </html>

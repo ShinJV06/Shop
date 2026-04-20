@@ -6,6 +6,7 @@ import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
 
+import java.math.BigDecimal;
 import java.util.Date;
 
 @Getter
@@ -23,9 +24,11 @@ public class InventoryItem {
     @JoinColumn(name = "product_id")
     private Product product;
 
+    /** Game của acc — Genshin Impact, Liên Quân Mobile, v.v. */
     @Column(length = 120)
     private String game;
 
+    /** AR Level / Rank — ví dụ: AR 58, Rank Kim Cương */
     @Column(length = 500)
     private String rankInfo;
 
@@ -34,6 +37,10 @@ public class InventoryItem {
 
     @Column(length = 2000)
     private String extraInfo;
+
+    /** Giá riêng của acc này — null = dùng giá product */
+    @Column(precision = 12, scale = 2)
+    private BigDecimal price;
 
     @Column(nullable = false, length = 8000)
     private String credentials;

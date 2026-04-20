@@ -1,0 +1,306 @@
+<!DOCTYPE html>
+<html lang="vi" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CTV — Quản lý acc</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link href="https://fonts.googleapis.com/css2?family=M+PLUS+Rounded+1c:wght@400;500;700;800&family=Nunito:wght@400;600;700;800;900&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --pink: #f472b6; --pink-soft: #fce7f3; --pink-mid: #fbcfe8;
+            --lavender: #e9d5ff; --purple: #a855f7;
+            --text: #4a2040; --text-mute: #9d6580;
+            --genshin: #4A90D9; --lienquan: #E84A5F; --other: #9B59B6;
+        }
+        *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+        body {
+            font-family: 'Nunito', sans-serif;
+            background: linear-gradient(135deg, #fff7f9 0%, #fce7f3 50%, #ede9fe 100%);
+            color: var(--text);
+            min-height: 100vh; padding: 24px;
+        }
+        .container { max-width: 1200px; margin: 0 auto; }
+        .page-header { text-align: center; margin-bottom: 24px; }
+        .page-header h1 {
+            font-size: 1.8rem; font-weight: 900;
+            background: linear-gradient(135deg, #be185d, #a855f7);
+            -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;
+        }
+        .page-header p { color: var(--text-mute); font-weight: 600; margin-top: 4px; }
+
+        /* Stats Row */
+        .stats-row {
+            display: flex; gap: 12px; margin-bottom: 20px; flex-wrap: wrap;
+        }
+        .stat-card {
+            background: rgba(255,255,255,0.9);
+            border: 1.5px solid var(--pink-mid);
+            border-radius: 16px; padding: 16px 20px;
+            text-align: center; min-width: 110px;
+            box-shadow: 0 4px 16px rgba(244,114,182,0.1);
+        }
+        .stat-card .stat-num {
+            font-size: 1.6rem; font-weight: 900;
+            background: linear-gradient(135deg, #be185d, #a855f7);
+            -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;
+        }
+        .stat-card .stat-num.pending { background: linear-gradient(135deg, #ea580c, #f97316); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+        .stat-card .stat-num.ok { background: linear-gradient(135deg, #16a34a, #22c55e); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+        .stat-card .stat-num.err { background: linear-gradient(135deg, #dc2626, #ef4444); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+        .stat-card .stat-lbl { font-size: 0.78rem; font-weight: 700; color: var(--text-mute); margin-top: 2px; }
+
+        /* Filters */
+        .filters-bar {
+            display: flex; gap: 10px; margin-bottom: 18px; flex-wrap: wrap; align-items: center;
+        }
+        .filter-btn {
+            padding: 8px 18px; border-radius: 30px;
+            border: 1.5px solid var(--pink-mid);
+            background: rgba(255,255,255,0.7);
+            font-size: 0.82rem; font-weight: 700; font-family: inherit;
+            cursor: pointer; transition: all 0.2s;
+            color: var(--text-mute);
+        }
+        .filter-btn:hover { border-color: var(--pink); background: var(--pink-soft); color: var(--text); }
+        .filter-btn.active { border-color: var(--purple); background: var(--lavender); color: #6b21a8; }
+        .filter-btn.genshin.active { border-color: var(--genshin); background: #dbeafe; color: #1e40af; }
+        .filter-btn.lienquan.active { border-color: var(--lienquan); background: #fee2e2; color: #991b1b; }
+
+        /* Table Card */
+        .table-card {
+            background: rgba(255,255,255,0.92);
+            border: 1.5px solid var(--pink-mid);
+            border-radius: 20px;
+            overflow: hidden;
+            box-shadow: 0 8px 32px rgba(244,114,182,0.12);
+        }
+
+        /* Table */
+        .acc-table { width: 100%; border-collapse: collapse; }
+        .acc-table th {
+            background: linear-gradient(135deg, #fce7f3, #ede9fe);
+            padding: 12px 14px;
+            text-align: left; font-size: 0.75rem;
+            font-weight: 800; color: var(--text-mute);
+            text-transform: uppercase; letter-spacing: 0.05em;
+            border-bottom: 1.5px solid var(--pink-mid);
+        }
+        .acc-table td { padding: 14px 14px; border-bottom: 1px solid #f9f5ff; font-size: 0.88rem; vertical-align: middle; }
+        .acc-table tr:last-child td { border-bottom: none; }
+        .acc-table tbody tr:hover td { background: #fafbff; }
+        .acc-table tbody tr.dimmed td { opacity: 0.55; }
+
+        /* Acc Row */
+        .acc-img {
+            width: 56px; height: 40px; border-radius: 8px;
+            object-fit: cover; background: linear-gradient(135deg, #fce7f3, #ede9fe);
+            border: 1px solid var(--pink-mid);
+        }
+        .acc-game-badge {
+            display: inline-flex; align-items: center; gap: 4px;
+            padding: 3px 10px; border-radius: 20px;
+            font-size: 0.72rem; font-weight: 700;
+        }
+        .acc-game-badge.genshin { background: #dbeafe; color: #1e40af; }
+        .acc-game-badge.lienquan { background: #fee2e2; color: #991b1b; }
+        .acc-game-badge.other { background: #f3e8ff; color: #6b21a8; }
+
+        .acc-name { font-weight: 800; color: var(--text); font-size: 0.9rem; }
+        .acc-rank { font-size: 0.75rem; color: var(--text-mute); font-weight: 600; margin-top: 2px; }
+        .acc-rank span { background: var(--pink-soft); padding: 1px 6px; border-radius: 6px; color: #be185d; font-size: 0.7rem; }
+
+        /* Price */
+        .acc-price {
+            font-weight: 900; font-size: 1rem;
+            background: linear-gradient(135deg, #be185d, #a855f7);
+            -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;
+        }
+        .acc-price-custom { font-weight: 800; font-size: 0.9rem; color: #16a34a; }
+        .acc-price-note { font-size: 0.7rem; color: var(--text-mute); font-weight: 600; margin-top: 2px; }
+
+        /* Status Badge */
+        .badge {
+            display: inline-flex; align-items: center; gap: 4px;
+            padding: 4px 10px; border-radius: 20px;
+            font-size: 0.75rem; font-weight: 700;
+        }
+        .badge-pending { background: #fff7ed; color: #ea580c; }
+        .badge-approved { background: #ecfdf5; color: #16a34a; }
+        .badge-rejected { background: #fef2f2; color: #dc2626; }
+        .badge-sold { background: #f3e8ff; color: #6b21a8; }
+
+        .acc-date { font-size: 0.78rem; color: var(--text-mute); font-weight: 600; white-space: nowrap; }
+
+        /* Actions */
+        .action-btn {
+            padding: 6px 12px; border-radius: 8px;
+            border: 1px solid; font-size: 0.78rem; font-weight: 700;
+            cursor: pointer; font-family: inherit;
+            transition: all 0.2s; display: inline-flex; align-items: center; gap: 4px;
+        }
+        .btn-del { border-color: #fca5a5; background: #fef2f2; color: #dc2626; }
+        .btn-del:hover { background: #fee2e2; border-color: #dc2626; }
+
+        /* Empty */
+        .empty-state { text-align: center; padding: 60px 20px; color: var(--text-mute); }
+        .empty-state .icon { font-size: 3.5rem; margin-bottom: 12px; }
+        .empty-state h3 { font-size: 1.1rem; font-weight: 800; color: var(--text); margin-bottom: 6px; }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .acc-table th:nth-child(4), .acc-table td:nth-child(4),
+            .acc-table th:nth-child(5), .acc-table td:nth-child(5) { display: none; }
+        }
+        @media (max-width: 500px) {
+            .acc-table th:nth-child(3), .acc-table td:nth-child(3) { display: none; }
+        }
+    </style>
+</head>
+<body>
+<div class="container">
+    <div class="page-header">
+        <h1>📦 Quản lý tài khoản đã đăng</h1>
+        <p>Danh sách acc bạn đã gửi duyệt. Chỉ xoá được acc <strong>chờ duyệt</strong>.</p>
+    </div>
+
+    <!-- Stats -->
+    <div class="stats-row">
+        <div class="stat-card">
+            <div class="stat-num" th:text="${allItems.size()}">0</div>
+            <div class="stat-lbl">Tổng acc</div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-num pending" th:text="${pendingCount}">0</div>
+            <div class="stat-lbl">Chờ duyệt</div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-num ok" th:text="${approvedCount}">0</div>
+            <div class="stat-lbl">Đã duyệt</div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-num" th:text="${approvedCount > 0 ? (allItems.size() - pendingCount)}">0</div>
+            <div class="stat-lbl">Đã bán</div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-num err" th:text="${rejectedCount}">0</div>
+            <div class="stat-lbl">Từ chối</div>
+        </div>
+    </div>
+
+    <!-- Filters -->
+    <div class="filters-bar">
+        <button class="filter-btn active" onclick="filterGame('all', this)">Tất cả</button>
+        <button class="filter-btn genshin" onclick="filterGame('genshin', this)">⚔️ Genshin</button>
+        <button class="filter-btn lienquan" onclick="filterGame('lienquan', this)">🎮 Liên Quân</button>
+    </div>
+
+    <!-- Table -->
+    <div class="table-card">
+        <table class="acc-table" id="accTable" th:if="${!allItems.isEmpty()}">
+            <thead>
+                <tr>
+                    <th>Ảnh</th>
+                    <th>Thông tin acc</th>
+                    <th>Giá bán</th>
+                    <th>Trạng thái</th>
+                    <th>Ngày đăng</th>
+                    <th></th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr th:each="item : ${allItems}"
+                    th:data-game="${item.game != null ? item.game.toLowerCase() : ''}"
+                    th:class="${item.moderationStatus.name() == 'REJECTED' || item.status.name() == 'SOLD'} ? 'dimmed' : ''">
+
+                    <!-- Ảnh -->
+                    <td>
+                        <img th:if="${item.listingImagePath}" th:src="@{${item.listingImagePath}}" class="acc-img" alt="acc">
+                        <div th:unless="${item.listingImagePath}" class="acc-img" style="display:flex;align-items:center;justify-content:center;font-size:1.2rem">🎮</div>
+                    </td>
+
+                    <!-- Thông tin -->
+                    <td>
+                        <div style="display:flex;flex-direction:column;gap:4px;">
+                            <!-- Game badge -->
+                            <span class="acc-game-badge"
+                                  th:classappend="${item.game != null and item.game.toLowerCase().contains('genshin')} ? 'genshin' : (${item.game != null and (item.game.toLowerCase().contains('liên') or item.game.toLowerCase().contains('lien'))} ? 'lienquan' : 'other')"
+                                  th:text="${item.game ?: 'Game'}">Game</span>
+
+                            <!-- Name -->
+                            <span class="acc-name" th:text="${item.product?.name ?: 'Acc #'+item.id}">Tên gói</span>
+
+                            <!-- Rank info -->
+                            <div class="acc-rank" th:if="${item.rankInfo != null}">
+                                <span th:text="${item.rankInfo}">AR 58</span>
+                            </div>
+
+                            <!-- Extra info -->
+                            <div style="font-size:0.75rem;color:var(--text-mute);font-weight:600;margin-top:2px"
+                                 th:if="${item.extraInfo != null}" th:text="${item.extraInfo}">Mô tả</div>
+                        </div>
+                    </td>
+
+                    <!-- Giá -->
+                    <td>
+                        <th:block th:with="hasCustom=${item.price != null}">
+                            <div th:if="${hasCustom}" class="acc-price-custom" th:text="${#numbers.formatDecimal(item.price, 0, 'COMMA', 0, 'POINT')} + 'đ'">0đ</div>
+                            <div th:unless="${hasCustom}" class="acc-price" th:text="${item.product?.price != null} ? ${#numbers.formatDecimal(item.product.price, 0, 'COMMA', 0, 'POINT')} + 'đ' : 'Liên hệ'">0đ</div>
+                            <div class="acc-price-note" th:if="${hasCustom}">Giá riêng</div>
+                            <div class="acc-price-note" th:unless="${hasCustom}">Giá gói</div>
+                        </th:block>
+                    </td>
+
+                    <!-- Trạng thái -->
+                    <td>
+                        <span class="badge badge-pending" th:if="${item.moderationStatus.name() == 'PENDING'}">⏳ Chờ duyệt</span>
+                        <span class="badge badge-approved" th:if="${item.moderationStatus.name() == 'APPROVED'}">✅ Đã duyệt</span>
+                        <span class="badge badge-rejected" th:if="${item.moderationStatus.name() == 'REJECTED'}">❌ Từ chối</span>
+                        <div style="margin-top:4px">
+                            <span class="badge badge-sold" th:if="${item.status.name() == 'SOLD'}">💰 Đã bán</span>
+                        </div>
+                    </td>
+
+                    <!-- Ngày -->
+                    <td class="acc-date" th:text="${#dates.format(item.createdAt, 'dd/MM/yyyy')}">-</td>
+
+                    <!-- Action -->
+                    <td>
+                        <form th:if="${item.moderationStatus.name() == 'PENDING'}"
+                              th:action="@{/ctv/my-accounts/delete/{id}(id=${item.id})}"
+                              method="post" onsubmit="return confirm('Xoá acc này?')">
+                            <button type="submit" class="action-btn btn-del">🗑 Xoá</button>
+                        </form>
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+
+        <div class="empty-state" th:if="${allItems.isEmpty()}">
+            <div class="icon">📦</div>
+            <h3>Chưa có acc nào</h3>
+            <p><a th:href="@{/ctv/submit}" style="color:var(--purple);font-weight:700">Đăng acc ngay →</a></p>
+        </div>
+    </div>
+</div>
+
+<script>
+    function filterGame(game, btn) {
+        document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
+        btn.classList.add('active');
+
+        const rows = document.querySelectorAll('#accTable tbody tr');
+        rows.forEach(row => {
+            const rowGame = row.dataset.game || '';
+            if (game === 'all') {
+                row.style.display = '';
+            } else if (game === 'genshin') {
+                row.style.display = rowGame.includes('genshin') ? '' : 'none';
+            } else if (game === 'lienquan') {
+                row.style.display = (rowGame.includes('liên') || rowGame.includes('lien')) ? '' : 'none';
+            }
+        });
+    }
+</script>
+</body>
+</html>

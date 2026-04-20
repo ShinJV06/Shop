@@ -24,6 +24,8 @@
                 <div class="admin-product-card">
                     <h3 th:text="${p.name}">Tên</h3>
                     <p class="admin-muted">Slug: <strong th:text="${p.slug}">-</strong></p>
+                    <p class="admin-muted" style="color:#a855f7;font-weight:700" th:if="${p.game != null}">Game: <span th:text="${p.game.name}">-</span></p>
+                    <p class="admin-muted" style="color:#ef4444;font-weight:700" th:if="${p.game == null}">⚠️ Chưa phân loại game!</p>
                     <form class="admin-form-grid" th:action="@{/admin/products/{id}(id=${p.id})}" method="post">
                         <label>Giá (VNĐ)</label>
                         <input type="number" name="price" th:value="${p.price}" required min="0">
@@ -35,6 +37,10 @@
                             <option th:value="false" th:selected="${!p.visible}">Không</option>
                         </select>
                         <button class="admin-btn admin-btn--primary" style="margin-top:14px" type="submit">Lưu thay đổi</button>
+                    </form>
+                    <form th:action="@{/admin/products/{id}/delete(id=${p.id})}" method="post" style="margin-top:12px"
+                          onsubmit="return confirm('Xóa sản phẩm này và tất cả acc liên quan?')">
+                        <button class="admin-btn admin-btn--danger" type="submit">🗑️ Xóa sản phẩm</button>
                     </form>
                 </div>
             </div>

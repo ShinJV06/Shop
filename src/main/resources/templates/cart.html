@@ -446,13 +446,15 @@
         </div>
 
         <div th:if="${!cartSummary.empty}" class="cart-list">
-            <article class="cart-item" th:each="item : ${cartSummary.items}" th:attr="data-product-id=${item.id},data-subtotal-amount=${item.subtotalAmount},data-item-name=${item.name}">
+            <article class="cart-item" th:each="item : ${cartSummary.items}">
                 <div class="cart-item-left">
-                    <input class="select-box item-select" type="checkbox" th:id="${'item-' + item.id}" checked>
+                    <input class="select-box item-select" type="checkbox" th:id="${'item-' + item['id']}" checked>
+                    <input type="hidden" class="item-slug" th:value="${item['id']}">
+                    <input type="hidden" class="item-price" th:value="${item['unitAmount']}">
                     <div>
-                        <div class="cart-item-name" th:text="${item.name}">Tên acc</div>
+                        <div class="cart-item-name" th:text="${item['name']}">Tên acc</div>
                         <div class="cart-item-meta">
-                            <div th:text="'Đơn giá: ' + ${item.price}">Đơn giá: 199.000đ</div>
+                            <div th:text="'Đơn giá: ' + ${item['price']}">Đơn giá: 199.000đ</div>
                         </div>
                         <div class="item-actions">
                             <button class="item-pay-btn" type="button">Mua acc này</button>
@@ -460,7 +462,7 @@
                         </div>
                     </div>
                 </div>
-                <div class="cart-item-subtotal" th:text="${item.subtotal}">199.000đ</div>
+                <div class="cart-item-subtotal" th:text="${item['subtotal']}">199.000đ</div>
             </article>
         </div>
 
@@ -475,6 +477,17 @@
                     <button class="remove-btn" id="clear-cart-btn" type="button">Xóa toàn bộ giỏ</button>
                     <button class="pay-btn" id="pay-selected-btn" type="button">Thanh toán đã chọn</button>
                 </div>
+            </div>
+
+            <div style="margin-top:14px;display:flex;gap:16px;align-items:center;flex-wrap:wrap">
+                <label style="cursor:pointer;font-weight:700">
+                    <input type="radio" name="paymentMethod" value="WALLET" id="pm-wallet" checked>
+                    💰 Thanh toán bằng ví <span th:if="${walletBalance != null}" th:text="'(' + ${walletBalance} + ')'" style="color:#7c3aed;font-size:0.82rem"></span>
+                </label>
+                <label style="cursor:pointer;font-weight:700">
+                    <input type="radio" name="paymentMethod" value="BANK" id="pm-bank">
+                    🏦 Chuyển khoản ngân hàng
+                </label>
             </div>
 
             <div class="qr-shell" id="qr-shell" hidden>
@@ -513,6 +526,8 @@
     const paymentDesc = document.getElementById('payment-desc');
     const paySelectedBtn = document.getElementById('pay-selected-btn');
     const qrShell = document.getElementById('qr-shell');
+    const pmWallet = document.getElementById('pm-wallet');
+    const pmBank = document.getElementById('pm-bank');
     const clearCartBtn = document.getElementById('clear-cart-btn');
     const cartMessage = document.getElementById('cart-message');
     const cartCountNav = document.getElementById('cart-count');
@@ -527,6 +542,11 @@
         return itemCards.filter(card => card.querySelector('.item-select').checked);
     }
 
+    function getCardSlug(card) {
+        const input = card.querySelector('.item-slug');
+        return input ? input.value : null;
+    }
+
     function buildQrUrl(amount, note) {
         const params = new URLSearchParams({
             amount: String(amount),
@@ -536,11 +556,21 @@
         return `https://img.vietqr.io/image/${BANK_CODE}-${ACCOUNT_NO}-compact2.png?${params.toString()}`;
     }
 
+    function getCardName(card) {
+        const nameEl = card.querySelector('.cart-item-name');
+        return nameEl ? nameEl.textContent.trim() : '';
+    }
+
+    function getCardPrice(card) {
+        const input = card.querySelector('.item-price');
+        return input ? Number(input.value) || 0 : 0;
+    }
+
     function updatePaymentBox(selectedCards, shouldShowQr = false, options = {}) {
         const total = options.serverTotal != null
             ? Number(options.serverTotal)
-            : selectedCards.reduce((sum, card) => sum + Number(card.dataset.subtotalAmount || 0), 0);
-        const selectedNames = selectedCards.map(card => card.dataset.itemName);
+            : selectedCards.reduce((sum, card) => sum + getCardPrice(card), 0);
+        const selectedNames = selectedCards.map(card => getCardName(card)).filter(Boolean);
         const note = options.paymentNote
             ? options.paymentNote
             : (selectedNames.length === 1 ? `MUA ${selectedNames[0].slice(0, 18)}` : DEFAULT_NOTE);
@@ -558,6 +588,17 @@
             return;
         }
 
+        const selectedPm = document.querySelector('input[name="paymentMethod"]:checked')?.value || 'BANK';
+        const isWallet = selectedPm === 'WALLET';
+
+        if (isWallet) {
+            paymentDesc.textContent = total > 0
+                ? `Tổng: ${formatCurrency(total)} — Số dư ví sẽ được trừ khi tạo đơn.`
+                : 'Đang chờ xử lý...';
+            qrShell.hidden = true;
+            return;
+        }
+
         paymentDesc.textContent = options.orderId
             ? `Đơn #${options.orderId} đã tạo. Quét QR với đúng số tiền và nội dung chuyển khoản.`
             : (selectedCards.length === 1
@@ -567,20 +608,34 @@
         qrImage.src = buildQrUrl(total, note);
         qrImage.alt = 'QR thanh toán ' + formatCurrency(total);
         qrShell.hidden = !shouldShowQr;
+        if (options.orderId && isWallet) {
+            paymentDesc.textContent = `Đơn #${options.orderId} đã tạo. Thanh toán bằng ví — số dư sẽ được trừ ngay.`;
+        }
     }
 
     function createOrderForSelection(selectedCards, thenShowQr) {
         if (!isLoggedIn) {
+            alert('Bạn cần đăng nhập để mua acc!');
             window.location.href = '/auth/login';
             return Promise.resolve(null);
         }
-        const slugs = selectedCards.map(card => card.dataset.productId);
+        const slugs = selectedCards.map(card => getCardSlug(card)).filter(Boolean);
+        console.log('Slugs to submit:', slugs);
+        if (slugs.length === 0) {
+            alert('Không có sản phẩm hợp lệ để tạo đơn. Hãy tải lại trang giỏ hàng.');
+            if (cartMessage) cartMessage.textContent = 'Không có sản phẩm hợp lệ. Hãy tải lại trang.';
+            return Promise.resolve(null);
+        }
+        const paymentMethod = document.querySelector('input[name="paymentMethod"]:checked')?.value || 'BANK';
+        console.log('Payment method:', paymentMethod);
+        console.log('Request body:', JSON.stringify({ productSlugs: slugs, paymentMethod: [paymentMethod] }));
         return fetch('/orders/create', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ productSlugs: slugs })
+            body: JSON.stringify({ productSlugs: slugs, paymentMethod: [paymentMethod] })
         }).then(async res => {
             const data = await res.json().catch(() => ({}));
+            console.log('Server response:', res.status, data);
             if (!res.ok) {
                 throw new Error(data.message || 'Không tạo được đơn.');
             }
@@ -592,12 +647,24 @@
             if (cartMessage) {
                 cartMessage.textContent = data.message || '';
             }
+            // Cập nhật số dư ví trên giao diện
+            if (data.walletBalanceFormatted && pmWallet) {
+                const walletSpan = pmWallet.parentElement.querySelector('span');
+                if (walletSpan) {
+                    walletSpan.textContent = '(' + data.walletBalanceFormatted + ')';
+                }
+            }
+            // Nếu thanh toán ví thành công, reload để cập nhật số dư
+            if (data.paymentMethod === 'WALLET' && data.message && data.message.includes('thành công')) {
+                setTimeout(() => window.location.reload(), 1500);
+            }
             const total = Number(data.totalAmount || 0);
             const note = data.paymentNote || DEFAULT_NOTE;
             updatePaymentBox(selectedCards, thenShowQr, {
                 paymentNote: note,
                 orderId: data.orderId,
-                serverTotal: total
+                serverTotal: total,
+                paymentMethod: data.paymentMethod
             });
             return data;
         });
@@ -607,6 +674,26 @@
         if (!selectAll) return;
         selectAll.checked = itemCards.length > 0 && itemCards.every(card => card.querySelector('.item-select').checked);
     }
+
+    function updatePaymentMethodVisibility() {
+        const selectedPm = document.querySelector('input[name="paymentMethod"]:checked')?.value || 'BANK';
+        if (selectedPm === 'WALLET') {
+            qrShell.hidden = true;
+            paymentDesc.textContent = 'Thanh toán bằng ví — số dư sẽ được trừ ngay khi tạo đơn.';
+        } else {
+            const selectedCards = getSelectedCards();
+            if (selectedCards.length > 0) {
+                qrShell.hidden = false;
+                updatePaymentBox(selectedCards, true);
+            } else {
+                qrShell.hidden = true;
+            }
+        }
+    }
+
+    [pmWallet, pmBank].forEach(radio => {
+        radio?.addEventListener('change', updatePaymentMethodVisibility);
+    });
 
     function postJson(url, payload) {
         return fetch(url, {
@@ -673,8 +760,9 @@
         });
 
         removeBtn.addEventListener('click', function () {
+            const slug = getCardSlug(card);
             removeBtn.disabled = true;
-            postJson('/cart/remove', { productId: card.dataset.productId })
+            postJson('/cart/remove', { productId: slug || '' })
                 .then(data => {
                     if (cartMessage) {
                         cartMessage.textContent = data.message || 'Đã xóa acc khỏi giỏ hàng.';

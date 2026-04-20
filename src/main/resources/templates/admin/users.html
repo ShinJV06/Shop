@@ -42,7 +42,7 @@
                                 <select name="role" onchange="this.form.submit()" style="max-width:160px;padding:8px 10px;border-radius:10px;border:1px solid #ddd6e6;font:inherit">
                                     <option th:each="r : ${T(com.example.demo.entity.Enum.Role).values()}"
                                             th:value="${r.name()}" th:text="${r.name()}"
-                                            th:selected="${u.role == r}">USER</option>
+                                            th:selected="${u.role.name() == r.name()}">USER</option>
                                 </select>
                             </form>
                         </td>

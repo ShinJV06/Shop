@@ -38,6 +38,11 @@
                         <input name="skinInfo">
                         <label>Mô tả thêm</label>
                         <textarea name="extraInfo"></textarea>
+                        <label>Giá riêng (tuỳ chọn)</label>
+                        <div style="display:flex;gap:8px;align-items:center">
+                            <input type="number" name="customPrice" placeholder="Bỏ trống = giá gói" min="1000" step="1000" style="flex:1">
+                            <span style="color:var(--admin-text-muted);font-weight:700;font-size:0.85rem">đ</span>
+                        </div>
                         <label>Credentials</label>
                         <textarea name="credentials" required placeholder="user:pass hoặc chuỗi giao acc…"></textarea>
                         <button class="admin-btn admin-btn--primary" style="margin-top:14px" type="submit">Lưu vào kho</button>
@@ -94,7 +99,7 @@
                                     <select name="status" onchange="this.form.submit()" style="padding:8px;border-radius:10px;border:1px solid #ddd6e6;font:inherit">
                                         <option th:each="s : ${T(com.example.demo.entity.Enum.InventoryItemStatus).values()}"
                                                 th:value="${s.name()}" th:text="${s.name()}"
-                                                th:selected="${it.status == s}"></option>
+                                                th:selected="${it.status.name() == s.name()}"></option>
                                     </select>
                                 </form>
                             </div>

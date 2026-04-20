@@ -1,0 +1,456 @@
+<!DOCTYPE html>
+<html lang="vi" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title th:text="${product.name} + ' - Genshin Cute Shop'">Danh sách Account</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=M+PLUS+Rounded+1c:wght@400;500;700;800&family=Nunito:wght@400;600;700;800;900&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --pink: #f472b6;
+            --pink-soft: #fce7f3;
+            --pink-mid: #fbcfe8;
+            --lavender: #e9d5ff;
+            --purple: #a855f7;
+            --cream: #fff7f9;
+            --text: #4a2040;
+            --text-mute: #9d6580;
+        }
+
+        *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+        html { scroll-behavior: smooth; }
+
+        body {
+            font-family: 'Nunito', 'M PLUS Rounded 1c', sans-serif;
+            background: var(--cream);
+            color: var(--text);
+            min-height: 100vh;
+        }
+
+        body::before {
+            content: '';
+            position: fixed;
+            inset: 0;
+            background:
+                radial-gradient(ellipse 80% 60% at 10% 0%, #fce7f3 0%, transparent 60%),
+                radial-gradient(ellipse 70% 50% at 90% 100%, #ede9fe 0%, transparent 55%);
+            z-index: -2;
+            pointer-events: none;
+        }
+
+        /* HEADER */
+        .header {
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0 5vw;
+            height: 64px;
+            background: rgba(255, 247, 249, 0.82);
+            backdrop-filter: blur(14px);
+            border-bottom: 1.5px solid var(--pink-mid);
+        }
+        .brand {
+            font-size: 1.25rem;
+            font-weight: 800;
+            color: var(--pink);
+            text-decoration: none;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        .nav {
+            display: flex;
+            align-items: center;
+            gap: 4px;
+        }
+        .nav a {
+            text-decoration: none;
+            color: var(--text-mute);
+            font-size: 0.85rem;
+            font-weight: 700;
+            padding: 6px 12px;
+            border-radius: 30px;
+            transition: background 0.2s, color 0.2s;
+        }
+        .nav a:hover { background: var(--pink-soft); color: var(--pink); }
+        .nav .cta {
+            background: linear-gradient(135deg, #f472b6, #c084fc);
+            color: #fff !important;
+            padding: 7px 18px;
+            border-radius: 30px;
+            font-weight: 800;
+        }
+        .nav .nav-cart {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+        }
+        .cart-count-badge {
+            min-width: 22px;
+            height: 22px;
+            padding: 0 6px;
+            border-radius: 999px;
+            background: linear-gradient(135deg, #f472b6, #a855f7);
+            color: #fff;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.72rem;
+            font-weight: 900;
+        }
+
+        /* MAIN */
+        main {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 30px 20px 100px;
+        }
+
+        /* BREADCRUMB */
+        .breadcrumb {
+            margin-bottom: 20px;
+            font-size: 0.85rem;
+            color: var(--text-mute);
+            font-weight: 600;
+        }
+        .breadcrumb a {
+            color: var(--pink);
+            text-decoration: none;
+        }
+        .breadcrumb a:hover { text-decoration: underline; }
+
+        /* PAGE HEADER */
+        .page-header {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+        .page-title {
+            font-size: 1.8rem;
+            font-weight: 900;
+            color: var(--text);
+            margin-bottom: 8px;
+        }
+        .page-subtitle {
+            color: var(--text-mute);
+            font-weight: 600;
+        }
+        .acc-count-badge {
+            display: inline-block;
+            background: linear-gradient(135deg, #f472b6, #a855f7);
+            color: white;
+            padding: 6px 20px;
+            border-radius: 25px;
+            font-size: 0.9rem;
+            font-weight: 800;
+            margin-top: 12px;
+        }
+
+        /* ACCOUNTS GRID */
+        .acc-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+            gap: 20px;
+        }
+        @media (max-width: 600px) {
+            .acc-grid { grid-template-columns: 1fr; }
+        }
+
+        .acc-card {
+            background: white;
+            border-radius: 16px;
+            overflow: hidden;
+            box-shadow: 0 4px 16px rgba(0,0,0,0.08);
+            transition: transform 0.3s, box-shadow 0.3s;
+            border: 2px solid transparent;
+        }
+        .acc-card:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 8px 28px rgba(244,114,182,0.25);
+            border-color: var(--pink-mid);
+        }
+
+        .acc-card-image {
+            height: auto;
+            min-height: 160px;
+            background: linear-gradient(135deg, #fce7f3, #ede9fe);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            overflow: hidden;
+            padding: 8px;
+        }
+        .acc-card-image img {
+            width: 100%;
+            height: auto;
+            max-height: 200px;
+            object-fit: contain;
+        }
+
+        .acc-card-body {
+            padding: 16px;
+        }
+
+        .acc-info {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 8px;
+            margin-bottom: 16px;
+        }
+        .acc-info-item {
+            display: flex;
+            flex-direction: column;
+            gap: 2px;
+        }
+        .acc-info-label {
+            font-size: 0.7rem;
+            font-weight: 700;
+            color: var(--text-mute);
+            text-transform: uppercase;
+        }
+        .acc-info-value {
+            font-size: 0.9rem;
+            font-weight: 800;
+            color: var(--text);
+        }
+        .acc-info-value.highlight {
+            color: var(--pink);
+        }
+        .acc-info-value.star {
+            color: #ca8a04;
+        }
+
+        .acc-card-footer {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding-top: 12px;
+            border-top: 1px solid #f0f0f0;
+        }
+
+        .acc-price {
+            font-size: 1.2rem;
+            font-weight: 900;
+            background: linear-gradient(135deg, #be185d, #a855f7);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .btn-buy-now {
+            background: linear-gradient(135deg, #f472b6, #a855f7);
+            color: #fff;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 25px;
+            font-size: 0.85rem;
+            font-weight: 800;
+            font-family: inherit;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+        .btn-buy-now:hover {
+            transform: scale(1.05);
+            box-shadow: 0 4px 15px rgba(244,114,182,0.4);
+        }
+        .btn-buy-now:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        /* EMPTY STATE */
+        .empty-state {
+            text-align: center;
+            padding: 60px 20px;
+            color: var(--text-mute);
+        }
+        .empty-state .icon {
+            font-size: 4rem;
+            margin-bottom: 16px;
+        }
+        .empty-state h3 {
+            font-size: 1.2rem;
+            margin-bottom: 8px;
+            color: var(--text);
+        }
+
+        /* TOAST */
+        .toast {
+            position: fixed;
+            bottom: 100px;
+            left: 50%;
+            transform: translateX(-50%) translateY(100px);
+            background: white;
+            padding: 14px 24px;
+            border-radius: 12px;
+            box-shadow: 0 8px 30px rgba(0,0,0,0.15);
+            font-weight: 700;
+            font-size: 0.9rem;
+            z-index: 200;
+            opacity: 0;
+            transition: all 0.3s;
+        }
+        .toast.show {
+            transform: translateX(-50%) translateY(0);
+            opacity: 1;
+        }
+        .toast.success { border-left: 4px solid #10b981; color: #065f46; }
+        .toast.error { border-left: 4px solid #ef4444; color: #991b1b; }
+
+        /* CHAT FAB */
+        .chat-fab {
+            position: fixed;
+            bottom: 28px;
+            right: 28px;
+            background: linear-gradient(135deg, #f472b6, #a855f7);
+            color: #fff;
+            font-size: 0.88rem;
+            font-weight: 800;
+            padding: 13px 22px;
+            border-radius: 50px;
+            text-decoration: none;
+            box-shadow: 0 6px 24px rgba(244,114,182,0.45);
+            z-index: 50;
+            transition: transform 0.2s;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        .chat-fab:hover { transform: translateY(-3px); }
+    </style>
+</head>
+<body>
+<!-- HEADER -->
+<header class="header">
+    <a class="brand" th:href="@{/}">
+        <span>🌸</span> Genshin Cute Shop
+    </a>
+    <nav class="nav">
+        <a th:href="@{/}">Trang chủ</a>
+        <a th:href="@{/cart}" class="nav-cart">Giỏ hàng <span class="cart-count-badge" id="cart-count" th:text="${cartSummary.count}">0</span></a>
+        <a th:href="@{/wallet}" th:if="${session.userId != null}">💰 Nạp tiền</a>
+        <a th:href="@{/profile}" th:if="${session.userId != null}">Profile</a>
+        <a th:href="@{/my-orders}" th:if="${session.userId != null}">Đơn mua</a>
+        <a th:href="@{/admin}" th:if="${session.role == 'ADMIN'}">Admin</a>
+        <a th:href="@{/auth/login}" th:if="${session.userId == null}">Đăng nhập</a>
+        <a class="cta" th:href="@{/auth/register}" th:if="${session.userId == null}">Đăng ký</a>
+    </nav>
+</header>
+
+<main>
+    <!-- BREADCRUMB -->
+    <nav class="breadcrumb">
+        <a th:href="@{/}">Trang chủ</a> / 
+        <span th:text="${product.name}">Product</span>
+    </nav>
+
+    <!-- PAGE HEADER -->
+    <div class="page-header">
+        <h1 class="page-title" th:text="${product.name}">Tên sản phẩm</h1>
+        <p class="page-subtitle">Chọn tài khoản phù hợp với bạn</p>
+        <span class="acc-count-badge" th:text="${availableCount} + ' tài khoản có sẵn'">0 tài khoản</span>
+    </div>
+
+    <!-- ACCOUNTS GRID -->
+    <div class="acc-grid" th:if="${!#lists.isEmpty(availableAccounts)}">
+        <div class="acc-card" th:each="acc, stat : ${availableAccounts}">
+            <div class="acc-card-image">
+                <img th:if="${acc.listingImagePath != null && !acc.listingImagePath.isEmpty()}" th:src="${acc.listingImagePath}" alt="Acc">
+                <img th:unless="${acc.listingImagePath != null && !acc.listingImagePath.isEmpty()}" th:src="${product.imagePath}" alt="Acc">
+            </div>
+            <div class="acc-card-body">
+                <div class="acc-info">
+                    <div class="acc-info-item">
+                        <span class="acc-info-label">Server</span>
+                        <span class="acc-info-value" th:text="${acc.game != null ? acc.game : 'Asia'}">Asia</span>
+                    </div>
+                    <div class="acc-info-item">
+                        <span class="acc-info-label">AR/Rank</span>
+                        <span class="acc-info-value highlight" th:text="${acc.rankInfo != null ? acc.rankInfo : '-'}">-</span>
+                    </div>
+                    <div class="acc-info-item">
+                        <span class="acc-info-label">Skin/Nhân vật</span>
+                        <span class="acc-info-value" th:text="${acc.skinInfo != null ? acc.skinInfo : '-'}">-</span>
+                    </div>
+                    <div class="acc-info-item">
+                        <span class="acc-info-label">Ghi chú</span>
+                        <span class="acc-info-value star" th:text="${acc.extraInfo != null ? acc.extraInfo : '-'}">-</span>
+                    </div>
+                </div>
+                <div class="acc-card-footer">
+                    <span class="acc-price" th:text="${accountPriceFormatted[acc.id] != null ? accountPriceFormatted[acc.id] : 'Liên hệ'}">0đ</span>
+                    <button type="button" class="btn-buy-now" th:data-id="${acc.id}" onclick="buyNow(this)">Mua ngay</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- EMPTY STATE -->
+    <div class="empty-state" th:if="${#lists.isEmpty(availableAccounts)}">
+        <div class="icon">😢</div>
+        <h3>Không có tài khoản nào</h3>
+        <p>Hiện tại gói này chưa có acc, vui lòng quay lại sau.</p>
+    </div>
+</main>
+
+<!-- TOAST -->
+<div class="toast" id="toast"></div>
+
+<!-- CHAT FAB -->
+<a class="chat-fab" href="https://www.facebook.com/utaitejapan" target="_blank">
+    💬 Chat Facebook
+</a>
+
+<script th:inline="javascript">
+    const productSlug = /*[[${product.slug}]]*/ '';
+    const cartCountEl = document.getElementById('cart-count');
+    const toast = document.getElementById('toast');
+
+    function showToast(msg, type) {
+        toast.textContent = msg;
+        toast.className = 'toast ' + type + ' show';
+        setTimeout(() => { toast.className = 'toast'; }, 3000);
+    }
+
+    function updateCart(count) {
+        if (cartCountEl) cartCountEl.textContent = count;
+    }
+
+    function buyNow(btn) {
+        const accId = btn.dataset.id;
+        btn.disabled = true;
+        btn.textContent = '⏳...';
+
+        fetch('/cart/add', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ productId: productSlug })
+        })
+        .then(async res => {
+            if (res.status === 401) {
+                window.location.href = '/auth/login';
+                return;
+            }
+            const data = await res.json().catch(() => ({}));
+            if (!res.ok) throw new Error(data.message || 'Lỗi');
+            
+            if (data.count !== undefined && cartCountEl) {
+                cartCountEl.textContent = data.count;
+            }
+            showToast('✅ Đã thêm vào giỏ hàng!', 'success');
+            setTimeout(() => { window.location.href = '/cart'; }, 1000);
+        })
+        .catch(err => {
+            showToast('❌ ' + err.message, 'error');
+            btn.disabled = false;
+            btn.textContent = 'Mua ngay';
+        });
+    }
+</script>
+</body>
+</html>

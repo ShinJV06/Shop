@@ -1,10 +1,12 @@
 package com.example.demo.service;
 
+import com.example.demo.entity.InventoryItem;
 import com.example.demo.entity.Product;
 import com.example.demo.repository.ProductRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.math.BigDecimal;
 import java.text.NumberFormat;
 import java.util.*;
 
@@ -21,6 +23,27 @@ public class ShopCatalogService {
 
     public Optional<Product> findBySlug(String slug) {
         return productRepository.findBySlug(slug);
+    }
+
+    /**
+     * Lấy giá hiệu quả của 1 inventory item.
+     * Ưu tiên: custom price của item > giá product.
+     */
+    public long getEffectivePrice(InventoryItem item) {
+        if (item != null && item.getPrice() != null) {
+            return item.getPrice().longValue();
+        }
+        if (item != null && item.getProduct() != null) {
+            return item.getProduct().getPrice();
+        }
+        return 0L;
+    }
+
+    /**
+     * Format giá hiệu quả thành chuỗi.
+     */
+    public String formatItemPrice(InventoryItem item) {
+        return formatPrice(getEffectivePrice(item));
     }
 
     public Map<String, Object> buildCartSummary(Map<String, Integer> cart) {
@@ -73,5 +96,10 @@ public class ShopCatalogService {
 
     public String formatPrice(double amount) {
         return NumberFormat.getNumberInstance(VI_LOCALE).format((long) amount) + "đ";
+    }
+
+    public String formatPrice(BigDecimal amount) {
+        if (amount == null) return "0đ";
+        return NumberFormat.getNumberInstance(VI_LOCALE).format(amount.longValue()) + "đ";
     }
 }

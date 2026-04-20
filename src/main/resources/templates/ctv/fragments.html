@@ -12,14 +12,24 @@
         </a>
     </div>
     <nav class="admin-nav">
-        <div class="admin-nav-section">CTV</div>
-        <a th:href="@{/ctv/submit}" class="is-active">
+        <div class="admin-nav-section">Menu CTV</div>
+        <a th:href="@{/ctv/submit}">
             <span class="ic">➕</span> Đăng / import acc
         </a>
+        <a th:href="@{/ctv/my-accounts}">
+            <span class="ic">📦</span> Quản lý acc
+        </a>
+        <a th:href="@{/explore/genshin}" target="_blank">
+            <span class="ic">🎮</span> Khám phá game
+        </a>
     </nav>
-    <div class="admin-sidebar-footer">
-        <a th:href="@{/}">← Về cửa hàng</a>
-    </div>
+    <div class="admin-nav-divider" style="height:1px;background:#3d3d6b;margin:12px 0;"></div>
+    <div class="admin-nav-section">Liên kết</div>
+    <nav class="admin-nav">
+        <a th:href="@{/}" target="_blank">
+            <span class="ic">🏠</span> Về cửa hàng
+        </a>
+    </nav>
 </aside>
 </body>
 </html>

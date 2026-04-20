@@ -153,7 +153,7 @@ input:focus {
 
 .social-login {
     display: flex;
-    flex-direction: column;
+    flex-direction: row;
     gap: 10px;
     margin-bottom: 14px;
 }
@@ -162,7 +162,7 @@ input:focus {
     display: flex;
     align-items: center;
     justify-content: center;
-    gap: 10px;
+    gap: 8px;
     padding: 12px 16px;
     border-radius: 12px;
     font-weight: 600;
@@ -171,6 +171,7 @@ input:focus {
     transition: all 0.3s ease;
     border: none;
     cursor: pointer;
+    flex: 1;
 }
 
 .btn-social:hover {

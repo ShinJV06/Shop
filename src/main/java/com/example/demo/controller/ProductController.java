@@ -3,6 +3,7 @@ package com.example.demo.controller;
 import com.example.demo.entity.Account;
 import com.example.demo.entity.InventoryItem;
 import com.example.demo.entity.Product;
+import com.example.demo.entity.Enum.InventoryItemStatus;
 import com.example.demo.entity.Enum.ModerationStatus;
 import com.example.demo.repository.AccountRepository;
 import com.example.demo.repository.InventoryItemRepository;
@@ -50,11 +51,12 @@ public class ProductController {
         Product product = productOpt.get();
         model.addAttribute("product", product);
 
-        // Lấy tất cả inventory items của product này (đã duyệt)
+        // Lấy tất cả inventory items của product này (đã duyệt, không SOLD)
         List<InventoryItem> accounts = inventoryItemRepository
             .findByModerationStatusAndHiddenFalseOrderByIdDesc(ModerationStatus.APPROVED)
             .stream()
             .filter(item -> item.getProduct() != null && item.getProduct().getId().equals(product.getId()))
+            .filter(item -> item.getStatus() != InventoryItemStatus.SOLD)
             .toList();
         model.addAttribute("accounts", accounts);
 
@@ -69,6 +71,11 @@ public class ProductController {
 
         // Cart summary
         model.addAttribute("cartSummary", shopCatalogService.buildCartSummary(getOrCreateCart(session)));
+        
+        // Compare count
+        @SuppressWarnings("unchecked")
+        List<String> compareList = (List<String>) session.getAttribute("compareList");
+        model.addAttribute("compareCount", compareList != null ? compareList.size() : 0);
 
         return "product-detail";
     }

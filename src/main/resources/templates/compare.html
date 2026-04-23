@@ -1,0 +1,515 @@
+<!DOCTYPE html>
+<html lang="vi" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>So sánh sản phẩm - Shop Acc Game</title>
+    <link rel="stylesheet" th:href="@{/css/home.css}">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <style>
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+
+        body {
+            font-family: 'Inter', 'Segoe UI', system-ui, -apple-system, sans-serif;
+            background: linear-gradient(135deg, #fef7f7 0%, #fdf2f8 50%, #faf5ff 100%);
+            min-height: 100vh;
+            color: #4a3f55;
+            padding: 40px 20px;
+        }
+
+        .compare-page {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        /* Header */
+        .header-section {
+            text-align: center;
+            margin-bottom: 40px;
+        }
+
+        .header-badge {
+            display: inline-block;
+            background: linear-gradient(135deg, #f9a8d4, #c084fc);
+            border-radius: 30px;
+            padding: 10px 28px;
+            font-size: 0.8rem;
+            font-weight: 700;
+            color: #ffffff;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            margin-bottom: 20px;
+            box-shadow: 0 4px 20px rgba(192, 132, 252, 0.35);
+        }
+
+        .main-title {
+            font-size: 2.5rem;
+            font-weight: 800;
+            color: #7c3aed;
+            margin-bottom: 10px;
+        }
+
+        .subtitle {
+            color: #9ca3af;
+            font-size: 1.1rem;
+        }
+
+        /* Message */
+        .message {
+            padding: 16px 24px;
+            border-radius: 16px;
+            margin-bottom: 30px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            font-weight: 600;
+            animation: slideIn 0.3s ease;
+        }
+
+        .message.success {
+            background: linear-gradient(135deg, rgba(52, 211, 153, 0.15), rgba(52, 211, 153, 0.1));
+            border: 1px solid rgba(52, 211, 153, 0.3);
+            color: #34d399;
+        }
+
+        .message.info {
+            background: linear-gradient(135deg, rgba(192, 132, 252, 0.15), rgba(192, 132, 252, 0.1));
+            border: 1px solid rgba(192, 132, 252, 0.3);
+            color: #c084fc;
+        }
+
+        @keyframes slideIn {
+            from { opacity: 0; transform: translateY(-10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        /* Compare Actions */
+        .compare-actions {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 30px;
+        }
+
+        .compare-info {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .compare-count {
+            background: linear-gradient(135deg, #f9a8d4, #c084fc);
+            color: #ffffff;
+            padding: 8px 20px;
+            border-radius: 20px;
+            font-weight: 700;
+            font-size: 1rem;
+        }
+
+        .compare-hint {
+            color: #9ca3af;
+            font-size: 0.95rem;
+        }
+
+        .btn-clear {
+            padding: 12px 24px;
+            background: transparent;
+            color: #f472b6;
+            border: 2px solid #f472b6;
+            border-radius: 12px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .btn-clear:hover {
+            background: #f472b6;
+            color: #ffffff;
+        }
+
+        /* Empty State */
+        .empty-state {
+            text-align: center;
+            padding: 80px 20px;
+            background: #ffffff;
+            border-radius: 28px;
+            border: 2px dashed rgba(192, 132, 252, 0.3);
+        }
+
+        .empty-icon {
+            font-size: 5rem;
+            margin-bottom: 20px;
+        }
+
+        .empty-state h3 {
+            font-size: 1.5rem;
+            color: #7c3aed;
+            margin-bottom: 12px;
+        }
+
+        .empty-state p {
+            color: #9ca3af;
+            margin-bottom: 24px;
+        }
+
+        .btn-browse {
+            display: inline-block;
+            padding: 16px 36px;
+            background: linear-gradient(135deg, #f9a8d4, #c084fc);
+            color: #ffffff;
+            border-radius: 14px;
+            font-weight: 700;
+            text-decoration: none;
+            transition: all 0.3s;
+            box-shadow: 0 8px 30px rgba(192, 132, 252, 0.3);
+        }
+
+        .btn-browse:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 12px 40px rgba(192, 132, 252, 0.4);
+        }
+
+        /* Compare Table */
+        .compare-container {
+            background: #ffffff;
+            border-radius: 28px;
+            overflow: hidden;
+            box-shadow: 0 20px 60px rgba(192, 132, 252, 0.1);
+        }
+
+        .compare-table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        .compare-table th {
+            background: linear-gradient(135deg, #fef3f8, #faf5ff);
+            padding: 20px 16px;
+            text-align: left;
+            font-weight: 700;
+            color: #7c3aed;
+            font-size: 0.95rem;
+            border-bottom: 2px solid rgba(192, 132, 252, 0.2);
+        }
+
+        .compare-table td {
+            padding: 18px 16px;
+            border-bottom: 1px solid rgba(244, 114, 182, 0.1);
+            vertical-align: middle;
+        }
+
+        .compare-table tr:last-child td {
+            border-bottom: none;
+        }
+
+        /* Product Columns */
+        .product-col {
+            width: 22%;
+            text-align: center;
+        }
+
+        .compare-table th.product-col {
+            padding: 24px 16px;
+        }
+
+        /* Product Card in Header */
+        .product-card {
+            background: linear-gradient(145deg, #fef3f8, #faf5ff);
+            border-radius: 20px;
+            padding: 20px;
+            position: relative;
+            transition: all 0.3s;
+        }
+
+        .product-card:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 15px 40px rgba(192, 132, 252, 0.15);
+        }
+
+        .product-image {
+            width: 100%;
+            aspect-ratio: 1;
+            object-fit: cover;
+            border-radius: 14px;
+            margin-bottom: 14px;
+            background: linear-gradient(135deg, #fce7f3, #f3e8ff);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 3rem;
+        }
+
+        .product-image img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            border-radius: 14px;
+        }
+
+        .product-name {
+            font-weight: 700;
+            font-size: 1rem;
+            color: #4a3f55;
+            margin-bottom: 8px;
+            line-height: 1.3;
+        }
+
+        .product-price {
+            font-size: 1.3rem;
+            font-weight: 800;
+            color: #f472b6;
+            margin-bottom: 14px;
+        }
+
+        .product-actions {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+
+        .btn-add-cart {
+            padding: 12px 20px;
+            background: linear-gradient(135deg, #f9a8d4, #c084fc);
+            color: #ffffff;
+            border: none;
+            border-radius: 12px;
+            font-weight: 700;
+            font-size: 0.9rem;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .btn-add-cart:hover {
+            transform: scale(1.02);
+            box-shadow: 0 8px 25px rgba(192, 132, 252, 0.3);
+        }
+
+        .btn-remove {
+            padding: 10px 20px;
+            background: transparent;
+            color: #9ca3af;
+            border: 2px solid #e5e7eb;
+            border-radius: 12px;
+            font-weight: 600;
+            font-size: 0.85rem;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .btn-remove:hover {
+            border-color: #f472b6;
+            color: #f472b6;
+        }
+
+        /* Feature Labels */
+        .feature-label {
+            font-weight: 600;
+            color: #7c3aed;
+            width: 15%;
+        }
+
+        .feature-value {
+            text-align: center;
+            color: #6b7280;
+            font-size: 0.95rem;
+        }
+
+        .feature-value.highlight {
+            color: #f472b6;
+            font-weight: 700;
+        }
+
+        .feature-value.best {
+            background: linear-gradient(135deg, rgba(52, 211, 153, 0.15), rgba(52, 211, 153, 0.1));
+            border-radius: 8px;
+            padding: 4px 12px;
+            color: #34d399;
+            font-weight: 700;
+        }
+
+        /* Feature Icons */
+        .feature-icon {
+            margin-right: 8px;
+        }
+
+        /* Responsive */
+        @media (max-width: 900px) {
+            .compare-table {
+                display: block;
+                overflow-x: auto;
+            }
+
+            .compare-table th,
+            .compare-table td {
+                min-width: 150px;
+            }
+
+            .product-col {
+                width: 200px;
+            }
+
+            .main-title {
+                font-size: 1.8rem;
+            }
+        }
+
+        @media (max-width: 600px) {
+            body {
+                padding: 20px 12px;
+            }
+
+            .compare-actions {
+                flex-direction: column;
+                gap: 16px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="compare-page">
+        <!-- Header -->
+        <div class="header-section">
+            <span class="header-badge">✨ So sánh thông minh</span>
+            <h1 class="main-title">So Sánh Sản Phẩm</h1>
+            <p class="subtitle">Chọn tối đa 4 sản phẩm để so sánh chi tiết</p>
+        </div>
+
+        <!-- Message -->
+        <div th:if="${message}" class="message" th:classappend="${message.contains('thành công') || message.contains('Đã thêm') || message.contains('xóa') ? 'success' : 'info'}">
+            <span>✨</span>
+            <span th:text="${message}">Thông báo</span>
+        </div>
+
+        <!-- Empty State -->
+        <div th:if="${#lists.isEmpty(products)}" class="empty-state">
+            <div class="empty-icon">⚖️</div>
+            <h3>Chưa có sản phẩm để so sánh</h3>
+            <p>Thêm sản phẩm vào danh sách so sánh từ trang danh sách game</p>
+            <a th:href="@{/}" class="btn-browse">Khám phá ngay</a>
+        </div>
+
+        <!-- Compare Table -->
+        <div th:if="${!#lists.isEmpty(products)}" class="compare-container">
+            <!-- Actions Bar -->
+            <div style="padding: 20px 24px; border-bottom: 1px solid rgba(192, 132, 252, 0.1);">
+                <div class="compare-actions">
+                    <div class="compare-info">
+                        <span class="compare-count" th:text="${#lists.size(products)} + ' / ' + ${maxCompare}">0 / 4</span>
+                        <span class="compare-hint">sản phẩm đang so sánh</span>
+                    </div>
+                    <form th:action="@{/compare/clear}" method="post">
+                        <button type="submit" class="btn-clear">🗑️ Xóa tất cả</button>
+                    </form>
+                </div>
+            </div>
+
+            <table class="compare-table">
+                <!-- Product Headers -->
+                <thead>
+                    <tr>
+                        <th class="feature-label" style="background: transparent;"></th>
+                        <th class="product-col" th:each="product : ${products}">
+                            <div class="product-card">
+                                <div class="product-image">
+                                    <img th:if="${product.imagePath}" th:src="${product.imagePath}" alt="Product">
+                                    <span th:unless="${product.imagePath}">🎮</span>
+                                </div>
+                                <div class="product-name" th:text="${product.name}">Tên sản phẩm</div>
+                                <div class="product-price" th:text="${#numbers.formatDecimal(product.price, 0, 'COMMA', 0, 'POINT')} + 'đ'">0đ</div>
+                                <div class="product-actions">
+                                    <a th:href="@{/product/{slug}(slug=${product.slug})}" class="btn-add-cart">👁️ Xem chi tiết</a>
+                                    <form th:action="@{/compare/remove}" method="post" style="display: inline;">
+                                        <input type="hidden" name="slug" th:value="${product.slug}">
+                                        <button type="submit" class="btn-remove">✖️ Bỏ so sánh</button>
+                                    </form>
+                                </div>
+                            </div>
+                        </th>
+                        <!-- Empty columns for remaining slots -->
+                        <th class="product-col" th:if="${#lists.size(products) < maxCompare}" 
+                            th:each="i : ${#numbers.sequence(1, maxCompare - #lists.size(products))}"
+                            style="opacity: 0.5;">
+                            <div class="product-card" style="border: 2px dashed rgba(192, 132, 252, 0.3); background: transparent;">
+                                <div class="product-image" style="border: none;">
+                                    <span>➕</span>
+                                </div>
+                                <div class="product-name" style="color: #9ca3af;">Thêm sản phẩm</div>
+                                <div class="product-actions">
+                                    <a th:href="@{/}" class="btn-add-cart" style="opacity: 0.7;">Chọn thêm</a>
+                                </div>
+                            </div>
+                        </th>
+                    </tr>
+                </thead>
+
+                <!-- Comparison Rows -->
+                <tbody>
+                    <!-- Game -->
+                    <tr>
+                        <td class="feature-label">
+                            <span class="feature-icon">🎮</span> Game
+                        </td>
+                        <td class="feature-value" th:each="product : ${products}" th:text="${product.game?.name ?: 'N/A'}">Game</td>
+                    </tr>
+
+                    <!-- Price -->
+                    <tr>
+                        <td class="feature-label">
+                            <span class="feature-icon">💰</span> Giá
+                        </td>
+                        <td class="feature-value highlight" th:each="product : ${products}" th:text="${#numbers.formatDecimal(product.price, 0, 'COMMA', 0, 'POINT')} + 'đ'">0đ</td>
+                    </tr>
+
+                    <!-- Status -->
+                    <tr>
+                        <td class="feature-label">
+                            <span class="feature-icon">✅</span> Trạng thái
+                        </td>
+                        <td class="feature-value" th:each="product : ${products}">
+                            <span th:if="${product.visible}" style="color: #34d399; font-weight: 600;">✓ Còn hàng</span>
+                            <span th:unless="${product.visible}" style="color: #f472b6; font-weight: 600;">✗ Hết hàng</span>
+                        </td>
+                    </tr>
+
+                    <!-- Description -->
+                    <tr>
+                        <td class="feature-label">
+                            <span class="feature-icon">📝</span> Mô tả
+                        </td>
+                        <td class="feature-value" th:each="product : ${products}">
+                            <span th:if="${product.description}" th:text="${#strings.substring(product.description, 0, T(java.lang.Math).min(100, product.description.length()))} + '...'">Mô tả</span>
+                            <span th:unless="${product.description}">Không có mô tả</span>
+                        </td>
+                    </tr>
+
+                    <!-- Date -->
+                    <tr>
+                        <td class="feature-label">
+                            <span class="feature-icon">📅</span> Ngày tạo
+                        </td>
+                        <td class="feature-value" th:each="product : ${products}" 
+                            th:text="${product.createdAt != null ? #dates.format(product.createdAt, 'dd/MM/yyyy') : 'N/A'}">01/01/2024</td>
+                    </tr>
+
+                    <!-- Quick Buy Row -->
+                    <tr style="background: linear-gradient(135deg, rgba(249, 168, 212, 0.1), rgba(192, 132, 252, 0.1));">
+                        <td class="feature-label" style="color: #c084fc; font-weight: 700;">
+                            <span class="feature-icon">🛒</span> Mua ngay
+                        </td>
+                        <td th:each="product : ${products}">
+                            <form th:if="${product.visible}" th:action="@{/cart/add}" method="post" style="text-align: center;">
+                                <input type="hidden" name="slug" th:value="${product.slug}">
+                                <input type="hidden" name="quantity" value="1">
+                                <button type="submit" class="btn-add-cart" style="width: 100%;">
+                                    🛒 Thêm vào giỏ
+                                </button>
+                            </form>
+                            <span th:unless="${product.visible}" style="color: #9ca3af;">Sản phẩm đã ngừng bán</span>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+</body>
+</html>

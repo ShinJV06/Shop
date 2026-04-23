@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="vi" xmlns:th="http://www.thymeleaf.org">
 <head>
     <meta charset="UTF-8">
@@ -201,6 +201,40 @@
             font-weight: 900;
             box-shadow: 0 3px 10px rgba(244,114,182,0.25);
         }
+        
+        /* Compare button */
+        .nav-compare {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            background: rgba(192, 132, 252, 0.12);
+            border: 2px solid rgba(192, 132, 252, 0.35);
+            border-radius: 20px;
+            padding: 6px 14px;
+            font-size: 0.85rem;
+            font-weight: 700;
+            color: #a855f7;
+            text-decoration: none;
+            transition: all 0.2s;
+        }
+        .nav-compare:hover {
+            background: #a855f7;
+            color: #fff;
+        }
+        .compare-badge {
+            min-width: 20px;
+            height: 20px;
+            padding: 0 5px;
+            border-radius: 999px;
+            background: linear-gradient(135deg, #f472b6, #a855f7);
+            color: #fff;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.7rem;
+            font-weight: 900;
+        }
+        
         .nav a:hover { background: var(--pink-soft); color: var(--pink); }
         .nav .cta {
             background: linear-gradient(135deg, #f472b6, #c084fc);
@@ -473,6 +507,39 @@
         .card-explore-btn:hover {
             transform: scale(1.05);
             box-shadow: 0 4px 15px rgba(244,114,182,0.4);
+        }
+        .card-explore-btn.sold-btn {
+            background: #6b7280;
+            cursor: not-allowed;
+        }
+        .card-explore-btn.sold-btn:hover {
+            transform: none;
+            box-shadow: none;
+        }
+        .card.sold {
+            opacity: 0.6;
+        }
+        .card.sold:hover {
+            transform: none;
+            box-shadow: none;
+        }
+        .sold-overlay {
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0,0,0,0.6);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.2rem;
+            font-weight: 800;
+            color: #fff;
+            border-radius: inherit;
+        }
+        .card-image {
+            position: relative;
         }
         .card-buy {
             background: linear-gradient(135deg, #f472b6, #a855f7);
@@ -835,16 +902,16 @@
 
 <!-- PETALS -->
 <div class="petals" aria-hidden="true">
-    <span class="petal">&#x1F338;</span>
-    <span class="petal">&#x273F;</span>
-    <span class="petal">&#x1F338;</span>
-    <span class="petal">&#x273F;</span>
-    <span class="petal">&#x1F338;</span>
-    <span class="petal">&#x273F;</span>
-    <span class="petal">&#x1F338;</span>
-    <span class="petal">&#x273F;</span>
-    <span class="petal">&#x1F338;</span>
-    <span class="petal">&#x273F;</span>
+    <span class="petal"></span>
+    <span class="petal">✿</span>
+    <span class="petal"></span>
+    <span class="petal">✿</span>
+    <span class="petal"></span>
+    <span class="petal">✿</span>
+    <span class="petal"></span>
+    <span class="petal">✿</span>
+    <span class="petal"></span>
+    <span class="petal">✿</span>
 </div>
 
 <!-- SIDE GIRLS -->
@@ -854,27 +921,29 @@
 <!-- HEADER -->
 <header class="header" id="trang-chu">
     <a class="brand" href="#trang-chu">
-        <span>&#x1F338;</span> Genshin Cute Shop
+        <span>🌸</span> Genshin Cute Shop
     </a>
     <nav class="nav">
-        <a href="#trang-chu">Trang ch&#x1EE7;</a>
+        <a href="#trang-chu">Trang chủ</a>
         <a href="#kho-acc">Mua ngay</a>
-        <a th:href="@{/cart}" class="nav-cart">Gi&#x1ECF; h&#xE0;ng <span class="cart-count-badge" id="cart-count" th:text="${cartSummary.count}">0</span></a>
-        <a th:href="@{/wallet}" th:if="${session.userId != null}">&#x1F4B0; N&#x1EA1;p ti&#x1EC1;n</a>
+        <a th:href="@{/reviews}">⭐ Đánh giá</a>
+        <a th:href="@{/compare}" class="nav-compare">⚖️ So sánh <span class="compare-badge" id="compare-count" th:text="${compareCount != null ? compareCount : 0}">0</span></a>
+        <a th:href="@{/cart}" class="nav-cart">🛒 Giỏ hàng <span class="cart-count-badge" id="cart-count" th:text="${cartSummary.count}">0</span></a>
+        <a th:href="@{/wallet}" th:if="${session.userId != null}">💰 Nạp tiền</a>
         <a th:href="@{/profile}" th:if="${session.userId != null}">Profile</a>
-        <a th:href="@{/my-orders}" th:if="${session.userId != null}">&#x110;&#x1A1;n mua</a>
+        <a th:href="@{/my-orders}" th:if="${session.userId != null}">Đơn mua</a>
         <a th:href="@{/admin}" th:if="${session.role == 'ADMIN'}">Admin</a>
         <a th:href="@{/ctv/submit}" th:if="${session.role == 'CTV'}">CTV</a>
-        <a href="#lien-he">Li&#xEA;n h&#x1EC7;</a>
-        <a th:href="@{/auth/login}" th:if="${session.userId == null}">&#x110;&#x103;ng nh&#x1EAD;p</a>
-        <a class="cta" th:href="@{/auth/register}" th:if="${session.userId == null}">&#x110;&#x103;ng k&#xFD; ngay &#x2728;</a>
+        <a href="#lien-he">Liên hệ</a>
+        <a th:href="@{/auth/login}" th:if="${session.userId == null}">Đăng nhập</a>
+        <a class="cta" th:href="@{/auth/register}" th:if="${session.userId == null}">Đăng ký ngay ✨</a>
         <div class="user-menu" th:if="${session.userId != null}">
-            <button class="user-trigger" id="userMenuTrigger" type="button" aria-label="T&#xE0;i kho&#x1EA3;n">
+            <button class="user-trigger" id="userMenuTrigger" type="button" aria-label="Tài khoản">
                 <img th:src="@{/images/user-avatar.png}" alt="User avatar" loading="lazy">
             </button>
             <div class="user-dropdown" id="userDropdown">
                 <div class="user-name" th:text="${session.username}">Username</div>
-                <a th:href="@{/my-orders}" style="display:block;padding:8px 0;font-weight:800;color:#a855f7;text-decoration:none;font-size:0.88rem">&#x1F6D2; L&#x1ECB;ch s&#x1EED; mua</a>
+                <a th:href="@{/my-orders}" style="display:block;padding:8px 0;font-weight:800;color:#a855f7;text-decoration:none;font-size:0.88rem">🛒 Lịch sử mua</a>
                 <form th:action="@{/auth/logout}" method="post">
                     <button class="user-logout" type="submit">Logout</button>
                 </form>
@@ -887,12 +956,12 @@
 
     <!-- HERO -->
     <section class="hero">
-        <div class="hero-badge">&#x1F338; Genshin Impact Account Shop &#x1F338;</div>
-        <h1>Shop Acc Genshin<br>Si&#xEA;u C&#x1EA5;p D&#x1EC5; Th&#x1B0;&#x1A1;ng</h1>
-        <p>Nick x&#x1ECB;n, gi&#xE1; m&#x1EC1;m, giao acc nhanh trong 5 ph&#x00FA;t. Uy t&#xED;n h&#xE0;ng &#x111;&#x1EA7;u, cam k&#x1EBF;t ch&#x1EA5;t l&#x1B0;&#x1EE3;ng!</p>
+        <div class="hero-badge">🌸 Genshin Impact Account Shop 🌸</div>
+        <h1>Shop Acc Genshin<br>Siêu Cấp Dễ Thương</h1>
+        <p>Nick xịn, giá mềm, giao acc nhanh trong 5 phút. Uy tín hàng đầu, cam kết chất lượng!</p>
         <div class="hero-actions">
-            <a href="#kho-acc" class="btn-primary">Xem kho acc ngay &#x2728;</a>
-            <a th:href="@{/auth/register}" class="btn-outline">&#x110;&#x103;ng k&#xFD; mi&#x1EC5;n ph&#xED;</a>
+            <a href="#kho-acc" class="btn-primary">Xem kho acc ngay ✨</a>
+            <a th:href="@{/auth/register}" class="btn-outline">Đăng ký miễn phí</a>
         </div>
     </section>
 
@@ -900,62 +969,65 @@
     <div class="stats">
         <div class="stat">
             <div class="stat-num">2,400+</div>
-            <div class="stat-label">Acc &#x111;&#xE3; b&#xE1;n</div>
+            <div class="stat-label">Acc đã bán</div>
         </div>
         <div class="stat">
             <div class="stat-num">99%</div>
-            <div class="stat-label">Kh&#xE1;ch h&#xE0;i l&#xF2;ng</div>
+            <div class="stat-label">Khách hài lòng</div>
         </div>
         <div class="stat">
-            <div class="stat-num">5 ph&#x00FA;t</div>
-            <div class="stat-label">Giao acc t&#x1EE9;c th&#xEC;</div>
+            <div class="stat-num">5 phút</div>
+            <div class="stat-label">Giao acc tức thì</div>
         </div>
         <div class="stat">
             <div class="stat-num">24/7</div>
-            <div class="stat-label">H&#x1ED7; tr&#x1EE3; online</div>
+            <div class="stat-label">Hỗ trợ online</div>
         </div>
     </div>
 
     <section class="cart-showcase" id="gio-hang" aria-labelledby="gio-hang-title">
         <div class="cart-copy">
-            <span class="cart-kicker">&#x1F6D2; Gi&#x1ECF; h&#xE0;ng n&#x1ED5;i b&#x1EAD;t</span>
-            <h3 id="gio-hang-title">Th&#xEA;m v&#xE0;o gi&#x1ECF; nhanh, ch&#x1ED1;t acc &#x111;&#x1EB9;p trong v&#xE0;i ph&#x00FA;t</h3>
+            <span class="cart-kicker"> Giỏ hàng nổi bật</span>
+            <h3 id="gio-hang-title">Thêm vào giỏ nhanh, chốt acc đẹp trong vài phút</h3>
             <p>
-                Khu v&#x1EF1;c gi&#x1ECF; h&#xE0;ng tr&#xEA;n trang ch&#x1EE7; gi&#x1EDF; c&#xF3; &#x1EA3;nh minh h&#x1ECD;a ri&#xEA;ng &#x111;&#x1EC3; n&#x1ED5;i b&#x1EAD;t h&#x1A1;n.
-                B&#x1EA1;n c&#xF3; th&#x1EC3; d&#xF9;ng block n&#xE0;y nh&#x1B0; &#x111;i&#x1EC3;m nh&#x1EA5;n cho acc hot, flash sale ho&#x1EB7;c danh s&#xE1;ch chu&#x1EA9;n b&#x1ECB; mua.
+                Khu vực giỏ hàng trên trang chủ giở có ảnh minh họa riêng để nổi bật hơn.
+                Bạn có thể dùng block này như điểm nhấn cho acc hot, flash sale hoặc danh sách chuẩn bị mua.
             </p>
             <div class="cart-meta">
                 <span class="cart-chip">Flash sale 20%</span>
-                <span class="cart-chip">Acc giao trong 5 ph&#x00FA;t</span>
-                <span class="cart-chip">B&#x1EA3;o h&#xE0;nh &#x111;&#x1ED5;i l&#x1ED7;i</span>
+                <span class="cart-chip">Acc giao trong 5 phút</span>
+                <span class="cart-chip">Bảo hành đổi lỗi</span>
             </div>
             <div class="hero-actions">
-                <a href="#kho-acc" class="btn-primary">Th&#xEA;m v&#xE0;o gi&#x1ECF; ngay</a>
-                <a th:href="@{/cart}" class="btn-outline">Xem gi&#x1ECF; h&#xE0;ng</a>
+                <a href="#kho-acc" class="btn-primary">Thêm vào giỏ ngay</a>
+                <a th:href="@{/cart}" class="btn-outline">Xem giỏ hàng</a>
             </div>
             <p class="cart-status" id="cart-status"></p>
         </div>
         <div class="cart-art">
-            <img th:src="@{/images/home-cart-banner.png}" alt="Minh h&#x1ECD;a gi&#x1ECF; h&#xE0;ng trang ch&#x1EE7;" loading="lazy">
+            <img th:src="@{/images/home-cart-banner.png}" alt="Minh họa giỏ hàng trang chủ" loading="lazy">
         </div>
     </section>
 
     <!-- CARDS -->
     <div class="warehouse-wrap" id="kho-acc">
-    <h2 class="section-title">Kho Acc N&#x1ED4;i B&#x1EAD;t &#x2728;</h2>
-    <p th:if="${#lists.isEmpty(visibleAccounts)}" style="text-align:center;color:var(--text-mute);font-weight:700">Ch&#x1B0;a c&#xF3; acc trong kho - h&#xE3;y th&#xEA;m acc &#x111;&#x1EC3; hi&#x1EC3;n th&#x1ECB;.</p>
+    <h2 class="section-title">Kho Genshin Nổi Bật</h2>
+    <p th:if="${#lists.isEmpty(visibleAccounts)}" style="text-align:center;color:var(--text-mute);font-weight:700">Chưa có genshin trong kho - hãy thêm genshin để hiển thị.</p>
     <section class="cards cards-center" th:if="${!#lists.isEmpty(visibleAccounts)}">
-        <article class="card" th:each="acc : ${visibleAccounts}" th:with="imgSrc=${(acc.listingImagePath != null && !#strings.isEmpty(acc.listingImagePath)) ? acc.listingImagePath : (acc.product != null ? acc.product.imagePath : '')}">
-            <a th:href="@{'/account/' + ${acc.id}}" style="text-decoration:none;color:inherit">
-                <div class="card-image" style="background: linear-gradient(135deg, #5B8DEE, #2E5BB8);">
-                    <img th:src="${imgSrc}" th:alt="${acc.product != null ? acc.product.name : 'Acc'}" loading="lazy">
-                </div>
-                <div class="card-body">
-                    <span th:class="${'card-tag' + (acc.product != null && #strings.contains(acc.product.slug,'premium') ? ' purple' : (acc.product != null && #strings.contains(acc.product.slug,'vip') ? ' gold' : ''))}">Acc</span>
-                    <h3 th:text="${acc.product != null ? acc.product.name : 'Acc Genshin'}">Acc</h3>
-                    <span class="card-explore-btn">Kh&#xE1;m ph&#xE1;</span>
-                </div>
-            </a>
+        <article class="card" th:each="acc : ${visibleAccounts}" th:with="imgSrc=${(acc.listingImagePath != null && !#strings.isEmpty(acc.listingImagePath)) ? acc.listingImagePath : (acc.product != null ? acc.product.imagePath : '')}, isSold=${acc.hidden || acc.status.name() == 'SOLD'}">
+            <div th:class="${isSold} ? 'card sold' : 'card'">
+                <a th:href="${isSold} ? 'javascript:void(0)' : @{'/account/' + ${acc.id}}" th:attr="onclick=${isSold} ? 'return false;' : null" style="text-decoration:none;color:inherit">
+                    <div class="card-image" style="background: linear-gradient(135deg, #5B8DEE, #2E5BB8);">
+                        <img th:src="${imgSrc}" th:alt="${acc.product != null ? acc.product.name : 'Genshin'}" loading="lazy">
+                        <div th:if="${isSold}" class="sold-overlay">Hết hàng</div>
+                    </div>
+                    <div class="card-body">
+                        <span th:class="${'card-tag' + (acc.product != null && #strings.contains(acc.product.slug,'premium') ? ' purple' : (acc.product != null && #strings.contains(acc.product.slug,'vip') ? ' gold' : ''))}">Genshin</span>
+                        <h3 th:text="${acc.product != null ? acc.product.name : 'Genshin'}">Genshin</h3>
+                        <span th:class="${isSold} ? 'card-explore-btn sold-btn' : 'card-explore-btn'">[[${isSold} ? 'Hết hàng' : 'Khám phá']]</span>
+                    </div>
+                </a>
+            </div>
         </article>
     </section>
     </div>
@@ -963,16 +1035,16 @@
     <!-- ACC DETAIL MODAL -->
     <div class="acc-detail-overlay" id="accDetailModal">
         <div class="acc-detail-modal">
-            <button class="acc-detail-close" onclick="closeAccDetail()" title="&#x110;&#xF3;ng">&#x2715;</button>
+            <button class="acc-detail-close" onclick="closeAccDetail()" title="Đóng">✕</button>
             <div class="acc-detail-image">
                 <img id="accDetailImage" src="" alt="Acc detail">
             </div>
             <div class="acc-detail-info">
-                <span class="acc-detail-tag" id="accDetailTag">Acc</span>
+                <span class="acc-detail-tag" id="accDetailTag">Genshin</span>
                 <h2 id="accDetailName">-</h2>
                 <div class="acc-detail-meta">
                     <div class="acc-detail-row" th:if="false"><span>ID:</span> <span id="accDetailId">-</span></div>
-                    <div class="acc-detail-row" th:if="false"><span>G&#xF3;i:</span> <span id="accDetailProduct">-</span></div>
+                    <div class="acc-detail-row" th:if="false"><span>Gói:</span> <span id="accDetailProduct">-</span></div>
                 </div>
                 <div class="acc-detail-specs">
                     <div class="acc-detail-spec" id="accDetailRank">
@@ -989,11 +1061,11 @@
                     </div>
                 </div>
                 <div class="acc-detail-desc" id="accDetailExtra">
-                    <h4>Th&#xF4;ng tin th&#xEA;m</h4>
+                    <h4>Thông tin thêm</h4>
                     <p>-</p>
                 </div>
                 <div class="acc-detail-footer">
-                    <div class="acc-detail-price" id="accDetailPrice">0&#x111;</div>
+                    <div class="acc-detail-price" id="accDetailPrice">0đ</div>
                     <button type="button" class="card-buy" id="accDetailBuyBtn">Mua ngay</button>
                 </div>
             </div>
@@ -1004,7 +1076,7 @@
 
 <!-- FAB -->
 <a class="chat-fab" href="https://www.facebook.com/utaitejapan?locale=vi_VN" target="_blank">
-    &#x1F4AC; Chat Facebook ngay
+     Chat Facebook ngay
 </a>
 
 <script th:inline="javascript">
@@ -1019,7 +1091,7 @@
         document.getElementById('accDetailPrice').textContent = data.price;
 
         const tagEl = document.getElementById('accDetailTag');
-        tagEl.textContent = 'Acc';
+        tagEl.textContent = 'Genshin';
         tagEl.className = 'acc-detail-tag' + (data.tagClass ? ' ' + data.tagClass : '');
 
         document.querySelector('#accDetailRank .spec-value').textContent = data.rank;
@@ -1080,7 +1152,7 @@
         const productId = button.dataset.productId;
         const originalText = button.textContent;
         button.disabled = true;
-        button.textContent = '&#x110;ang th&#xEA;m...';
+        button.textContent = 'Đang thêm...';
 
         fetch('/cart/add', {
             method: 'POST',
@@ -1094,7 +1166,7 @@
         .then(data => {
             if (!data) return;
             updateCartUi(data);
-            button.textContent = '&#x110;&#xE3; c&#xF3; trong gi&#x1ECF;';
+            button.textContent = 'Đã có trong giỏ';
         })
         .catch(err => {
             cartStatusEl.textContent = err.message;
@@ -1123,5 +1195,153 @@
 
     setupUserMenu();
 </script>
+
+<!-- FOOTER -->
+<footer class="site-footer">
+    <div class="footer-container">
+        <div class="footer-brand">
+            <div class="footer-logo">🌸 GenshinCuteShop</div>
+            <p class="footer-desc">Chuyên cung cấp tài khoản game chất lượng cao, giá cả hợp lý. Giao dịch nhanh chóng, an toàn và uy tín hàng đầu Việt Nam.</p>
+            <div class="footer-social">
+                <a href="https://www.facebook.com/" target="_blank" class="social-link">📘 Facebook</a>
+                <a href="https://zalo.me/" target="_blank" class="social-link">💬 Zalo</a>
+                <a href="https://m.me/" target="_blank" class="social-link">💭 Messenger</a>
+            </div>
+        </div>
+        
+        <div class="footer-section">
+            <h4>Dịch vụ</h4>
+            <ul>
+                <li><a href="/">Mua tài khoản</a></li>
+                <li><a href="/cart">Giỏ hàng</a></li>
+                <li><a href="/my-orders">Lịch sử mua hàng</a></li>
+                <li><a href="/reviews">Đánh giá</a></li>
+            </ul>
+        </div>
+        
+        <div class="footer-section">
+            <h4>Hỗ trợ</h4>
+            <ul>
+                <li><a href="#">Hướng dẫn mua hàng</a></li>
+                <li><a href="#">Chính sách bảo hành</a></li>
+                <li><a href="#">Điều khoản sử dụng</a></li>
+                <li><a href="#">Liên hệ hỗ trợ</a></li>
+            </ul>
+        </div>
+        
+        <div class="footer-section">
+            <h4>Đánh giá</h4>
+            <div class="footer-rating">
+                <div class="stars">⭐⭐⭐⭐⭐</div>
+                <p class="rating-text">4.9/5 sao</p>
+                <p class="rating-count">Hơn 2,000+ đánh giá tích cực từ khách hàng</p>
+            </div>
+            <div class="footer-trust">
+                <span class="trust-badge">🔒 Bảo mật</span>
+                <span class="trust-badge">⚡ Giao nhanh</span>
+                <span class="trust-badge">✅ Uy tín</span>
+            </div>
+        </div>
+    </div>
+    
+    <div class="footer-bottom">
+        <p>© 2026 GenshinCuteShop - Chuyên bán acc Genshin Impact, Liên Quân Mobile và các game khác.</p>
+        <p class="footer-note">Cam kết 100% tài khoản chính chủ, giao ngay trong 5 phút sau khi thanh toán.</p>
+    </div>
+</footer>
+
+<style>
+.site-footer {
+    background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
+    color: #e2e8f0;
+    padding: 60px 20px 30px;
+    margin-top: 60px;
+    position: relative;
+    z-index: 10;
+}
+.footer-container {
+    max-width: 1200px;
+    margin: 0 auto;
+    display: grid;
+    grid-template-columns: 1.5fr 1fr 1fr 1fr;
+    gap: 40px;
+}
+@media (max-width: 900px) {
+    .footer-container { grid-template-columns: 1fr 1fr; }
+}
+@media (max-width: 600px) {
+    .footer-container { grid-template-columns: 1fr; }
+}
+.footer-brand .footer-logo {
+    font-size: 1.5rem;
+    font-weight: 800;
+    color: #f472b6;
+    margin-bottom: 15px;
+}
+.footer-brand .footer-desc {
+    font-size: 0.9rem;
+    line-height: 1.6;
+    color: #94a3b8;
+    margin-bottom: 20px;
+}
+.footer-social {
+    display: flex;
+    gap: 10px;
+    flex-wrap: wrap;
+}
+.social-link {
+    background: rgba(255,255,255,0.1);
+    color: #e2e8f0;
+    padding: 8px 14px;
+    border-radius: 20px;
+    text-decoration: none;
+    font-size: 0.85rem;
+    font-weight: 600;
+    transition: background 0.2s;
+}
+.social-link:hover { background: #f472b6; }
+.footer-section h4 {
+    color: #a855f7;
+    font-size: 1rem;
+    margin-bottom: 15px;
+    font-weight: 700;
+}
+.footer-section ul {
+    list-style: none;
+    padding: 0;
+}
+.footer-section ul li { margin-bottom: 10px; }
+.footer-section ul li a {
+    color: #94a3b8;
+    text-decoration: none;
+    font-size: 0.9rem;
+    transition: color 0.2s;
+}
+.footer-section ul li a:hover { color: #f472b6; }
+.footer-rating { margin-bottom: 15px; }
+.footer-rating .stars { font-size: 1.2rem; margin-bottom: 5px; }
+.footer-rating .rating-text { color: #fbbf24; font-weight: 700; font-size: 1rem; }
+.footer-rating .rating-count { color: #94a3b8; font-size: 0.8rem; margin-top: 5px; }
+.footer-trust { display: flex; gap: 8px; flex-wrap: wrap; }
+.trust-badge {
+    background: rgba(139,92,246,0.2);
+    color: #c4b5fd;
+    padding: 4px 10px;
+    border-radius: 12px;
+    font-size: 0.75rem;
+    font-weight: 600;
+}
+.footer-bottom {
+    max-width: 1200px;
+    margin: 40px auto 0;
+    padding-top: 25px;
+    border-top: 1px solid rgba(255,255,255,0.1);
+    text-align: center;
+}
+.footer-bottom p { color: #64748b; font-size: 0.85rem; margin-bottom: 5px; }
+.footer-bottom .footer-note { color: #475569; font-size: 0.8rem; }
+</style>
+
 </body>
 </html>
+

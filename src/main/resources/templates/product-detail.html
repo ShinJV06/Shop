@@ -283,12 +283,12 @@
     </h2>
 
     <div th:if="${!#lists.isEmpty(accounts)}" class="accounts-grid">
-        <div th:each="acc : ${accounts}" class="acc-card" th:classappend="${acc.hidden ? 'sold' : ''}">
+        <div th:each="acc : ${accounts}" class="acc-card" th:classappend="${acc.hidden || acc.status.name() == 'SOLD'} ? 'sold' : ''">
             <div class="acc-body">
                 <div class="acc-header">
                     <span class="acc-name" th:text="${acc.product != null ? acc.product.name : 'Acc #'+acc.id}">Tên</span>
-                    <span class="acc-status available" th:if="${!acc.hidden}">Còn hàng</span>
-                    <span class="acc-status sold" th:if="${acc.hidden}">Hết hàng</span>
+                    <span class="acc-status available" th:if="${!acc.hidden && acc.status.name() != 'SOLD'}">Còn hàng</span>
+                    <span class="acc-status sold" th:if="${acc.hidden || acc.status.name() == 'SOLD'}">Hết hàng</span>
                 </div>
                 <div class="acc-tags">
                     <span class="acc-tag" th:if="${acc.rankInfo != null}" th:text="${acc.rankInfo}">AR 58</span>
@@ -296,13 +296,13 @@
                 </div>
                 <div class="acc-price" th:text="${accountPrices[acc.id] != null ? accountPrices[acc.id] : 'Liên hệ'}">0đ</div>
                 <p class="acc-desc" th:text="${acc.extraInfo != null ? acc.extraInfo : 'Tài khoản chất lượng, giao ngay'}">Mô tả</p>
-                <button class="buy-btn available" th:if="${!acc.hidden}"
+                <button class="buy-btn available" th:if="${!acc.hidden && acc.status.name() != 'SOLD'}"
                         th:attr="data-product-id=${acc.product?.slug}"
                         onclick="addToCart(this)">
                     🛒 Mua ngay
                 </button>
-                <button class="buy-btn sold" th:if="${acc.hidden}" disabled>
-                    Đã bán
+                <button class="buy-btn sold" th:if="${acc.hidden || acc.status.name() == 'SOLD'}" disabled>
+                    Hết hàng
                 </button>
             </div>
         </div>

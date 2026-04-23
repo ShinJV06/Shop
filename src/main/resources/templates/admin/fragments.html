@@ -20,13 +20,16 @@
             <span class="ic">👤</span> Người dùng
         </a>
         <a th:href="@{/admin/accounts}" th:classappend="${active == 'accounts'} ? ' is-active'">
-            <span class="ic">🎮</span> Quản lý acc
+            <span class="ic">🎮</span> Quản lý genshin
         </a>
         <a th:href="@{/admin/packages}" th:classappend="${active == 'packages'} ? ' is-active'">
-            <span class="ic">📦</span> Gói acc
+            <span class="ic">📦</span> Gói genshin
         </a>
         <a th:href="@{/admin/orders}" th:classappend="${active == 'orders'} ? ' is-active'">
             <span class="ic">🧾</span> Quản lý mua hàng
+        </a>
+        <a th:href="@{/reviews/admin/pending}" th:classappend="${active == 'reviews'} ? ' is-active'">
+            <span class="ic">⭐</span> Quản lý Review
         </a>
     </nav>
     <div class="admin-sidebar-footer">

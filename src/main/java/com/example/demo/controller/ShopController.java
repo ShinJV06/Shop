@@ -1,6 +1,7 @@
 package com.example.demo.controller;
 
 import com.example.demo.entity.Account;
+import com.example.demo.entity.Enum.InventoryItemStatus;
 import com.example.demo.entity.Enum.ModerationStatus;
 import com.example.demo.entity.Enum.OrderStatus;
 import com.example.demo.entity.Game;
@@ -85,9 +86,12 @@ public class ShopController {
         }
         model.addAttribute("topDepositors", topDepositorList);
 
-        // Lấy acc đã duyệt, không bị ẩn - gộp theo product
+        // Lấy acc đã duyệt, không bị ẩn, không phải SOLD - gộp theo product
         List<InventoryItem> visibleAccounts = inventoryItemRepository
-            .findByModerationStatusAndHiddenFalseOrderByIdDesc(ModerationStatus.APPROVED);
+            .findByModerationStatusAndHiddenFalseOrderByIdDesc(ModerationStatus.APPROVED)
+            .stream()
+            .filter(item -> item.getStatus() != InventoryItemStatus.SOLD)
+            .collect(Collectors.toList());
 
         // Map product -> list accounts
         Map<Long, List<InventoryItem>> accountsByProduct = visibleAccounts.stream()
@@ -219,12 +223,23 @@ public class ShopController {
         if (userId != null && !"ADMIN".equals(role)) {
             model.addAttribute("homeUserPendingOrders", shopOrderRepository.findTop5ByBuyerIdAndStatusOrderByIdDesc(userId, OrderStatus.PENDING_PAYMENT));
         }
+        
+        // Compare count
+        @SuppressWarnings("unchecked")
+        List<String> compareList = (List<String>) session.getAttribute("compareList");
+        model.addAttribute("compareCount", compareList != null ? compareList.size() : 0);
+        
         return "home";
     }
 
     @GetMapping("/cart")
     public String cartPage(Model model, HttpSession session) {
         model.addAttribute("cartSummary", buildCartSummary(session));
+        
+        @SuppressWarnings("unchecked")
+        List<String> compareList = (List<String>) session.getAttribute("compareList");
+        model.addAttribute("compareCount", compareList != null ? compareList.size() : 0);
+        
         return "cart";
     }
 
@@ -464,14 +479,17 @@ public class ShopController {
 
         // Lấy tất cả inventory items đã duyệt của game này
         List<InventoryItem> allAccounts = inventoryItemRepository
-            .findByGameIdAndModerationStatusAndHiddenFalse(game.getId());
+            .findByGameIdAndModerationStatusAndHiddenFalse(game.getId())
+            .stream()
+            .filter(acc -> acc.getStatus() != InventoryItemStatus.SOLD)
+            .collect(Collectors.toList());
 
         // Lọc theo gói acc (product)
         if (product != null && !product.isBlank()) {
             String productSlug = product.toLowerCase();
             allAccounts = allAccounts.stream()
                 .filter(acc -> acc.getProduct() != null && acc.getProduct().getSlug().toLowerCase().equals(productSlug))
-                .toList();
+                .collect(Collectors.toList());
         }
 
         // Lọc theo tìm kiếm
@@ -484,7 +502,7 @@ public class ShopController {
                     String rankInfo = acc.getRankInfo() != null ? acc.getRankInfo().toLowerCase() : "";
                     return name.contains(searchLower) || notes.contains(searchLower) || rankInfo.contains(searchLower);
                 })
-                .toList();
+                .collect(Collectors.toList());
         }
 
         // Lọc theo AR Level
@@ -512,7 +530,7 @@ public class ShopController {
                         return false;
                     }
                 })
-                .toList();
+                .collect(Collectors.toList());
         }
 
         // Lọc theo Server
@@ -520,7 +538,7 @@ public class ShopController {
             final String serverFilter = server;
             allAccounts = allAccounts.stream()
                 .filter(acc -> acc.getGame() != null && acc.getGame().toLowerCase().contains(serverFilter.toLowerCase()))
-                .toList();
+                .collect(Collectors.toList());
         }
 
         // Lọc theo giá
@@ -533,7 +551,7 @@ public class ShopController {
                     double price = shopCatalogService.getEffectivePrice(acc);
                     return price >= min && price <= max;
                 })
-                .toList();
+                .collect(Collectors.toList());
         }
 
         // Sắp xếp
@@ -614,7 +632,7 @@ public class ShopController {
             model.addAttribute("accountJson", "{}");
         }
 
-        return "explore";
+        return "game-page";
     }
 
     @GetMapping("/account/{id}")
@@ -631,6 +649,13 @@ public class ShopController {
         }
         InventoryItem acc = itemOpt.get();
         model.addAttribute("acc", acc);
+
+        // Tính backUrl an toàn - dùng Product.game thay vì InventoryItem.game
+        String backUrl = "/";
+        if (acc.getProduct() != null && acc.getProduct().getGame() != null && acc.getProduct().getGame().getSlug() != null) {
+            backUrl = "/explore/" + acc.getProduct().getGame().getSlug();
+        }
+        model.addAttribute("backUrl", backUrl);
 
         // Get related accounts (same product/game)
         if (acc.getProduct() != null && acc.getProduct().getGame() != null) {
@@ -671,7 +696,10 @@ public class ShopController {
         Game game = gameOpt.get();
 
         List<InventoryItem> allAccounts = inventoryItemRepository
-            .findByGameIdAndModerationStatusAndHiddenFalse(game.getId());
+            .findByGameIdAndModerationStatusAndHiddenFalse(game.getId())
+            .stream()
+            .filter(acc -> acc.getStatus() != InventoryItemStatus.SOLD)
+            .collect(Collectors.toList());
 
         // Apply filters (same as explore endpoint)
         if (search != null && !search.isBlank()) {
@@ -682,7 +710,7 @@ public class ShopController {
                     String notes = acc.getExtraInfo() != null ? acc.getExtraInfo().toLowerCase() : "";
                     return name.contains(searchLower) || notes.contains(searchLower);
                 })
-                .toList();
+                .collect(Collectors.toList());
         }
 
         // Pagination

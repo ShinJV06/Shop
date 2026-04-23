@@ -1,0 +1,323 @@
+<!DOCTYPE html>
+<html lang="vi" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Tất cả Review — Admin</title>
+    <link rel="stylesheet" th:href="@{/css/admin-panel.css}">
+    <style>
+        .status-badge {
+            display: inline-block;
+            padding: 5px 12px;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            font-weight: 600;
+        }
+        .status-approved {
+            background: #dcfce7;
+            color: #16a34a;
+        }
+        .status-pending {
+            background: #fef3c7;
+            color: #d97706;
+        }
+        .status-rejected {
+            background: #fee2e2;
+            color: #dc2626;
+        }
+        .review-card-admin {
+            background: #fff;
+            border-radius: 16px;
+            padding: 20px;
+            margin-bottom: 16px;
+            border: 1px solid #e2e8f0;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+        }
+        .review-header-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 12px;
+            flex-wrap: wrap;
+            gap: 10px;
+        }
+        .review-user-info {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+        .review-avatar {
+            width: 44px;
+            height: 44px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #f97316, #ec4899);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: 700;
+            font-size: 1.1rem;
+        }
+        .review-user-name {
+            font-weight: 700;
+            color: #1e293b;
+            font-size: 1rem;
+        }
+        .review-date {
+            font-size: 0.8rem;
+            color: #94a3b8;
+        }
+        .review-stars {
+            color: #fbbf24;
+            font-size: 1rem;
+            letter-spacing: 2px;
+        }
+        .review-comment {
+            color: #475569;
+            line-height: 1.6;
+            margin: 12px 0;
+            padding: 12px;
+            background: #f8fafc;
+            border-radius: 10px;
+        }
+        .review-images {
+            display: flex;
+            gap: 10px;
+            margin-top: 12px;
+            flex-wrap: wrap;
+        }
+        .review-images img {
+            width: 70px;
+            height: 70px;
+            object-fit: cover;
+            border-radius: 10px;
+            border: 2px solid #e2e8f0;
+        }
+        .review-product {
+            display: inline-block;
+            background: #f1f5f9;
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            color: #64748b;
+            margin-top: 10px;
+        }
+        .review-actions {
+            display: flex;
+            gap: 10px;
+            margin-top: 16px;
+            padding-top: 16px;
+            border-top: 1px solid #e2e8f0;
+            flex-wrap: wrap;
+        }
+        .btn-approve {
+            padding: 8px 16px;
+            background: linear-gradient(135deg, #10b981, #059669);
+            color: white;
+            border: none;
+            border-radius: 10px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+        .btn-approve:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(16, 185, 129, 0.4);
+        }
+        .btn-reject {
+            padding: 8px 16px;
+            background: #64748b;
+            color: white;
+            border: none;
+            border-radius: 10px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+        .btn-reject:hover {
+            background: #475569;
+        }
+        .btn-delete {
+            padding: 8px 16px;
+            background: linear-gradient(135deg, #ef4444, #dc2626);
+            color: white;
+            border: none;
+            border-radius: 10px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+        .btn-delete:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(239, 68, 68, 0.4);
+        }
+        .stats-row {
+            display: flex;
+            gap: 20px;
+            margin-bottom: 24px;
+            flex-wrap: wrap;
+        }
+        .stat-card {
+            background: linear-gradient(135deg, #f97316, #ec4899);
+            color: white;
+            padding: 20px 30px;
+            border-radius: 16px;
+            min-width: 180px;
+        }
+        .stat-card.pending {
+            background: linear-gradient(135deg, #f59e0b, #d97706);
+        }
+        .stat-card.approved {
+            background: linear-gradient(135deg, #10b981, #059669);
+        }
+        .stat-card .stat-number {
+            font-size: 2rem;
+            font-weight: 800;
+        }
+        .stat-card .stat-label {
+            font-size: 0.9rem;
+            opacity: 0.9;
+        }
+    </style>
+</head>
+<body class="admin-body">
+<div class="admin-app">
+    <aside th:replace="~{admin/fragments :: sidebar (active='reviews')}"></aside>
+    <div class="admin-main">
+        <header class="admin-main-header">
+            <div>
+                <div class="admin-breadcrumb"><a th:href="@{/admin}">Admin</a> / Tất cả Review</div>
+                <h1>Tất cả đánh giá</h1>
+                <p>Xem và quản lý tất cả đánh giá</p>
+            </div>
+        </header>
+        <div class="admin-content">
+            <div class="stats-row">
+                <a th:href="@{/reviews/admin/pending}" style="text-decoration: none;">
+                    <div class="stat-card pending">
+                        <div class="stat-number" th:text="${pendingCount}">0</div>
+                        <div class="stat-label">Chờ duyệt</div>
+                    </div>
+                </a>
+                <div class="stat-card approved">
+                    <div class="stat-number" th:text="${approvedCount}">0</div>
+                    <div class="stat-label">Đã duyệt</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-number" th:text="${approvedCount + pendingCount}">0</div>
+                    <div class="stat-label">Tổng cộng</div>
+                </div>
+            </div>
+
+            <div th:each="review : ${allReviews}" class="review-card-admin">
+                <div class="review-header-row">
+                    <div class="review-user-info">
+                        <div class="review-avatar" th:text="${#strings.substring(review.username, 0, 1).toUpperCase()}">K</div>
+                        <div>
+                            <div class="review-user-name" th:text="${review.username}">Username</div>
+                            <div class="review-date" th:text="${#temporals.format(review.createdAt, 'dd/MM/yyyy HH:mm')}">01/01/2024</div>
+                        </div>
+                    </div>
+                    <div style="display: flex; align-items: center; gap: 12px;">
+                        <span class="status-badge"
+                              th:classappend="${review.approved ? 'status-approved' : (review.moderationStatus == 'REJECTED' ? 'status-rejected' : 'status-pending')}"
+                              th:text="${review.approved ? 'Đã duyệt' : (review.moderationStatus == 'REJECTED' ? 'Từ chối' : 'Chờ duyệt')}">Chờ duyệt</span>
+                        <div class="review-stars">
+                            <span th:each="i : ${#numbers.sequence(1, 5)}"
+                                  th:text="${i <= review.rating ? '★' : '☆'}"
+                                  th:style="${i <= review.rating} ? 'color: #fbbf24' : 'color: #e2e8f0'">★★★★★</span>
+                        </div>
+                    </div>
+                </div>
+
+                <p class="review-comment" th:if="${review.comment != null and !review.comment.isEmpty()}" th:text="${review.comment}">
+                    Nội dung đánh giá...
+                </p>
+                <p class="review-comment" th:if="${review.comment == null or review.comment.isEmpty()}" style="font-style: italic; color: #94a3b8;">
+                    Không có nhận xét
+                </p>
+
+                <div class="review-images" th:if="${review.imagePaths != null and !review.imagePaths.isEmpty()}">
+                    <img th:each="img : ${#strings.arraySplit(review.imagePaths, ',')}"
+                         th:src="${img}" alt="Review image">
+                </div>
+
+                <span class="review-product" th:if="${review.productName != null}" th:text="${review.productName}">Genshin Impact</span>
+
+                <div class="review-actions">
+                    <button th:if="${!review.approved && review.moderationStatus != 'REJECTED'}"
+                            class="btn-approve"
+                            th:onclick="'approveReview(' + ${review.id} + ')'">
+                        ✓ Duyệt
+                    </button>
+                    <button th:if="${!review.approved && review.moderationStatus != 'REJECTED'}"
+                            class="btn-reject"
+                            th:onclick="'rejectReview(' + ${review.id} + ')'">
+                        ✗ Từ chối
+                    </button>
+                    <button th:if="${review.approved}"
+                            class="btn-reject"
+                            th:onclick="'unapproveReview(' + ${review.id} + ')'">
+                        ↩ Bỏ duyệt
+                    </button>
+                    <button class="btn-delete"
+                            th:onclick="'deleteReview(' + ${review.id} + ')'">
+                        🗑 Xóa
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    async function approveReview(id) {
+        if (!confirm('Duyệt đánh giá này?')) return;
+        try {
+            const res = await fetch(`/reviews/admin/approve/${id}`, { method: 'POST' });
+            const data = await res.json();
+            if (data.success) location.reload();
+            else alert(data.message || 'Có lỗi xảy ra');
+        } catch (e) {
+            alert('Có lỗi: ' + e);
+        }
+    }
+
+    async function rejectReview(id) {
+        if (!confirm('Từ chối đánh giá này?')) return;
+        try {
+            const res = await fetch(`/reviews/admin/reject/${id}`, { method: 'POST' });
+            const data = await res.json();
+            if (data.success) location.reload();
+            else alert(data.message || 'Có lỗi xảy ra');
+        } catch (e) {
+            alert('Có lỗi: ' + e);
+        }
+    }
+
+    async function unapproveReview(id) {
+        if (!confirm('Bỏ duyệt đánh giá này?')) return;
+        try {
+            const res = await fetch(`/reviews/admin/reject/${id}`, { method: 'POST' });
+            const data = await res.json();
+            if (data.success) location.reload();
+            else alert(data.message || 'Có lỗi xảy ra');
+        } catch (e) {
+            alert('Có lỗi: ' + e);
+        }
+    }
+
+    async function deleteReview(id) {
+        if (!confirm('Xóa đánh giá này vĩnh viễn?')) return;
+        try {
+            const res = await fetch(`/reviews/admin/delete/${id}`, { method: 'POST' });
+            const data = await res.json();
+            if (data.success) location.reload();
+            else alert(data.message || 'Có lỗi xảy ra');
+        } catch (e) {
+            alert('Có lỗi: ' + e);
+        }
+    }
+</script>
+</body>
+</html>

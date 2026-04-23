@@ -322,6 +322,65 @@
             gap: 8px;
         }
         .chat-fab:hover { transform: translateY(-3px); }
+
+        /* COMPARE BUTTON */
+        .nav-compare {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            background: rgba(192, 132, 252, 0.1);
+            border: 2px solid rgba(192, 132, 252, 0.3);
+            border-radius: 20px;
+            padding: 6px 14px;
+            font-size: 0.85rem;
+            font-weight: 700;
+            color: #c084fc;
+            text-decoration: none;
+            transition: all 0.2s;
+        }
+        .nav-compare:hover {
+            background: #c084fc;
+            color: #fff;
+        }
+        .compare-badge {
+            min-width: 20px;
+            height: 20px;
+            padding: 0 5px;
+            border-radius: 999px;
+            background: linear-gradient(135deg, #f472b6, #c084fc);
+            color: #fff;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.7rem;
+            font-weight: 900;
+        }
+
+        /* Compare button on cards */
+        .btn-compare {
+            background: transparent;
+            color: #c084fc;
+            border: 2px solid rgba(192, 132, 252, 0.4);
+            border-radius: 20px;
+            padding: 6px 12px;
+            font-size: 0.78rem;
+            font-weight: 700;
+            font-family: inherit;
+            cursor: pointer;
+            transition: all 0.2s;
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
+        }
+        .btn-compare:hover {
+            background: #c084fc;
+            color: #fff;
+        }
+        .btn-compare.added {
+            background: linear-gradient(135deg, #34d399, #10b981);
+            color: #fff;
+            border-color: transparent;
+        }
     </style>
 </head>
 <body>
@@ -332,6 +391,9 @@
     </a>
     <nav class="nav">
         <a th:href="@{/}">Trang chủ</a>
+        <a th:href="@{/compare}" class="nav-compare">
+            ⚖️ So sánh <span class="compare-badge" id="compare-count" th:text="${compareCount != null ? compareCount : 0}">0</span>
+        </a>
         <a th:href="@{/cart}" class="nav-cart">Giỏ hàng <span class="cart-count-badge" id="cart-count" th:text="${cartSummary.count}">0</span></a>
         <a th:href="@{/wallet}" th:if="${session.userId != null}">💰 Nạp tiền</a>
         <a th:href="@{/profile}" th:if="${session.userId != null}">Profile</a>
@@ -360,8 +422,8 @@
     <div class="acc-grid" th:if="${!#lists.isEmpty(availableAccounts)}">
         <div class="acc-card" th:each="acc, stat : ${availableAccounts}">
             <div class="acc-card-image">
-                <img th:if="${acc.listingImagePath != null && !acc.listingImagePath.isEmpty()}" th:src="${acc.listingImagePath}" alt="Acc">
-                <img th:unless="${acc.listingImagePath != null && !acc.listingImagePath.isEmpty()}" th:src="${product.imagePath}" alt="Acc">
+                <img th:if="${acc.listingImagePath != null && !acc.listingImagePath.isEmpty()}" th:src="${acc.listingImagePath}" alt="Genshin">
+                <img th:unless="${acc.listingImagePath != null && !acc.listingImagePath.isEmpty()}" th:src="${product.imagePath}" alt="Genshin">
             </div>
             <div class="acc-card-body">
                 <div class="acc-info">
@@ -384,7 +446,12 @@
                 </div>
                 <div class="acc-card-footer">
                     <span class="acc-price" th:text="${accountPriceFormatted[acc.id] != null ? accountPriceFormatted[acc.id] : 'Liên hệ'}">0đ</span>
-                    <button type="button" class="btn-buy-now" th:data-id="${acc.id}" onclick="buyNow(this)">Mua ngay</button>
+                    <div style="display: flex; gap: 8px; align-items: center;">
+                        <button type="button" class="btn-compare" th:data-slug="${product.slug}" onclick="toggleCompare(this, '[[${product.slug}]]')">
+                            ⚖️ So sánh
+                        </button>
+                        <button type="button" class="btn-buy-now" th:data-id="${acc.id}" onclick="buyNow(this)">Mua ngay</button>
+                    </div>
                 </div>
             </div>
         </div>
@@ -409,7 +476,11 @@
 <script th:inline="javascript">
     const productSlug = /*[[${product.slug}]]*/ '';
     const cartCountEl = document.getElementById('cart-count');
+    const compareCountEl = document.getElementById('compare-count');
     const toast = document.getElementById('toast');
+
+    // Track which products are in compare list
+    const compareSlugs = new Set();
 
     function showToast(msg, type) {
         toast.textContent = msg;
@@ -419,6 +490,65 @@
 
     function updateCart(count) {
         if (cartCountEl) cartCountEl.textContent = count;
+    }
+
+    function toggleCompare(btn, slug) {
+        const isAdded = btn.classList.contains('added');
+
+        if (isAdded) {
+            // Remove from compare
+            fetch('/compare/remove', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+                body: 'slug=' + encodeURIComponent(slug)
+            })
+            .then(() => {
+                btn.classList.remove('added');
+                btn.innerHTML = '⚖️ So sánh';
+                updateCompareCount(-1);
+                showToast('Đã xóa khỏi so sánh', 'success');
+            })
+            .catch(err => {
+                showToast('❌ ' + err.message, 'error');
+            });
+        } else {
+            // Add to compare
+            fetch('/compare/add', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+                body: 'slug=' + encodeURIComponent(slug),
+                redirect: 'follow'
+            })
+            .then(async res => {
+                // Backend returns redirect, so we check status
+                if (res.redirected) {
+                    btn.classList.add('added');
+                    btn.innerHTML = '✓ Đã thêm';
+                    updateCompareCount(1);
+                    showToast('Đã thêm vào so sánh!', 'success');
+                } else {
+                    const data = await res.json().catch(() => ({}));
+                    if (!res.ok) {
+                        throw new Error(data.message || 'Lỗi khi thêm so sánh');
+                    }
+                    btn.classList.add('added');
+                    btn.innerHTML = '✓ Đã thêm';
+                    updateCompareCount(1);
+                    showToast('Đã thêm vào so sánh!', 'success');
+                }
+            })
+            .catch(err => {
+                showToast('❌ ' + err.message, 'error');
+            });
+        }
+    }
+
+    function updateCompareCount(delta) {
+        if (!compareCountEl) return;
+        let current = parseInt(compareCountEl.textContent) || 0;
+        current += delta;
+        if (current < 0) current = 0;
+        compareCountEl.textContent = current;
     }
 
     function buyNow(btn) {

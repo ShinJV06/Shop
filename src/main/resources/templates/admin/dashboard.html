@@ -6,6 +6,56 @@
     <title>Tổng quan — Admin</title>
     <link rel="stylesheet" th:href="@{/css/admin-panel.css}">
     <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
+    <style>
+        .chart-panel {
+            background: linear-gradient(135deg, #1e1e3f 0%, #2d2d5a 100%);
+            border-radius: 20px;
+            padding: 30px;
+            margin-bottom: 30px;
+            box-shadow: 0 10px 40px rgba(168, 85, 247, 0.2);
+        }
+        .chart-panel h2 {
+            color: #fff;
+            font-size: 1.3rem;
+            font-weight: 700;
+            margin: 0 0 20px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        .chart-panel h2::before {
+            content: '📊';
+        }
+        .chart-container {
+            position: relative;
+            height: 320px;
+            width: 100%;
+        }
+        .chart-summary {
+            display: flex;
+            gap: 20px;
+            margin-top: 20px;
+            flex-wrap: wrap;
+        }
+        .chart-summary-item {
+            background: rgba(255,255,255,0.1);
+            border-radius: 12px;
+            padding: 12px 20px;
+            text-align: center;
+            flex: 1;
+            min-width: 120px;
+        }
+        .chart-summary-item .label {
+            color: #a0a0c0;
+            font-size: 0.8rem;
+            margin-bottom: 4px;
+        }
+        .chart-summary-item .value {
+            color: #fbbf24;
+            font-size: 1.2rem;
+            font-weight: 700;
+        }
+    </style>
 </head>
 <body class="admin-body">
 <div class="admin-app">
@@ -20,19 +70,16 @@
         </header>
         <div class="admin-content">
             <p class="admin-muted" style="margin:0 0 18px">
-                <!-- Tạm thời ẩn: Nhập kho, Sản phẩm, Đơn hàng -->
-                <!--
-                <a class="admin-btn admin-btn--sky" style="text-decoration:none;display:inline-block;margin:0 8px 8px 0" th:href="@{/admin/stock}">Nhập kho</a>
-                <a class="admin-btn admin-btn--orange" style="text-decoration:none;display:inline-block;margin:0 8px 8px 0" th:href="@{/admin/products}">Sản phẩm</a>
-                <a class="admin-btn admin-btn--green" style="text-decoration:none;display:inline-block;margin:0 8px 8px 0" th:href="@{/admin/orders}">Đơn hàng</a>
-                -->
                 <a class="admin-btn admin-btn--rose" style="text-decoration:none;display:inline-block;margin:0 8px 8px 0" th:href="@{/admin/accounts}">Quản lý acc</a>
             </p>
-            <div class="admin-panel" style="padding:20px 22px 8px;margin-bottom:22px">
-                <h2 style="margin:0 0 14px;font-size:1rem;font-weight:800">Doanh thu đã thanh toán (7 ngày)</h2>
-                <div class="admin-chart-wrap">
-                    <canvas id="revChart" height="120" aria-label="Biểu đồ doanh thu"></canvas>
+            
+            <!-- BIỂU ĐỒ DOANH THU - TO VÀ ĐẸP -->
+            <div class="chart-panel">
+                <h2>Doanh thu 7 ngày gần nhất</h2>
+                <div class="chart-container">
+                    <canvas id="revChart" aria-label="Biểu đồ doanh thu"></canvas>
                 </div>
+                <div class="chart-summary" id="chartSummary"></div>
             </div>
 
             <div class="admin-stat-grid">
@@ -101,41 +148,100 @@
     const chartLabels = /*[[${stats.chartLabels}]]*/ [];
     const chartValues = /*[[${stats.chartValues}]]*/ [];
     /*]]>*/
+    
     const ctx = document.getElementById('revChart');
     if (ctx && typeof Chart !== 'undefined') {
+        // Tạo gradient cho chart
+        const gradient = ctx.getContext('2d').createLinearGradient(0, 0, 0, 320);
+        gradient.addColorStop(0, 'rgba(244, 114, 182, 0.9)');
+        gradient.addColorStop(1, 'rgba(168, 85, 247, 0.3)');
+        
+        // Tính tổng và trung bình
+        const total = chartValues.reduce((a, b) => a + b, 0);
+        const avg = chartValues.length > 0 ? Math.round(total / chartValues.length) : 0;
+        const max = chartValues.length > 0 ? Math.max(...chartValues) : 0;
+        
         new Chart(ctx, {
             type: 'bar',
             data: {
                 labels: chartLabels,
                 datasets: [{
-                    label: 'VNĐ (đơn PAID)',
+                    label: 'Doanh thu (VNĐ)',
                     data: chartValues,
-                    borderRadius: 8,
-                    backgroundColor: 'rgba(168, 85, 247, 0.55)',
-                    borderColor: 'rgba(244, 114, 182, 0.9)',
-                    borderWidth: 1
+                    borderRadius: 12,
+                    borderSkipped: false,
+                    backgroundColor: gradient,
+                    borderColor: 'rgba(244, 114, 182, 1)',
+                    borderWidth: 2,
+                    hoverBackgroundColor: 'rgba(244, 114, 182, 1)'
                 }]
             },
             options: {
                 responsive: true,
                 maintainAspectRatio: false,
+                animation: {
+                    duration: 1500,
+                    easing: 'easeOutQuart'
+                },
                 plugins: {
-                    legend: { display: false }
+                    legend: { display: false },
+                    tooltip: {
+                        backgroundColor: 'rgba(30, 30, 63, 0.95)',
+                        titleColor: '#fff',
+                        bodyColor: '#fbbf24',
+                        padding: 12,
+                        cornerRadius: 8,
+                        callbacks: {
+                            label: function(context) {
+                                const val = context.raw;
+                                return val.toLocaleString('vi-VN') + 'đ';
+                            }
+                        }
+                    }
                 },
                 scales: {
+                    x: {
+                        grid: { display: false },
+                        ticks: { 
+                            color: '#a0a0c0',
+                            font: { size: 12, weight: 500 }
+                        }
+                    },
                     y: {
                         beginAtZero: true,
+                        grid: { color: 'rgba(255,255,255,0.05)' },
                         ticks: {
+                            color: '#a0a0c0',
+                            font: { size: 11 },
                             callback: function (v) {
                                 if (v >= 1e6) return (v / 1e6).toFixed(1) + 'M';
-                                if (v >= 1e3) return (v / 1e3).toFixed(0) + 'k';
-                                return v;
+                                if (v >= 1e3) return (v / 1e3).toFixed(0) + 'K';
+                                return v.toLocaleString('vi-VN') + 'đ';
                             }
                         }
                     }
                 }
             }
         });
+        
+        // Thêm summary cards
+        const summaryEl = document.getElementById('chartSummary');
+        if (summaryEl) {
+            summaryEl.innerHTML = `
+                <div class="chart-summary-item">
+                    <div class="label">Tổng 7 ngày</div>
+                    <div class="value">${total.toLocaleString('vi-VN')}đ</div>
+                </div>
+                <div class="chart-summary-item">
+                    <div class="label">Trung bình/ngày</div>
+                    <div class="value">${avg.toLocaleString('vi-VN')}đ</div>
+                </div>
+                <div class="chart-summary-item">
+                    <div class="label">Cao nhất</div>
+                    <div class="value">${max.toLocaleString('vi-VN')}đ</div>
+                </div>
+            `;
+        }
     }
 </script>
 </body>

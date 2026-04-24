@@ -28,8 +28,11 @@
         <a th:href="@{/admin/orders}" th:classappend="${active == 'orders'} ? ' is-active'">
             <span class="ic">🧾</span> Quản lý mua hàng
         </a>
-        <a th:href="@{/reviews/admin/pending}" th:classappend="${active == 'reviews'} ? ' is-active'">
-            <span class="ic">⭐</span> Quản lý Review
+        <a th:href="@{/reviews/admin/comments}" th:classappend="${active == 'comments'} ? ' is-active'">
+            <span class="ic">💬</span> Quản lý bình luận
+        </a>
+        <a th:href="@{/admin/chat}" th:classappend="${active == 'chat'} ? ' is-active'">
+            <span class="ic">💬</span> Quản lý Chat
         </a>
     </nav>
     <div class="admin-sidebar-footer">

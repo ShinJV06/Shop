@@ -10,7 +10,9 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
+import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpSession;
+import java.io.File;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -29,7 +31,8 @@ public class ReviewController {
     @Autowired
     private AccountRepository accountRepository;
 
-    private static final String UPLOAD_DIR = "uploads/reviews/";
+    // Sử dụng đường dẫn tuyệt đối để tránh lỗi
+    private static final String UPLOAD_DIR = System.getProperty("user.dir") + "/uploads/reviews/";
 
     @GetMapping
     public String listReviews(Model model, HttpSession session) {
@@ -52,6 +55,17 @@ public class ReviewController {
             .average().orElse(0);
         model.addAttribute("avgRating", avgRating);
         model.addAttribute("totalReviews", reviews.size());
+
+        // Tính phân bố đánh giá (rating distribution)
+        Map<Integer, Long> ratingCounts = reviews.stream()
+            .collect(java.util.stream.Collectors.groupingBy(Review::getRating, java.util.stream.Collectors.counting()));
+        int total = reviews.size();
+        Map<Integer, Integer> ratingPercents = new HashMap<>();
+        for (int i = 5; i >= 1; i--) {
+            long count = ratingCounts.getOrDefault(i, 0L);
+            ratingPercents.put(i, total > 0 ? (int)((count * 100) / total) : 0);
+        }
+        model.addAttribute("ratingPercents", ratingPercents);
 
         // Kiểm tra user đã đăng nhập chưa
         boolean isLoggedIn = session.getAttribute("username") != null;
@@ -93,6 +107,7 @@ public class ReviewController {
             @RequestParam(required = false) String comment,
             @RequestParam(required = false) String productSlug,
             @RequestParam(required = false) String productName,
+            @RequestParam(required = false) List<String> tags,
             @RequestParam(required = false) List<MultipartFile> images,
             HttpSession session,
             Model model
@@ -111,7 +126,12 @@ public class ReviewController {
         review.setProductSlug(productSlug);
         review.setProductName(productName);
         review.setCreatedAt(LocalDateTime.now());
-        
+
+        // Xử lý tags
+        if (tags != null && !tags.isEmpty()) {
+            review.setTags(String.join(",", tags));
+        }
+
         // MẶC ĐỊNH LÀ CHƯA DUYỆT - CẦN ADMIN DUYỆT MỚI HIỂN THỊ
         review.setApproved(false);
         review.setModerationStatus("PENDING");
@@ -129,7 +149,8 @@ public class ReviewController {
                         String filename = UUID.randomUUID() + "_" + image.getOriginalFilename();
                         Path filePath = uploadPath.resolve(filename);
                         image.transferTo(filePath.toFile());
-                        imagePaths.add("/" + UPLOAD_DIR + filename);
+                        // Lưu đường dẫn tương đối để serve qua URL
+                        imagePaths.add("/uploads/reviews/" + filename);
                     }
                 }
                 review.setImagePaths(String.join(",", imagePaths));
@@ -240,6 +261,27 @@ public class ReviewController {
         return ResponseEntity.ok(Map.of("success", true, "message", "Đã xóa review"));
     }
 
+    @GetMapping("/admin/comments")
+    public String manageComments(Model model, HttpSession session) {
+        String role = (String) session.getAttribute("role");
+        if (role == null || !"ADMIN".equals(role)) {
+            return "redirect:/auth/login";
+        }
+
+        List<Review> allReviews = reviewRepository.findAllByOrderByCreatedAtDesc();
+        model.addAttribute("allReviews", allReviews);
+
+        long publishedCount = reviewRepository.countByApprovedTrue();
+        long pendingCount = reviewRepository.countByApprovedFalse();
+        long totalCount = allReviews.size();
+
+        model.addAttribute("publishedCount", publishedCount);
+        model.addAttribute("pendingCount", pendingCount);
+        model.addAttribute("totalCount", totalCount);
+
+        return "admin/comments";
+    }
+
     @GetMapping("/admin/all")
     public String allReviews(Model model, HttpSession session) {
         String role = (String) session.getAttribute("role");
@@ -249,12 +291,12 @@ public class ReviewController {
 
         List<Review> allReviews = reviewRepository.findAllByOrderByCreatedAtDesc();
         model.addAttribute("allReviews", allReviews);
-        
+
         long approvedCount = reviewRepository.countByApprovedTrue();
         long pendingCount = reviewRepository.countByApprovedFalse();
         model.addAttribute("approvedCount", approvedCount);
         model.addAttribute("pendingCount", pendingCount);
-        
+
         return "admin/reviews-all";
     }
 }

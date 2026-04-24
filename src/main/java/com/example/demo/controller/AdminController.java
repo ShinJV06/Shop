@@ -479,6 +479,17 @@ public class AdminController {
         return "redirect:/admin/accounts";
     }
 
+    @GetMapping("/chat")
+    public String chatPage(HttpSession session, RedirectAttributes ra) {
+        try {
+            currentUserService.requireAdmin(session);
+        } catch (CurrentUserService.UnauthorizedException ex) {
+            ra.addFlashAttribute("errorMessage", ex.getMessage());
+            return "redirect:/auth/login";
+        }
+        return "admin/chat";
+    }
+
     private Account requireAdmin(HttpSession session, RedirectAttributes ra) {
         try {
             return currentUserService.requireAdmin(session);

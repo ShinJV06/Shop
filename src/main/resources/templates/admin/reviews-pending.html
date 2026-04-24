@@ -6,30 +6,46 @@
     <title>Review chờ duyệt — Admin</title>
     <link rel="stylesheet" th:href="@{/css/admin-panel.css}">
     <style>
-        .review-card-admin {
+        .admin-table-container {
             background: #fff;
-            border-radius: 16px;
-            padding: 20px;
-            margin-bottom: 16px;
-            border: 1px solid #e2e8f0;
+            border-radius: 12px;
+            overflow: hidden;
             box-shadow: 0 2px 8px rgba(0,0,0,0.06);
         }
-        .review-header-row {
+        .admin-table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+        .admin-table th {
+            background: linear-gradient(135deg, #f59e0b, #d97706);
+            color: white;
+            padding: 14px 16px;
+            text-align: left;
+            font-weight: 600;
+            font-size: 0.85rem;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+        .admin-table td {
+            padding: 14px 16px;
+            border-bottom: 1px solid #f1f5f9;
+            vertical-align: middle;
+        }
+        .admin-table tbody tr:hover {
+            background: #fffaf0;
+        }
+        .admin-table tbody tr:last-child td {
+            border-bottom: none;
+        }
+
+        .user-cell {
             display: flex;
-            justify-content: space-between;
             align-items: center;
-            margin-bottom: 12px;
-            flex-wrap: wrap;
             gap: 10px;
         }
-        .review-user-info {
-            display: flex;
-            align-items: center;
-            gap: 12px;
-        }
-        .review-avatar {
-            width: 44px;
-            height: 44px;
+        .user-avatar {
+            width: 36px;
+            height: 36px;
             border-radius: 50%;
             background: linear-gradient(135deg, #f97316, #ec4899);
             display: flex;
@@ -37,111 +53,87 @@
             justify-content: center;
             color: white;
             font-weight: 700;
-            font-size: 1.1rem;
+            font-size: 0.9rem;
         }
-        .review-user-name {
-            font-weight: 700;
+        .user-name {
+            font-weight: 600;
             color: #1e293b;
-            font-size: 1rem;
         }
-        .review-date {
-            font-size: 0.8rem;
-            color: #94a3b8;
-        }
-        .review-stars {
+
+        .stars-cell {
             color: #fbbf24;
             font-size: 1rem;
-            letter-spacing: 2px;
+            letter-spacing: 1px;
         }
-        .review-comment {
-            color: #475569;
-            line-height: 1.6;
-            margin: 12px 0;
-            padding: 12px;
-            background: #f8fafc;
-            border-radius: 10px;
-        }
-        .review-images {
-            display: flex;
-            gap: 10px;
-            margin-top: 12px;
-            flex-wrap: wrap;
-        }
-        .review-images img {
-            width: 70px;
-            height: 70px;
-            object-fit: cover;
-            border-radius: 10px;
-            border: 2px solid #e2e8f0;
-        }
-        .review-product {
-            display: inline-block;
-            background: #f1f5f9;
-            padding: 4px 12px;
-            border-radius: 20px;
-            font-size: 0.8rem;
+
+        .comment-cell {
+            max-width: 300px;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
             color: #64748b;
-            margin-top: 10px;
         }
-        .review-actions {
+
+        .images-cell {
             display: flex;
-            gap: 10px;
-            margin-top: 16px;
-            padding-top: 16px;
-            border-top: 1px solid #e2e8f0;
+            gap: 6px;
             flex-wrap: wrap;
+        }
+        .images-cell img {
+            width: 40px;
+            height: 40px;
+            object-fit: cover;
+            border-radius: 6px;
+            border: 1px solid #e2e8f0;
+        }
+
+        .actions-cell {
+            display: flex;
+            gap: 8px;
+            flex-wrap: wrap;
+        }
+        .btn-sm {
+            padding: 6px 12px;
+            border: none;
+            border-radius: 6px;
+            font-size: 0.8rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s;
         }
         .btn-approve {
-            padding: 10px 20px;
             background: linear-gradient(135deg, #10b981, #059669);
             color: white;
-            border: none;
-            border-radius: 10px;
-            font-weight: 600;
-            cursor: pointer;
-            transition: all 0.3s;
         }
         .btn-approve:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 6px 20px rgba(16, 185, 129, 0.4);
+            transform: translateY(-1px);
+            box-shadow: 0 4px 12px rgba(16, 185, 129, 0.3);
         }
         .btn-reject {
-            padding: 10px 20px;
             background: linear-gradient(135deg, #ef4444, #dc2626);
             color: white;
-            border: none;
-            border-radius: 10px;
-            font-weight: 600;
-            cursor: pointer;
-            transition: all 0.3s;
         }
         .btn-reject:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 6px 20px rgba(239, 68, 68, 0.4);
+            transform: translateY(-1px);
+            box-shadow: 0 4px 12px rgba(239, 68, 68, 0.3);
         }
         .btn-delete {
-            padding: 10px 20px;
             background: #64748b;
             color: white;
-            border: none;
-            border-radius: 10px;
-            font-weight: 600;
-            cursor: pointer;
-            transition: all 0.3s;
         }
         .btn-delete:hover {
             background: #475569;
         }
-        .empty-state {
-            text-align: center;
-            padding: 60px 20px;
-            color: #64748b;
+
+        .product-tag {
+            display: inline-block;
+            background: #fef3c7;
+            padding: 4px 10px;
+            border-radius: 12px;
+            font-size: 0.75rem;
+            color: #d97706;
         }
-        .empty-state .icon {
-            font-size: 4rem;
-            margin-bottom: 16px;
-            opacity: 0.5;
-        }
+
         .stats-row {
             display: flex;
             gap: 20px;
@@ -153,7 +145,7 @@
             color: white;
             padding: 20px 30px;
             border-radius: 16px;
-            min-width: 180px;
+            min-width: 150px;
         }
         .stat-card.pending {
             background: linear-gradient(135deg, #f59e0b, #d97706);
@@ -168,6 +160,21 @@
         .stat-card .stat-label {
             font-size: 0.9rem;
             opacity: 0.9;
+        }
+
+        .empty-state {
+            text-align: center;
+            padding: 60px 20px;
+            color: #64748b;
+        }
+
+        @media (max-width: 1024px) {
+            .admin-table-container {
+                overflow-x: auto;
+            }
+            .admin-table {
+                min-width: 900px;
+            }
         }
     </style>
 </head>
@@ -188,12 +195,12 @@
                     <div class="stat-number" th:text="${pendingCount}">0</div>
                     <div class="stat-label">Đang chờ duyệt</div>
                 </div>
-                <div class="stat-card">
-                    <a th:href="@{/reviews/admin/all}" style="color: white; text-decoration: none;">
+                <a th:href="@{/reviews/admin/all}" style="text-decoration: none;">
+                    <div class="stat-card">
                         <div class="stat-number">📋</div>
                         <div class="stat-label">Tất cả review</div>
-                    </a>
-                </div>
+                    </div>
+                </a>
             </div>
 
             <div th:if="${#lists.isEmpty(pendingReviews)}" class="empty-state">
@@ -201,50 +208,73 @@
                 <p>Không có review nào đang chờ duyệt!</p>
             </div>
 
-            <div th:each="review : ${pendingReviews}" class="review-card-admin">
-                <div class="review-header-row">
-                    <div class="review-user-info">
-                        <div class="review-avatar" th:text="${#strings.substring(review.username, 0, 1).toUpperCase()}">K</div>
-                        <div>
-                            <div class="review-user-name" th:text="${review.username}">Username</div>
-                            <div class="review-date" th:text="${#temporals.format(review.createdAt, 'dd/MM/yyyy HH:mm')}">01/01/2024</div>
-                        </div>
-                    </div>
-                    <div class="review-stars">
-                        <span th:each="i : ${#numbers.sequence(1, 5)}"
-                              th:text="${i <= review.rating ? '★' : '☆'}"
-                              th:style="${i <= review.rating} ? 'color: #fbbf24' : 'color: #e2e8f0'">★★★★★</span>
-                    </div>
-                </div>
-
-                <p class="review-comment" th:if="${review.comment != null and !review.comment.isEmpty()}" th:text="${review.comment}">
-                    Nội dung đánh giá...
-                </p>
-                <p class="review-comment" th:if="${review.comment == null or review.comment.isEmpty()}" style="font-style: italic; color: #94a3b8;">
-                    Không có nhận xét
-                </p>
-
-                <div class="review-images" th:if="${review.imagePaths != null and !review.imagePaths.isEmpty()}">
-                    <img th:each="img : ${#strings.arraySplit(review.imagePaths, ',')}"
-                         th:src="${img}" alt="Review image">
-                </div>
-
-                <span class="review-product" th:if="${review.productName != null}" th:text="${review.productName}">Genshin Impact</span>
-
-                <div class="review-actions">
-                    <button class="btn-approve"
-                            th:onclick="'approveReview(' + ${review.id} + ')'">
-                        ✓ Duyệt
-                    </button>
-                    <button class="btn-reject"
-                            th:onclick="'rejectReview(' + ${review.id} + ')'">
-                        ✗ Từ chối
-                    </button>
-                    <button class="btn-delete"
-                            th:onclick="'deleteReview(' + ${review.id} + ')'">
-                        🗑 Xóa
-                    </button>
-                </div>
+            <div class="admin-table-container" th:if="${!#lists.isEmpty(pendingReviews)}">
+                <table class="admin-table">
+                    <thead>
+                        <tr>
+                            <th>Người dùng</th>
+                            <th>Đánh giá</th>
+                            <th>Nội dung</th>
+                            <th>Hình ảnh</th>
+                            <th>Sản phẩm</th>
+                            <th>Ngày tạo</th>
+                            <th>Hành động</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr th:each="review : ${pendingReviews}">
+                            <td>
+                                <div class="user-cell">
+                                    <div class="user-avatar" th:text="${#strings.substring(review.username, 0, 1).toUpperCase()}">K</div>
+                                    <span class="user-name" th:text="${review.username}">Username</span>
+                                </div>
+                            </td>
+                            <td>
+                                <span class="stars-cell">
+                                    <th:block th:each="i : ${#numbers.sequence(1, 5)}">
+                                        <span th:text="${i <= review.rating ? '★' : '☆'}"
+                                              th:style="${i <= review.rating} ? 'color: #fbbf24' : 'color: #e2e8f0'">★</span>
+                                    </th:block>
+                                </span>
+                            </td>
+                            <td>
+                                <span class="comment-cell" th:text="${review.comment != null and !review.comment.isEmpty()} ? ${review.comment} : '—'">
+                                    Nội dung đánh giá...
+                                </span>
+                            </td>
+                            <td>
+                                <div class="images-cell" th:if="${review.imagePaths != null and !review.imagePaths.isEmpty()}">
+                                    <img th:each="img : ${#strings.arraySplit(review.imagePaths, ',')}"
+                                         th:src="${img}" alt="img">
+                                </div>
+                                <span th:if="${review.imagePaths == null or review.imagePaths.isEmpty()}" style="color: #94a3b8;">—</span>
+                            </td>
+                            <td>
+                                <span class="product-tag" th:if="${review.productName != null}" th:text="${review.productName}">Genshin Impact</span>
+                                <span th:if="${review.productName == null}" style="color: #94a3b8;">—</span>
+                            </td>
+                            <td style="white-space: nowrap; color: #64748b; font-size: 0.85rem;" th:text="${#temporals.format(review.createdAt, 'dd/MM/yyyy HH:mm')}">
+                                01/01/2024
+                            </td>
+                            <td>
+                                <div class="actions-cell">
+                                    <button class="btn-sm btn-approve"
+                                            th:onclick="'approveReview(' + ${review.id} + ')'">
+                                        ✓ Duyệt
+                                    </button>
+                                    <button class="btn-sm btn-reject"
+                                            th:onclick="'rejectReview(' + ${review.id} + ')'">
+                                        ✗ Từ chối
+                                    </button>
+                                    <button class="btn-sm btn-delete"
+                                            th:onclick="'deleteReview(' + ${review.id} + ')'">
+                                        🗑 Xóa
+                                    </button>
+                                </div>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
             </div>
         </div>
     </div>

@@ -40,6 +40,9 @@ public class Review {
     @Column(name = "moderation_status")
     private String moderationStatus = "PENDING"; // PENDING, APPROVED, REJECTED
 
+    @Column(length = 500)
+    private String tags; // Lưu tags dạng "Giao nhanh,Uy tín,Chất lượng"
+
     @PrePersist
     protected void onCreate() {
         createdAt = LocalDateTime.now();
@@ -79,4 +82,7 @@ public class Review {
 
     public String getModerationStatus() { return moderationStatus; }
     public void setModerationStatus(String moderationStatus) { this.moderationStatus = moderationStatus; }
+
+    public String getTags() { return tags; }
+    public void setTags(String tags) { this.tags = tags; }
 }

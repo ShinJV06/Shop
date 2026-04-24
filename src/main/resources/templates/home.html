@@ -7,6 +7,8 @@
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=M+PLUS+Rounded+1c:wght@400;500;700;800&family=Nunito:wght@400;600;700;800;900&display=swap" rel="stylesheet">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/sockjs-client/1.5.4/sockjs.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/stomp.js/2.3.4/stomp.min.js"></script>
     <style>
         :root {
             --pink:      #f472b6;
@@ -589,7 +591,7 @@
         .acc-detail-overlay.open { display: flex; }
         .acc-detail-modal {
             background: linear-gradient(160deg, #fff7f9 0%, #fce7f3 50%, #ede9fe 100%);
-            border-radius: 28px;
+            border-radius: 32px;
             border: 2px solid var(--pink-mid);
             width: min(900px, 95vw);
             max-height: 90vh;
@@ -742,31 +744,84 @@
             font-size: 0.95rem;
         }
 
-        .chat-fab {
-            position: fixed;
-            bottom: 28px;
-            right: 28px;
-            background: linear-gradient(135deg, #f472b6, #a855f7);
-            color: #fff;
-            font-size: 0.88rem;
-            font-weight: 800;
-            padding: 13px 22px;
-            border-radius: 50px;
-            text-decoration: none;
-            box-shadow: 0 6px 24px rgba(244,114,182,0.45);
-            z-index: 50;
-            transition: transform 0.2s, box-shadow 0.2s;
-            display: flex;
+        /* Holiday Marquee */
+        .holiday-bar {
+            background: linear-gradient(90deg, #f472b6, #a855f7, #ec4899, #c084fc);
+            background-size: 300% 100%;
+            animation: shimmer 4s ease-in-out infinite;
+            padding: 12px 0;
+            overflow: hidden;
+            position: relative;
+            z-index: 99;
+            border-bottom: 2px solid rgba(255,255,255,0.3);
+        }
+        @keyframes shimmer {
+            0%, 100% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+        }
+        .marquee-wrapper {
+            width: 100%;
+            overflow: hidden;
+            white-space: nowrap;
+        }
+        .marquee-content {
+            display: inline-block;
+            white-space: nowrap;
+            animation: marquee 40s linear infinite;
+            will-change: transform;
+        }
+        .marquee-content:hover {
+            animation-play-state: paused;
+        }
+        @keyframes marquee {
+            0% { transform: translateX(0); }
+            100% { transform: translateX(-50%); }
+        }
+        .holiday-item {
+            display: inline-flex;
             align-items: center;
             gap: 8px;
+            padding: 0 24px;
+            font-size: 0.88rem;
+            font-weight: 700;
+            color: #fff;
+            text-shadow: 0 1px 4px rgba(0,0,0,0.25);
         }
-        .chat-fab:hover { transform: translateY(-3px) scale(1.04); box-shadow: 0 12px 32px rgba(244,114,182,0.5); }
-
-        @media (min-width: 1100px) {
-            .chat-fab {
-                bottom: 100px;
-                right: max(32px, calc(12vw + 8px));
-            }
+        .holiday-item .holiday-icon {
+            font-size: 1.1rem;
+        }
+        .holiday-item .holiday-date {
+            background: rgba(255,255,255,0.3);
+            padding: 3px 12px;
+            border-radius: 20px;
+            font-size: 0.78rem;
+            backdrop-filter: blur(4px);
+            border: 1px solid rgba(255,255,255,0.2);
+        }
+        .holiday-item .holiday-name {
+            letter-spacing: 0.3px;
+        }
+        .holiday-item .holiday-note {
+            font-size: 0.75rem;
+            opacity: 0.85;
+            font-weight: 600;
+        }
+        .holiday-item.today-highlight {
+            background: rgba(255,255,255,0.25);
+            border-radius: 25px;
+            padding: 6px 16px 6px 8px;
+            margin: 0 8px;
+            border: 1px solid rgba(255,255,255,0.4);
+        }
+        .holiday-item.soon-highlight .holiday-date {
+            background: #fbbf24;
+            color: #000;
+            font-weight: 800;
+        }
+        .holiday-divider {
+            color: rgba(255,255,255,0.4);
+            font-size: 0.7rem;
+            margin: 0 4px;
         }
 
         .stats {
@@ -791,15 +846,15 @@
         .stat-label { font-size: 0.82rem; color: var(--text-mute); font-weight: 700; margin-top: 2px; }
 
         .cart-showcase {
-            margin: 34px 0 10px;
+            margin: 40px -48px 16px;
             display: grid;
-            grid-template-columns: minmax(0, 1.1fr) minmax(260px, 340px);
-            gap: 24px;
+            grid-template-columns: minmax(0, 1.1fr) minmax(300px, 420px);
+            gap: 36px;
             align-items: center;
-            background: linear-gradient(135deg, rgba(255,255,255,0.78), rgba(252,231,243,0.9));
-            border: 1.5px solid var(--pink-mid);
-            border-radius: 28px;
-            padding: 24px;
+            background: linear-gradient(135deg, rgba(255,255,255,0.88), rgba(252,231,243,0.95));
+            border: 2px solid var(--pink-mid);
+            border-radius: 40px;
+            padding: 52px 56px;
             box-shadow: var(--shadow);
             backdrop-filter: blur(12px);
             overflow: hidden;
@@ -807,7 +862,7 @@
         .cart-copy {
             display: flex;
             flex-direction: column;
-            gap: 14px;
+            gap: 20px;
         }
         .cart-kicker {
             display: inline-flex;
@@ -823,29 +878,29 @@
             font-weight: 800;
         }
         .cart-copy h3 {
-            font-size: clamp(1.45rem, 3vw, 2rem);
+            font-size: clamp(1.8rem, 3.5vw, 2.5rem);
             line-height: 1.2;
             font-weight: 900;
             color: var(--text);
         }
         .cart-copy p {
             color: var(--text-mute);
-            font-size: 0.95rem;
-            line-height: 1.75;
+            font-size: 1.1rem;
+            line-height: 1.8;
             font-weight: 600;
         }
         .cart-meta {
             display: flex;
             flex-wrap: wrap;
-            gap: 10px;
+            gap: 14px;
         }
         .cart-chip {
-            padding: 8px 14px;
+            padding: 11px 18px;
             border-radius: 999px;
             background: rgba(255,255,255,0.84);
             border: 1px solid var(--pink-mid);
             color: var(--text);
-            font-size: 0.8rem;
+            font-size: 0.9rem;
             font-weight: 800;
         }
         .cart-status {
@@ -884,11 +939,12 @@
         @media (max-width: 760px) {
             .cart-showcase {
                 grid-template-columns: 1fr;
-                padding: 20px;
+                padding: 36px;
+                margin: 34px -12px 10px;
             }
             .cart-art {
                 order: -1;
-                width: min(100%, 260px);
+                width: min(100%, 320px);
             }
         }
 
@@ -899,6 +955,141 @@
     </style>
 </head>
 <body th:attr="data-logged-in=${session.userId != null}">
+
+<!-- HOLIDAY MARQUEE BAR -->
+<div class="holiday-bar" id="holidayBar">
+    <div class="marquee-wrapper">
+        <div class="marquee-content" id="holidayContent"></div>
+    </div>
+</div>
+
+<script>
+(function() {
+    // Danh sách các ngày lễ Việt Nam năm 2026 (đã tính sẵn)
+    const holidays2026 = [
+        // Dương lịch
+        { date: "2026-01-01", name: "Tết Dương Lịch", icon: "🎆", type: "dl" },
+        { date: "2026-02-14", name: "Lễ Valentine", icon: "💕", type: "dl" },
+        { date: "2026-03-08", name: "Ngày Quốc Tế Phụ Nữ", icon: "🌸", type: "dl" },
+        { date: "2026-04-26", name: "Giỗ Tổ Hùng Vương", icon: "🏮", type: "dl" },
+        { date: "2026-04-30", name: "Ngày Giải Phóng Miền Nam", icon: "🚩", type: "dl" },
+        { date: "2026-05-01", name: "Ngày Quốc Tế Lao Động", icon: "👑", type: "dl" },
+        { date: "2026-09-02", name: "Quốc Khánh Việt Nam", icon: "🇻🇳", type: "dl" },
+        { date: "2026-10-20", name: "Ngày Phụ Nữ Việt Nam", icon: "🌷", type: "dl" },
+        { date: "2026-10-31", name: "Halloween", icon: "🎃", type: "dl" },
+        { date: "2026-11-20", name: "Ngày Nhà Giáo Việt Nam", icon: "👨‍🏫", type: "dl" },
+        { date: "2026-12-25", name: "Giáng Sinh", icon: "🎄", type: "dl" },
+        { date: "2026-12-31", name: "Giao Thừa Năm Mới", icon: "🎉", type: "dl" },
+        // Âm lịch 2026
+        { date: "2026-02-17", name: "Đêm Giao Thừa Tết Nguyên Đán", icon: "🧧", type: "al", lunarNote: "29 Tết" },
+        { date: "2026-02-18", name: "Tết Nguyên Đán 2026", icon: "🧧", type: "al", lunarNote: "Mùng 1 Tết" },
+        { date: "2026-02-19", name: "Mùng 2 Tết Nguyên Đán", icon: "🧧", type: "al", lunarNote: "Mùng 2 Tết" },
+        { date: "2026-02-20", name: "Mùng 3 Tết Nguyên Đán", icon: "🧧", type: "al", lunarNote: "Mùng 3 Tết" },
+        { date: "2026-02-21", name: "Mùng 4 Tết Nguyên Đán", icon: "🧧", type: "al", lunarNote: "Mùng 4 Tết" },
+        { date: "2026-02-22", name: "Mùng 5 Tết Nguyên Đán", icon: "🧧", type: "al", lunarNote: "Mùng 5 Tết" },
+        { date: "2026-02-23", name: "Haitreo - Ngày Tao Quân", icon: "🏮", type: "al", lunarNote: "Mùng 7 Tết" },
+        { date: "2026-02-24", name: "Đại Lợi - Ngày Nhà Nông", icon: "🌾", type: "al", lunarNote: "Mùng 8 Tết" },
+        { date: "2026-03-03", name: "Tết Nguyên Tiêu", icon: "🌕", type: "al", lunarNote: "15/01 ÂL" },
+        { date: "2026-04-08", name: "Giỗ Tổ Hùng Vương", icon: "🏔️", type: "al", lunarNote: "10/03 ÂL" },
+        { date: "2026-08-02", name: "Lễ Vu Lan", icon: "👻", type: "al", lunarNote: "15/07 ÂL" },
+        { date: "2026-09-25", name: "Tết Trung Thu", icon: "🐉", type: "al", lunarNote: "15/08 ÂL" },
+        { date: "2026-10-24", name: "Lễ Hiếu Hỷ", icon: "🎊", type: "al", lunarNote: "09/09 ÂL" },
+    ];
+
+    function getUpcomingHolidays(daysAhead = 14) {
+        const today = new Date();
+        today.setHours(0, 0, 0, 0);
+        
+        const upcoming = [];
+        const past = [];
+        
+        holidays2026.forEach(holiday => {
+            const holidayDate = new Date(holiday.date);
+            holidayDate.setHours(0, 0, 0, 0);
+            
+            const diffTime = holidayDate.getTime() - today.getTime();
+            const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+            
+            if (diffDays >= 0 && diffDays <= daysAhead) {
+                upcoming.push({ ...holiday, daysAway: diffDays });
+            } else if (diffDays < 0 && diffDays >= -3) {
+                // Hiển thị ngày lễ vừa qua (trong 3 ngày)
+                past.push({ ...holiday, daysAgo: Math.abs(diffDays) });
+            }
+        });
+        
+        // Sắp xếp: ngày lễ hiện tại/trước, rồi sắp tới
+        upcoming.sort((a, b) => a.daysAway - b.daysAway);
+        past.sort((a, b) => a.daysAgo - b.daysAgo);
+        
+        return { upcoming, past };
+    }
+
+    function formatDate(dateStr) {
+        const date = new Date(dateStr);
+        const day = date.getDate().toString().padStart(2, '0');
+        const month = (date.getMonth() + 1).toString().padStart(2, '0');
+        return `${day}/${month}`;
+    }
+
+    function renderHolidayBar() {
+        const { upcoming, past } = getUpcomingHolidays(14);
+        const content = document.getElementById('holidayContent');
+        
+        let html = '';
+        
+        // Kiểm tra có ngày lễ nào không
+        if (upcoming.length === 0 && past.length === 0) {
+            html = `
+                <span class="holiday-item">
+                    <span class="holiday-icon">📅</span>
+                    <span class="holiday-name">Không có ngày lễ lớn nào hôm nay - Chúc bạn một ngày tốt lành!</span>
+                </span>
+            `;
+            content.innerHTML = html + html;
+            return;
+        }
+        
+        // Hiển thị ngày lễ đang diễn ra hoặc vừa qua
+        past.forEach(h => {
+            const dateDisplay = h.lunarNote || formatDate(h.date);
+            const isToday = h.daysAgo === 0;
+            const noteText = h.lunarNote ? `<span class="holiday-note">(${h.lunarNote})</span>` : '';
+            html += `
+                <span class="holiday-item ${isToday ? 'today-highlight' : ''}">
+                    <span class="holiday-icon">${h.icon}</span>
+                    <span class="holiday-date">${dateDisplay}</span>
+                    <span class="holiday-name">${isToday ? '🎉 HÔM NAY: ' : '🔔 Vừa qua: '}${h.name}</span>
+                    ${noteText}
+                </span>
+                <span class="holiday-divider">•</span>
+            `;
+        });
+        
+        // Hiển thị các ngày lễ sắp tới
+        upcoming.forEach(h => {
+            const dateDisplay = h.lunarNote || formatDate(h.date);
+            const isSoon = h.daysAway <= 3;
+            const noteText = h.lunarNote ? `<span class="holiday-note">(${h.lunarNote})</span>` : '';
+            html += `
+                <span class="holiday-item ${isSoon ? 'soon-highlight' : ''}">
+                    <span class="holiday-icon">${h.icon}</span>
+                    <span class="holiday-date">${dateDisplay}</span>
+                    <span class="holiday-name">${h.name}</span>
+                    ${noteText}
+                    ${h.daysAway === 0 ? '✨' : `<span class="holiday-note">(${h.daysAway} ngày)</span>`}
+                </span>
+                <span class="holiday-divider">•</span>
+            `;
+        });
+        
+        // Duplicate cho loop mượt
+        content.innerHTML = html + html;
+    }
+
+    renderHolidayBar();
+})();
+</script>
 
 <!-- PETALS -->
 <div class="petals" aria-hidden="true">
@@ -1073,11 +1264,6 @@
     </div>
 
 </main>
-
-<!-- FAB -->
-<a class="chat-fab" href="https://www.facebook.com/utaitejapan?locale=vi_VN" target="_blank">
-     Chat Facebook ngay
-</a>
 
 <script th:inline="javascript">
     const accountData = /*[[${accountJson}]]*/ {};
@@ -1340,7 +1526,328 @@
 }
 .footer-bottom p { color: #64748b; font-size: 0.85rem; margin-bottom: 5px; }
 .footer-bottom .footer-note { color: #475569; font-size: 0.8rem; }
+
+/* ===== CHAT WIDGET ===== */
+.chat-fab {
+    position: fixed;
+    bottom: 100px;
+    right: 32px;
+    width: 60px;
+    height: 60px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, #f472b6, #a855f7);
+    border: none;
+    cursor: pointer;
+    box-shadow: 0 4px 20px rgba(244,114,182,0.4);
+    z-index: 9999;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.5rem;
+    transition: transform 0.3s, box-shadow 0.3s;
+}
+.chat-fab:hover {
+    transform: scale(1.1);
+    box-shadow: 0 6px 28px rgba(244,114,182,0.5);
+}
+
+.chat-window {
+    position: fixed;
+    bottom: 180px;
+    right: 32px;
+    width: 380px;
+    height: 520px;
+    background: #fff;
+    border-radius: 20px;
+    box-shadow: 0 10px 50px rgba(0,0,0,0.2);
+    z-index: 9999;
+    display: none;
+    flex-direction: column;
+    overflow: hidden;
+}
+.chat-window.open {
+    display: flex;
+    animation: slideUp 0.3s ease;
+}
+@keyframes slideUp {
+    from { opacity: 0; transform: translateY(20px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+.chat-header {
+    background: linear-gradient(135deg, #f472b6, #a855f7);
+    color: white;
+    padding: 16px 20px;
+    font-weight: 700;
+    font-size: 1rem;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+.chat-close {
+    background: none;
+    border: none;
+    color: white;
+    font-size: 1.2rem;
+    cursor: pointer;
+    padding: 4px 8px;
+}
+.chat-close:hover { opacity: 0.8; }
+
+.chat-messages {
+    flex: 1;
+    overflow-y: auto;
+    padding: 16px;
+    background: #f8fafc;
+}
+.chat-msg {
+    margin-bottom: 12px;
+    display: flex;
+    flex-direction: column;
+}
+.chat-msg.user { align-items: flex-end; }
+.chat-msg.admin { align-items: flex-start; }
+.chat-bubble {
+    max-width: 80%;
+    padding: 10px 14px;
+    border-radius: 16px;
+    font-size: 0.9rem;
+    line-height: 1.4;
+}
+.chat-msg.user .chat-bubble {
+    background: linear-gradient(135deg, #f472b6, #a855f7);
+    color: white;
+    border-bottom-right-radius: 4px;
+}
+.chat-msg.admin .chat-bubble {
+    background: white;
+    border: 1px solid #e2e8f0;
+    border-bottom-left-radius: 4px;
+}
+.chat-meta {
+    font-size: 0.7rem;
+    color: #94a3b8;
+    margin-top: 4px;
+    padding: 0 4px;
+}
+
+.chat-input-area {
+    padding: 12px 16px;
+    background: white;
+    border-top: 1px solid #e2e8f0;
+    display: flex;
+    gap: 8px;
+}
+.chat-input {
+    flex: 1;
+    border: 1px solid #e2e8f0;
+    border-radius: 24px;
+    padding: 10px 16px;
+    font-size: 0.9rem;
+    outline: none;
+}
+.chat-input:focus { border-color: #f472b6; }
+.chat-send-btn {
+    background: linear-gradient(135deg, #f472b6, #a855f7);
+    border: none;
+    color: white;
+    width: 42px;
+    height: 42px;
+    border-radius: 50%;
+    cursor: pointer;
+    font-size: 1rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+.chat-send-btn:hover { opacity: 0.9; }
+
+.chat-login-msg {
+    padding: 20px;
+    text-align: center;
+    background: #f8fafc;
+}
+.chat-login-msg p {
+    color: #6b7280;
+    margin: 0 0 12px;
+    font-size: 0.9rem;
+}
+.chat-login-btn {
+    background: linear-gradient(135deg, #f472b6, #a855f7);
+    color: white;
+    border: none;
+    padding: 10px 24px;
+    border-radius: 25px;
+    font-weight: 700;
+    font-size: 0.85rem;
+    cursor: pointer;
+    text-decoration: none;
+}
 </style>
+
+<!-- Chat Widget -->
+<button class="chat-fab" id="chatBtn">💬</button>
+<div class="chat-window" id="chatWindow">
+    <div class="chat-header">
+        <span>💬 Chat hỗ trợ</span>
+        <button class="chat-close" id="chatClose">✕</button>
+    </div>
+    <div class="chat-messages" id="chatMessages">
+        <div class="chat-msg admin">
+            <div class="chat-bubble">Xin chào! Shop Acc Genshin có thể giúp gì cho bạn?</div>
+            <div class="chat-meta">Hỗ trợ • vừa xong</div>
+        </div>
+    </div>
+    <div class="chat-input-area" id="chatInputArea">
+        <input type="text" class="chat-input" id="chatInput" placeholder="Nhập tin nhắn..." autocomplete="off">
+        <button class="chat-send-btn" id="chatSend">➤</button>
+    </div>
+    <div class="chat-login-msg" id="chatLoginMsg" style="display:none;">
+        <p>Vui lòng đăng nhập để chat với chúng tôi</p>
+        <a href="/auth/login" class="chat-login-btn">Đăng nhập ngay</a>
+    </div>
+</div>
+
+<script>
+// ===== USER CHAT WIDGET =====
+(function() {
+    let stompClient = null;
+    let currentUser = "";
+    let isLoggedIn = false;
+    let userSessionId = "";
+    
+    const chatBtn = document.getElementById('chatBtn');
+    const chatWindow = document.getElementById('chatWindow');
+    const chatClose = document.getElementById('chatClose');
+    const chatMessages = document.getElementById('chatMessages');
+    const chatInput = document.getElementById('chatInput');
+    const chatSend = document.getElementById('chatSend');
+    const chatInputArea = document.getElementById('chatInputArea');
+    const chatLoginMsg = document.getElementById('chatLoginMsg');
+    
+    // Toggle chat
+    chatBtn.addEventListener('click', function() {
+        chatWindow.classList.toggle('open');
+        if (chatWindow.classList.contains('open') && !stompClient) {
+            initChat();
+        }
+    });
+    
+    chatClose.addEventListener('click', function() {
+        chatWindow.classList.remove('open');
+    });
+    
+    // Send message
+    function doSend() {
+        const content = chatInput.value.trim();
+        if (!content || !isLoggedIn || !userSessionId) return;
+        
+        const msgData = {
+            sender: currentUser,
+            content: content,
+            sessionId: userSessionId
+        };
+        
+        fetch('/api/chat/send', {
+            method: 'POST',
+            headers: {'Content-Type': 'application/json'},
+            body: JSON.stringify(msgData)
+        }).then(r => r.json())
+          .then(data => {
+              // Thêm tin nhắn vào UI ngay lập tức
+              showMsg({...data, sender: currentUser});
+          }).catch(err => console.error('Send error:', err));
+        
+        chatInput.value = '';
+    }
+    
+    chatSend.addEventListener('click', doSend);
+    chatInput.addEventListener('keypress', function(e) {
+        if (e.key === 'Enter') doSend();
+    });
+    
+    // Hiển thị tin nhắn
+    function showMsg(data) {
+        const isOwn = data.sender === currentUser;
+        const isAdmin = data.role === 'ADMIN' || data.sender === 'Admin';
+        const div = document.createElement('div');
+        div.className = 'chat-msg ' + (isOwn ? 'user' : 'admin');
+        
+        // Chỉ hiển thị trạng thái khi là tin nhắn của admin và đã được xem
+        let metaHtml = (isAdmin ? 'Hỗ trợ' : data.sender) + ' • ' + (data.timestamp || '');
+        if (isAdmin && data.seen === true) {
+            metaHtml += ' <span style="color:#22c55e;font-size:0.65rem">✓ Đã xem</span>';
+        }
+        
+        div.innerHTML = '<div class="chat-bubble">' + escHtml(data.content) + '</div>' +
+                       '<div class="chat-meta">' + metaHtml + '</div>';
+        chatMessages.appendChild(div);
+        chatMessages.scrollTop = chatMessages.scrollHeight;
+    }
+    
+    function escHtml(text) {
+        const d = document.createElement('div');
+        d.textContent = text;
+        return d.innerHTML;
+    }
+    
+    // Khởi tạo chat
+    function initChat() {
+        fetch('/api/chat/check-login')
+            .then(r => r.json())
+            .then(data => {
+                isLoggedIn = data.loggedIn || false;
+                currentUser = data.username || "Khách";
+                
+                if (!isLoggedIn) {
+                    chatInputArea.style.display = 'none';
+                    chatLoginMsg.style.display = 'block';
+                    return;
+                }
+                
+                chatInputArea.style.display = 'flex';
+                chatLoginMsg.style.display = 'none';
+                
+                // Luôn dùng username làm sessionId để đảm bảo trùng khớp với admin
+                userSessionId = currentUser;
+                
+                // Load lịch sử tin nhắn
+                loadHistory();
+            });
+    }
+    
+    // Load lịch sử tin nhắn - CHỈ lấy tin nhắn của user hiện tại
+    function loadHistory() {
+        if (!userSessionId) return;
+        
+        // Lấy tin nhắn theo sender = username (của user)
+        fetch('/api/chat/user/conversation?sessionId=' + encodeURIComponent(userSessionId))
+            .then(r => r.json())
+            .then(msgs => {
+                chatMessages.innerHTML = '';
+                if (msgs && msgs.length > 0) {
+                    msgs.forEach(m => showMsg(m));
+                } else {
+                    // Hiển thị tin nhắn chào mừng
+                    chatMessages.innerHTML = `
+                        <div class="chat-msg admin">
+                            <div class="chat-bubble">Xin chào ${currentUser}! Shop Acc Genshin có thể giúp gì cho bạn?</div>
+                            <div class="chat-meta">Hỗ trợ • vừa xong</div>
+                        </div>
+                    `;
+                }
+            })
+            .catch(err => console.error('Load history error:', err));
+    }
+    
+    // Poll tin nhắn mới mỗi 3 giây
+    setInterval(function() {
+        if (chatWindow.classList.contains('open') && isLoggedIn && userSessionId) {
+            loadHistory();
+        }
+    }, 3000);
+})();
+</script>
 
 </body>
 </html>

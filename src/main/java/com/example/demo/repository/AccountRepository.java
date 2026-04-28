@@ -3,7 +3,9 @@ package com.example.demo.repository;
 import com.example.demo.entity.Account;
 import com.example.demo.entity.Enum.Role;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
 
 public interface AccountRepository extends JpaRepository<Account, Long> {
     Account findAccountByUsername(String username);
@@ -19,6 +21,10 @@ public interface AccountRepository extends JpaRepository<Account, Long> {
     long countByRole(Role role);
 
     long countByCreatedAtAfter(java.util.Date from);
+
+    @Modifying(clearAutomatically = true)
+    @Query("UPDATE Account a SET a.wallet = a.wallet + :amount WHERE a.username = :username")
+    int addToWallet(@Param("username") String username, @Param("amount") double amount);
 
     @Query(value = """
         SELECT a.* FROM account a

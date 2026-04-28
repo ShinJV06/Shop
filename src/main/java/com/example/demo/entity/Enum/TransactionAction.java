@@ -10,5 +10,6 @@ public enum TransactionAction {
     USER_UNLOCKED,
     PASSWORD_RESET_BY_ADMIN,
     USER_ROLE_CHANGED,
-    DEPOSIT
+    DEPOSIT,
+    PURCHASE
 }

@@ -62,6 +62,11 @@ public class InventoryItem {
     @Column(name = "submitted_by_id")
     private Long submittedById;
 
+    @Column(name = "buyer_id")
+    private Long buyerId;
+
+    private Date soldAt;
+
     /** Ảnh minh hoạ acc (upload CTV / admin); có thể null với dữ liệu cũ — UI fallback ảnh gói. */
     @Column(length = 500)
     private String listingImagePath;

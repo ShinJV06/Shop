@@ -1,0 +1,186 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title th:text="${subject}">Email</title>
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #f4f4f4;
+        }
+        .email-container {
+            max-width: 600px;
+            margin: 20px auto;
+            background: #ffffff;
+            border-radius: 12px;
+            overflow: hidden;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.1);
+        }
+        .email-header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 30px;
+            text-align: center;
+        }
+        .email-header h1 {
+            margin: 0;
+            font-size: 24px;
+            font-weight: 600;
+        }
+        .email-body {
+            padding: 30px;
+            color: #333333;
+        }
+        .email-body h2 {
+            color: #667eea;
+            margin-top: 0;
+        }
+        .order-summary {
+            background: #f8f9fa;
+            border-radius: 8px;
+            padding: 20px;
+            margin: 20px 0;
+        }
+        .order-item {
+            display: flex;
+            justify-content: space-between;
+            padding: 10px 0;
+            border-bottom: 1px solid #e9ecef;
+        }
+        .order-item:last-child {
+            border-bottom: none;
+        }
+        .order-total {
+            display: flex;
+            justify-content: space-between;
+            font-weight: bold;
+            font-size: 18px;
+            color: #667eea;
+            margin-top: 15px;
+            padding-top: 15px;
+            border-top: 2px solid #667eea;
+        }
+        .credentials-box {
+            background: #2d3748;
+            color: #48bb78;
+            padding: 20px;
+            border-radius: 8px;
+            font-family: 'Courier New', monospace;
+            margin: 20px 0;
+            word-break: break-all;
+        }
+        .credentials-box .label {
+            color: #a0aec0;
+            font-family: 'Segoe UI', sans-serif;
+            font-size: 12px;
+            margin-bottom: 8px;
+        }
+        .btn {
+            display: inline-block;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 12px 30px;
+            text-decoration: none;
+            border-radius: 6px;
+            font-weight: 600;
+            margin: 10px 5px;
+        }
+        .btn-secondary {
+            background: #e2e8f0;
+            color: #4a5568;
+        }
+        .email-footer {
+            background: #f8f9fa;
+            padding: 20px;
+            text-align: center;
+            color: #718096;
+            font-size: 12px;
+        }
+        .status-badge {
+            display: inline-block;
+            padding: 6px 16px;
+            border-radius: 20px;
+            font-weight: 600;
+            font-size: 14px;
+        }
+        .status-pending { background: #f6e05e; color: #744210; }
+        .status-paid { background: #48bb78; color: white; }
+        .status-refunded { background: #fc8181; color: white; }
+        .warning-box {
+            background: #fffaf0;
+            border-left: 4px solid #ed8936;
+            padding: 15px;
+            margin: 20px 0;
+        }
+        .highlight {
+            color: #667eea;
+            font-weight: 600;
+        }
+        ul {
+            line-height: 1.8;
+            padding-left: 20px;
+        }
+        li {
+            margin: 5px 0;
+        }
+    </style>
+</head>
+<body>
+    <div class="email-container">
+        <div class="email-header">
+            <h1> Genshin Cute Shop</h1>
+        </div>
+        <div class="email-body">
+            <h2> Chào mừng đến với Genshin Cute Shop!</h2>
+            <p>Xin chào <strong th:text="${username}">User</strong>,</p>
+            
+            <p>Cảm ơn bạn đã đăng ký tài khoản tại <strong>Genshin Cute Shop</strong> - nơi mua bán tài khoản game uy tín hàng đầu!</p>
+            
+            <div class="order-summary">
+                <p><strong>👤 Tên đăng nhập:</strong> <span th:text="${username}">username</span></p>
+                <p><strong>📧 Email:</strong> <span th:text="${email}">email@example.com</span></p>
+                <p><strong>📅 Ngày đăng ký:</strong> <span th:text="${createdAt}">01/01/2026</span></p>
+            </div>
+            
+            <h3>🎁 Ưu đãi dành cho bạn</h3>
+            <ul>
+                <li>✅ <strong>Tài khoản game chính hãng</strong> - 100% an toàn, bảo mật</li>
+                <li>✅ <strong>Bảo hành 7 ngày</strong> - Hoàn tiền nếu acc có vấn đề</li>
+                <li>✅ <strong>Hỗ trợ 24/7</strong> - Luôn sẵn sàng giải đáp thắc mắc</li>
+                <li>✅ <strong>Nạp tiền dễ dàng</strong> - Ví điện tử, ngân hàng, MoMo, ZaloPay</li>
+            </ul>
+            
+            <h3>🚀 Bắt đầu ngay</h3>
+            <p>Khám phá các tài khoản game hot:</p>
+            <ul>
+                <li>🎮 <strong>Genshin Impact</strong> - AR60, nhiều nhân vật 5 sao</li>
+                <li>⚔️ <strong>Liên Quân Mobile</strong> - Rank cao, tướng đầy đủ</li>
+                <li>🌟 <strong>Honkai: Star Rail</strong> - Account full 5 sao</li>
+                <li>🎯 <strong>Ngộ Đắc Cốc</strong> - Server Việt, Hàn, Nhật</li>
+            </ul>
+            
+            <div class="warning-box">
+                <strong>🔐 Bước tiếp theo:</strong>
+                <p style="margin: 10px 0 0 0;">Vui lòng đăng nhập và <span class="highlight">đổi mật khẩu ngay</span> để bảo mật tài khoản của bạn.</p>
+            </div>
+            
+            <p style="text-align: center; margin-top: 30px;">
+                <a th:href="${loginUrl}" class="btn">Đăng nhập ngay</a>
+                <a th:href="${shopUrl}" class="btn btn-secondary">Khám phá shop</a>
+            </p>
+            
+            <p style="margin-top: 30px; color: #718096; font-size: 13px;">
+                Nếu bạn có bất kỳ câu hỏi nào, đừng ngần ngại liên hệ với chúng tôi qua email hoặc hotline.
+            </p>
+        </div>
+        <div class="email-footer">
+            <p>Email này được gửi tự động từ Genshin Cute Shop</p>
+            <p>Nếu bạn có câu hỏi, vui lòng liên hệ bộ phận hỗ trợ.</p>
+            <p>© 2026 Genshin Cute Shop. All rights reserved.</p>
+        </div>
+    </div>
+</body>
+</html>

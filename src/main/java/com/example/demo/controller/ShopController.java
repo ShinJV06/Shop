@@ -6,12 +6,14 @@ import com.example.demo.entity.Enum.ModerationStatus;
 import com.example.demo.entity.Enum.OrderStatus;
 import com.example.demo.entity.Game;
 import com.example.demo.entity.InventoryItem;
+import com.example.demo.entity.MysteryBag;
 import com.example.demo.entity.Product;
 import com.example.demo.entity.ShopOrder;
 import com.example.demo.model.AddToCartRequest;
 import com.example.demo.repository.AccountRepository;
 import com.example.demo.repository.GameRepository;
 import com.example.demo.repository.InventoryItemRepository;
+import com.example.demo.repository.MysteryBagRepository;
 import com.example.demo.repository.ProductRepository;
 import com.example.demo.repository.ShopOrderRepository;
 import com.example.demo.repository.TransactionLogEntryRepository;
@@ -64,6 +66,9 @@ public class ShopController {
 
     @Autowired
     private GameService gameService;
+
+    @Autowired
+    private MysteryBagRepository mysteryBagRepository;
 
     @GetMapping("/")
     public String homePage(Model model, HttpSession session) {
@@ -218,6 +223,7 @@ public class ShopController {
             if (accountOpt.isPresent()) {
                 double balance = accountOpt.get().getWallet();
                 model.addAttribute("walletBalance", shopCatalogService.formatPrice(Math.max(0, balance)));
+                session.setAttribute("wallet", shopCatalogService.formatPrice(Math.max(0, balance)));
             }
         }
         if (userId != null && !"ADMIN".equals(role)) {
@@ -305,6 +311,30 @@ public class ShopController {
         Map<String, Object> summary = buildCartSummary(session);
         summary.put("message", "Đã thêm " + product.getName() + " vào giỏ hàng.");
         return ResponseEntity.ok(summary);
+    }
+
+    @GetMapping("/minigame")
+    public String minigamePage() {
+        return "minigame.html";
+    }
+
+    // DEBUG: Test mystery bag API directly
+    @GetMapping("/debug/mystery-bags")
+    @ResponseBody
+    public ResponseEntity<?> debugMysteryBags() {
+        try {
+            var bags = mysteryBagRepository.findAllActive();
+            return ResponseEntity.ok(Map.of(
+                "success", true,
+                "count", bags.size(),
+                "bags", bags
+            ));
+        } catch (Exception e) {
+            return ResponseEntity.ok(Map.of(
+                "success", false,
+                "error", e.getMessage()
+            ));
+        }
     }
 
     @PostMapping("/cart/buy-now")

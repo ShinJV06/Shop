@@ -2,6 +2,7 @@ package com.example.demo.service;
 
 import com.example.demo.entity.Account;
 import com.example.demo.entity.Enum.Role;
+import com.example.demo.event.WelcomeAccountEvent;
 import com.example.demo.exception.AccountNotFoundException;
 import com.example.demo.exception.DuplicateEntity;
 import com.example.demo.model.AccountResponse;
@@ -11,10 +12,12 @@ import com.example.demo.model.RegisterRequest;
 import com.example.demo.model.ResetPasswordRequest;
 import com.example.demo.repository.AccountRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.mail.SimpleMailMessage;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Date;
 import java.util.UUID;
@@ -33,6 +36,10 @@ public class AuthenticationService {
     @Autowired
     private JavaMailSender mailSender;
 
+    @Autowired
+    private ApplicationEventPublisher eventPublisher;
+
+    @Transactional
     public AccountResponse register(RegisterRequest request) {
         if (accountRepository.findAccountByUsername(request.getUsername()) != null) {
             throw new DuplicateEntity("Username already exists");
@@ -51,6 +58,10 @@ public class AuthenticationService {
         account.setCreatedAt(new Date());
 
         Account savedAccount = accountRepository.save(account);
+
+        // Publish event to send welcome email asynchronously
+        eventPublisher.publishEvent(new WelcomeAccountEvent(savedAccount));
+
         String token = tokenService.generateToken(savedAccount);
         return toAccountResponse(savedAccount, token);
     }
@@ -115,8 +126,17 @@ public class AuthenticationService {
     private void sendResetEmail(String email, String resetToken) {
         SimpleMailMessage message = new SimpleMailMessage();
         message.setTo(email);
-        message.setSubject("Password reset");
-        message.setText("Your reset password token is: " + resetToken + "\nToken will expire in 15 minutes.");
+        message.setSubject("[Genshin Cute Shop] Quên mật khẩu - Mã xác nhận: " + resetToken);
+        message.setText(
+            "========================================\n" +
+            "     YÊU CẦU ĐẶT LẠI MẬT KHẨU\n" +
+            "========================================\n\n" +
+            "Mã xác nhận của bạn: " + resetToken + "\n\n" +
+            "Mã sẽ hết hạn sau 15 phút.\n\n" +
+            "Nếu bạn không yêu cầu đặt lại mật khẩu, vui lòng bỏ qua email này.\n\n" +
+            "========================================\n" +
+            "Genshin Cute Shop\n"
+        );
         mailSender.send(message);
     }
 

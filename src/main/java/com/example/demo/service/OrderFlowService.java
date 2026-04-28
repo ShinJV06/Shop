@@ -34,6 +34,9 @@ public class OrderFlowService {
     @Autowired
     private AccountRepository accountRepository;
 
+    @Autowired
+    private NotificationService notificationService;
+
     @Transactional
     public ShopOrder createOrderFromSlugs(Long buyerId, Collection<String> productSlugs, String paymentMethod) {
         if (productSlugs == null || productSlugs.isEmpty()) {
@@ -62,6 +65,9 @@ public class OrderFlowService {
         order.setTotalAmount(total);
         ShopOrder saved = shopOrderRepository.save(order);
         log(saved.getId(), buyerId, TransactionAction.ORDER_CREATED, "Tạo đơn #" + saved.getId() + ", tổng " + total + ", TT: " + paymentMethod);
+
+        // Gửi notification đơn hàng mới
+        notificationService.notifyOrderCreated(saved);
 
         // Thanh toán ví → trừ tiền, giao acc luôn
         if ("WALLET".equals(paymentMethod)) {
@@ -102,43 +108,55 @@ public class OrderFlowService {
             saved.setPaidAt(now);
             shopOrderRepository.save(saved);
             log(saved.getId(), buyerId, TransactionAction.PAYMENT_CONFIRMED, "Thanh toán ví tự động, đã gán acc.");
+
+            // Gửi notification thanh toán thành công
+            notificationService.notifyOrderPaid(saved);
         }
         return saved;
     }
 
     @Transactional
     public void confirmPayment(Long orderId, Long adminId) {
+        confirmPaymentForGateway(orderId, "ADMIN", null);
+    }
+
+    @Transactional
+    public void confirmPaymentForGateway(Long orderId, String paymentMethod, String transactionNo) {
         ShopOrder order = shopOrderRepository.findById(orderId)
                 .orElseThrow(() -> new IllegalArgumentException("Không tìm thấy đơn."));
-        if (order.getStatus() != OrderStatus.PENDING_PAYMENT) {
+        
+        if (order.getStatus() == OrderStatus.PAID) {
+            return;
+        }
+        
+        if (order.getStatus() != OrderStatus.PENDING_PAYMENT && 
+            order.getStatus() != OrderStatus.PENDING_VNPAY && 
+            order.getStatus() != OrderStatus.PENDING_MOMO) {
             throw new IllegalStateException("Đơn không ở trạng thái chờ thanh toán.");
         }
+        
         Account buyer = accountRepository.findAccountById(order.getBuyerId());
         if (buyer == null) {
             throw new IllegalStateException("Không tìm thấy tài khoản người mua.");
         }
 
-        // WALLET: trừ tiền từ ví người mua ngay
-        if ("WALLET".equals(order.getPaymentMethod())) {
-            if (buyer.getWallet() < order.getTotalAmount()) {
-                throw new IllegalStateException("Số dư ví không đủ! Số dư hiện tại: " + (long)buyer.getWallet() + "đ, cần: " + order.getTotalAmount() + "đ");
-            }
-            buyer.setWallet(buyer.getWallet() - order.getTotalAmount());
-            accountRepository.save(buyer);
-            TransactionLogEntry walletLog = new TransactionLogEntry();
-            walletLog.setOrderId(orderId);
-            walletLog.setActorAccountId(order.getBuyerId());
-            walletLog.setAction(TransactionAction.PAYMENT_CONFIRMED);
-            walletLog.setType("PAYMENT");
-            walletLog.setAmount((double) -order.getTotalAmount());
-            walletLog.setDetail("Thanh toán đơn #" + orderId + " bằng ví, trừ " + order.getTotalAmount() + "đ");
-            transactionLogEntryRepository.save(walletLog);
-        }
-        // BANK: đơn đã chuyển khoản, admin xác nhận là đã nhận tiền
+        // Lưu thông tin giao dịch
+        order.setPaymentMethod(paymentMethod);
+        order.setTransactionNo(transactionNo);
+
+        // Ghi log thanh toán
+        TransactionLogEntry paymentLog = new TransactionLogEntry();
+        paymentLog.setOrderId(orderId);
+        paymentLog.setActorAccountId(order.getBuyerId());
+        paymentLog.setAction(TransactionAction.PAYMENT_CONFIRMED);
+        paymentLog.setType("PAYMENT");
+        paymentLog.setAmount((double) order.getTotalAmount());
+        paymentLog.setDetail("Thanh toán đơn #" + orderId + " qua " + paymentMethod + 
+                (transactionNo != null ? ", txn: " + transactionNo : ""));
+        transactionLogEntryRepository.save(paymentLog);
 
         Date now = new Date();
         for (OrderLine line : order.getLines()) {
-            // TEST: tạm bỏ kiểm tra tồn kho để test thanh toán
             Optional<InventoryItem> pickOpt = inventoryItemRepository
                     .pickRandomAvailable(line.getProduct().getId());
             if (pickOpt.isPresent()) {
@@ -154,7 +172,10 @@ public class OrderFlowService {
         order.setStatus(OrderStatus.PAID);
         order.setPaidAt(now);
         shopOrderRepository.save(order);
-        log(orderId, adminId, TransactionAction.PAYMENT_CONFIRMED, "Admin xác nhận thanh toán, đã gán acc ngẫu nhiên.");
+        log(orderId, order.getBuyerId(), TransactionAction.PAYMENT_CONFIRMED, 
+                "Xác nhận thanh toán qua " + paymentMethod + ", đã gán acc ngẫu nhiên.");
+
+        notificationService.notifyOrderPaid(order);
     }
 
     @Transactional
@@ -196,6 +217,9 @@ public class OrderFlowService {
         order.setPaidAt(null);
         shopOrderRepository.save(order);
         log(orderId, adminId, TransactionAction.REFUNDED, "Hoàn tiền / hủy giao acc.");
+
+        // Gửi notification hoàn tiền
+        notificationService.notifyOrderRefunded(order);
     }
 
     public List<TransactionLogEntry> logsForOrder(Long orderId) {

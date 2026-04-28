@@ -1,0 +1,1921 @@
+<!DOCTYPE html>
+<html lang="vi" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mini Game - Túi Mù &amp; Rương May Mắn - Gaming Zone</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;500;600;700;800;900&family=Rajdhani:wght@300;400;500;600;700&family=Exo+2:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    
+    <!-- Audio Elements -->
+    <audio id="bgMusic" loop preload="none">
+        <source th:src="@{/audio/Pokiwar Music.mp3}" type="audio/mpeg">
+    </audio>
+    <audio id="spinSound" preload="none">
+        <source th:src="@{/audio/spin.mp3}" type="audio/mpeg">
+    </audio>
+    <audio id="winSound" preload="none">
+        <source th:src="@{/audio/win.mp3}" type="audio/mpeg">
+    </audio>
+    <audio id="clickSound" preload="none">
+        <source th:src="@{/audio/click.mp3}" type="audio/mpeg">
+    </audio>
+    
+    <style>
+        *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+        :root {
+            --bg: #0a0a0f;
+            --bg-card: #12121a;
+            --bg-card-hover: #1a1a25;
+            --border: rgba(124, 58, 237, 0.2);
+            --border-glow: rgba(124, 58, 237, 0.5);
+            
+            --accent: #7c3aed;
+            --accent-light: #a78bfa;
+            --accent-dark: #5b21b6;
+            --gold: #fbbf24;
+            --gold-light: #fcd34d;
+            
+            --cyan: #00f5ff;
+            --purple: #bf5fff;
+            --pink: #ff2d7a;
+            --green: #00ff88;
+            --red: #ff3333;
+            
+            --text: #e8e8e8;
+            --text-muted: #8888aa;
+            --text-dim: #555577;
+        }
+
+        html { scroll-behavior: smooth; }
+
+        body {
+            font-family: 'Rajdhani', 'Exo 2', sans-serif;
+            background: var(--bg);
+            color: var(--text);
+            min-height: 100vh;
+            overflow-x: hidden;
+        }
+
+        /* ========== BACKGROUND EFFECTS ========== */
+        .bg-gaming {
+            position: fixed;
+            inset: 0;
+            z-index: -2;
+            background: 
+                radial-gradient(ellipse 100% 100% at 20% 0%, rgba(124, 58, 237, 0.1) 0%, transparent 50%),
+                radial-gradient(ellipse 80% 80% at 80% 20%, rgba(251, 191, 36, 0.05) 0%, transparent 50%),
+                radial-gradient(ellipse 60% 60% at 50% 90%, rgba(255, 45, 122, 0.05) 0%, transparent 50%),
+                linear-gradient(180deg, #0a0a0f 0%, #0d0d15 50%, #0a0a0f 100%);
+        }
+
+        .grid-lines {
+            position: fixed;
+            inset: 0;
+            z-index: -1;
+            background-image: 
+                linear-gradient(rgba(124, 58, 237, 0.03) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(124, 58, 237, 0.03) 1px, transparent 1px);
+            background-size: 60px 60px;
+            animation: gridMove 20s linear infinite;
+        }
+
+        @keyframes gridMove {
+            0% { transform: perspective(500px) rotateX(60deg) translateY(0); }
+            100% { transform: perspective(500px) rotateX(60deg) translateY(60px); }
+        }
+
+        .particles {
+            position: fixed;
+            inset: 0;
+            z-index: -1;
+            pointer-events: none;
+        }
+
+        .particle {
+            position: absolute;
+            width: 4px;
+            height: 4px;
+            background: var(--accent);
+            border-radius: 50%;
+            box-shadow: 0 0 10px var(--accent), 0 0 20px var(--accent);
+            animation: float 15s ease-in-out infinite;
+        }
+
+        .particle:nth-child(2) { left: 20%; top: 30%; background: var(--gold); box-shadow: 0 0 10px var(--gold), 0 0 20px var(--gold); animation-delay: -3s; }
+        .particle:nth-child(3) { left: 70%; top: 20%; background: var(--pink); box-shadow: 0 0 10px var(--pink), 0 0 20px var(--pink); animation-delay: -5s; }
+        .particle:nth-child(4) { left: 40%; top: 60%; animation-delay: -8s; }
+        .particle:nth-child(5) { left: 85%; top: 70%; background: var(--green); box-shadow: 0 0 10px var(--green), 0 0 20px var(--green); animation-delay: -2s; }
+        .particle:nth-child(6) { left: 15%; top: 80%; background: var(--accent); box-shadow: 0 0 10px var(--accent); animation-delay: -10s; }
+
+        @keyframes float {
+            0%, 100% { transform: translate(0, 0) scale(1); opacity: 0.6; }
+            25% { transform: translate(50px, -30px) scale(1.2); opacity: 1; }
+            50% { transform: translate(-20px, -60px) scale(0.8); opacity: 0.4; }
+            75% { transform: translate(30px, -20px) scale(1.1); opacity: 0.8; }
+        }
+
+        /* ========== TOAST NOTIFICATIONS ========== */
+        .toast-container {
+            position: fixed;
+            top: 90px;
+            right: 20px;
+            z-index: 9999;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            pointer-events: none;
+        }
+
+        .toast {
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            padding: 14px 20px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.4), 0 0 20px rgba(124, 58, 237, 0.2);
+            animation: toastIn 0.4s ease forwards;
+            pointer-events: auto;
+            max-width: 320px;
+        }
+
+        .toast.success { border-color: var(--green); }
+        .toast.error { border-color: var(--red); }
+        .toast.warning { border-color: var(--gold); }
+
+        .toast-icon { font-size: 1.3rem; }
+        .toast.success .toast-icon { color: var(--green); }
+        .toast.error .toast-icon { color: var(--red); }
+        .toast.warning .toast-icon { color: var(--gold); }
+
+        .toast-message {
+            font-size: 0.9rem;
+            font-weight: 600;
+            color: var(--text);
+            line-height: 1.4;
+        }
+
+        .toast-close {
+            background: none;
+            border: none;
+            color: var(--text-muted);
+            cursor: pointer;
+            font-size: 1.1rem;
+            padding: 4px;
+            margin-left: auto;
+            transition: color 0.2s;
+        }
+
+        .toast-close:hover { color: var(--text); }
+
+        @keyframes toastIn {
+            from { transform: translateX(100%); opacity: 0; }
+            to { transform: translateX(0); opacity: 1; }
+        }
+
+        @keyframes toastOut {
+            from { transform: translateX(0); opacity: 1; }
+            to { transform: translateX(100%); opacity: 0; }
+        }
+
+        /* ========== HEADER ========== */
+        .header {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            z-index: 100;
+            padding: 0 48px;
+            height: 72px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            background: rgba(10, 10, 15, 0.95);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border-bottom: 1px solid var(--border);
+            box-shadow: 0 4px 30px rgba(124, 58, 237, 0.1);
+        }
+
+        .header::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            height: 2px;
+            background: linear-gradient(90deg, transparent, var(--accent), var(--gold), var(--accent), transparent);
+            opacity: 0.6;
+        }
+
+        .brand {
+            display: flex;
+            align-items: center;
+            gap: 14px;
+            text-decoration: none;
+            font-family: 'Orbitron', sans-serif;
+            font-size: 1.3rem;
+            font-weight: 700;
+            color: var(--accent-light);
+            text-shadow: 0 0 20px var(--accent);
+            transition: all 0.3s ease;
+        }
+
+        .brand:hover {
+            text-shadow: 0 0 30px var(--accent), 0 0 60px var(--accent);
+            transform: scale(1.02);
+        }
+
+        .brand-icon {
+            width: 46px;
+            height: 46px;
+            background: linear-gradient(135deg, var(--accent-dark), var(--accent));
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.4rem;
+            box-shadow: 0 0 30px rgba(124, 58, 237, 0.4);
+            position: relative;
+            transition: all 0.3s ease;
+        }
+        
+        .brand:hover .brand-icon {
+            box-shadow: 0 0 40px rgba(124, 58, 237, 0.6);
+            transform: scale(1.05);
+        }
+
+        .brand-icon::before {
+            content: '';
+            position: absolute;
+            inset: -2px;
+            border-radius: 14px;
+            background: linear-gradient(135deg, var(--accent), var(--gold));
+            z-index: -1;
+            animation: iconPulse 2s ease-in-out infinite;
+        }
+
+        @keyframes iconPulse {
+            0%, 100% { opacity: 0.5; }
+            50% { opacity: 1; }
+        }
+
+        .nav {
+            display: flex;
+            align-items: center;
+            gap: 4px;
+        }
+
+        .nav a {
+            text-decoration: none;
+            color: var(--text-muted);
+            font-size: 0.95rem;
+            font-weight: 600;
+            padding: 10px 18px;
+            border-radius: 8px;
+            transition: all 0.3s ease;
+            position: relative;
+        }
+
+        .nav a:hover {
+            color: var(--accent-light);
+            background: rgba(124, 58, 237, 0.1);
+        }
+
+        .nav .active {
+            color: var(--accent-light);
+            background: rgba(124, 58, 237, 0.15);
+        }
+
+        .nav .btn-signup {
+            background: linear-gradient(135deg, var(--accent-dark), var(--accent));
+            color: #fff;
+            font-weight: 700;
+            box-shadow: 0 4px 20px rgba(124, 58, 237, 0.3);
+        }
+
+        .nav .btn-signup:hover {
+            box-shadow: 0 8px 30px rgba(124, 58, 237, 0.5);
+            transform: translateY(-2px);
+        }
+
+        .cart-badge {
+            background: var(--gold);
+            color: #000;
+            font-size: 0.7rem;
+            font-weight: 700;
+            padding: 2px 8px;
+            border-radius: 10px;
+            box-shadow: 0 0 10px var(--gold);
+        }
+
+        .user-menu { position: relative; }
+        .user-trigger {
+            width: 44px;
+            height: 44px;
+            border-radius: 12px;
+            border: 2px solid var(--accent);
+            background: transparent;
+            cursor: pointer;
+            overflow: hidden;
+            transition: all 0.3s ease;
+            box-shadow: 0 0 15px rgba(124, 58, 237, 0.2);
+        }
+        .user-trigger:hover {
+            border-color: var(--gold);
+            box-shadow: 0 0 25px rgba(251, 191, 36, 0.4);
+            transform: scale(1.05);
+        }
+        .user-trigger img { width: 100%; height: 100%; object-fit: cover; }
+        .user-dropdown {
+            position: absolute;
+            top: calc(100% + 12px);
+            right: 0;
+            min-width: 200px;
+            background: var(--bg-card);
+            border-radius: 16px;
+            padding: 16px;
+            box-shadow: 0 15px 40px rgba(0, 0, 0, 0.5), 0 0 30px rgba(124, 58, 237, 0.1);
+            display: none;
+            border: 1px solid var(--border);
+        }
+        .user-dropdown.open { display: block; }
+        .user-name {
+            font-size: 0.95rem;
+            font-weight: 700;
+            margin-bottom: 12px;
+            padding-bottom: 12px;
+            border-bottom: 1px solid var(--border);
+            color: var(--accent-light);
+        }
+        .user-wallet {
+            background: rgba(124, 58, 237, 0.1);
+            border: 1px solid rgba(124, 58, 237, 0.2);
+            border-radius: 8px;
+            padding: 10px 12px;
+            margin-bottom: 12px;
+            font-size: 0.9rem;
+            font-weight: 700;
+            color: var(--gold);
+            text-align: center;
+        }
+        .user-logout {
+            width: 100%;
+            border: none;
+            background: linear-gradient(135deg, var(--pink), var(--accent));
+            color: #fff;
+            padding: 12px;
+            border-radius: 10px;
+            font-weight: 700;
+            font-family: inherit;
+            cursor: pointer;
+            box-shadow: 0 4px 15px rgba(255, 45, 122, 0.3);
+        }
+
+        /* ========== SOUND TOGGLE ========== */
+        .sound-toggle {
+            position: fixed;
+            top: 90px;
+            right: 30px;
+            z-index: 9998;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            background: rgba(10, 10, 15, 0.9);
+            backdrop-filter: blur(20px);
+            border: 1px solid var(--border);
+            border-radius: 50px;
+            padding: 10px 20px;
+            cursor: pointer;
+            transition: all 0.4s ease;
+            box-shadow: 0 4px 20px rgba(124, 58, 237, 0.2);
+        }
+
+        .sound-toggle:hover {
+            background: rgba(124, 58, 237, 0.15);
+            border-color: var(--accent);
+            transform: translateY(-2px);
+        }
+
+        .sound-toggle .sound-icon { font-size: 1.2rem; transition: transform 0.3s; }
+        .sound-toggle.playing .sound-icon { animation: soundPulse 1s ease-in-out infinite; }
+        @keyframes soundPulse { 0%, 100% { transform: scale(1); } 50% { transform: scale(1.2); } }
+        .sound-toggle .sound-label { color: var(--text-muted); font-size: 0.8rem; font-weight: 600; }
+        .sound-toggle.playing .sound-label { color: var(--accent-light); }
+
+        /* ========== MAIN CONTENT ========== */
+        main {
+            position: relative;
+            z-index: 2;
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 100px 48px 80px;
+        }
+
+        /* ========== PAGE TITLE ========== */
+        .page-header {
+            text-align: center;
+            margin-bottom: 48px;
+        }
+
+        .page-title {
+            font-family: 'Orbitron', sans-serif;
+            font-size: clamp(2rem, 5vw, 3rem);
+            font-weight: 900;
+            margin-bottom: 12px;
+            background: linear-gradient(135deg, var(--accent-light), var(--gold), var(--accent-light));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            text-shadow: none;
+            filter: drop-shadow(0 0 30px rgba(124, 58, 237, 0.5));
+        }
+
+        .page-subtitle {
+            font-size: 1.1rem;
+            color: var(--text-muted);
+            max-width: 500px;
+            margin: 0 auto;
+        }
+
+        /* ========== STATS BAR ========== */
+        .stats-bar {
+            display: flex;
+            justify-content: center;
+            gap: 20px;
+            flex-wrap: wrap;
+            margin-bottom: 40px;
+        }
+
+        .stat-card {
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: 16px;
+            padding: 20px 28px;
+            display: flex;
+            align-items: center;
+            gap: 16px;
+            box-shadow: 0 8px 30px rgba(0, 0, 0, 0.3);
+            transition: all 0.4s ease;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .stat-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 3px;
+            background: linear-gradient(90deg, var(--accent), var(--gold));
+        }
+
+        .stat-card:hover {
+            transform: translateY(-6px);
+            border-color: var(--accent);
+            box-shadow: 0 15px 40px rgba(124, 58, 237, 0.2);
+        }
+
+        .stat-icon { font-size: 2rem; }
+        .stat-content { text-align: left; }
+        .stat-value {
+            font-family: 'Orbitron', sans-serif;
+            font-size: 1.5rem;
+            font-weight: 800;
+            color: var(--gold);
+            text-shadow: 0 0 20px rgba(251, 191, 36, 0.5);
+        }
+        .stat-label {
+            font-size: 0.85rem;
+            color: var(--text-muted);
+            font-weight: 600;
+        }
+
+        /* ========== GAME TABS ========== */
+        .game-tabs {
+            display: flex;
+            justify-content: center;
+            gap: 12px;
+            margin-bottom: 40px;
+            flex-wrap: wrap;
+        }
+
+        .game-tab {
+            display: inline-flex;
+            align-items: center;
+            gap: 10px;
+            padding: 16px 28px;
+            background: var(--bg-card);
+            border: 2px solid var(--border);
+            border-radius: 16px;
+            color: var(--text-muted);
+            font-size: 1rem;
+            font-weight: 700;
+            font-family: 'Rajdhani', sans-serif;
+            cursor: pointer;
+            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .game-tab:hover {
+            border-color: var(--accent);
+            color: var(--accent-light);
+            background: rgba(124, 58, 237, 0.1);
+        }
+
+        .game-tab.active {
+            background: linear-gradient(135deg, rgba(124, 58, 237, 0.2), rgba(251, 191, 36, 0.2));
+            border-color: var(--accent);
+            color: var(--accent-light);
+            box-shadow: 0 0 30px rgba(124, 58, 237, 0.3);
+        }
+
+        .game-tab .tab-icon { font-size: 1.3rem; }
+
+        /* ========== GAME SECTIONS ========== */
+        .game-section {
+            display: none;
+            animation: fadeIn 0.5s ease;
+        }
+
+        .game-section.active { display: block; }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        /* ========== MYSTERY BAG / LOOT BOX GRID ========== */
+        .game-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+            gap: 28px;
+            margin-bottom: 48px;
+        }
+
+        .game-card {
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: 24px;
+            overflow: hidden;
+            box-shadow: 0 8px 30px rgba(0, 0, 0, 0.3);
+            transition: all 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+            position: relative;
+        }
+
+        .game-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 4px;
+            background: linear-gradient(90deg, var(--accent), var(--gold));
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+
+        .game-card::after {
+            content: '';
+            position: absolute;
+            inset: -2px;
+            border-radius: 26px;
+            background: linear-gradient(135deg, var(--accent), var(--gold));
+            opacity: 0;
+            transition: opacity 0.4s ease;
+            z-index: -1;
+            filter: blur(20px);
+        }
+
+        .game-card:hover {
+            transform: translateY(-12px);
+            box-shadow: 0 25px 60px rgba(0, 0, 0, 0.4), 0 0 40px rgba(124, 58, 237, 0.15);
+            border-color: var(--accent);
+        }
+
+        .game-card:hover::before { opacity: 1; }
+        .game-card:hover::after { opacity: 0.15; }
+
+        .card-ribbon {
+            position: absolute;
+            top: 16px;
+            right: 16px;
+            padding: 8px 16px;
+            font-size: 0.75rem;
+            font-weight: 700;
+            border-radius: 8px;
+            z-index: 3;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .card-ribbon.common { background: linear-gradient(135deg, #6b7280, #9ca3af); color: #fff; }
+        .card-ribbon.rare { background: linear-gradient(135deg, var(--cyan), #06b6d4); color: #000; }
+        .card-ribbon.legendary { background: linear-gradient(135deg, var(--gold), #f59e0b); color: #000; box-shadow: 0 4px 20px rgba(251, 191, 36, 0.5); }
+
+        .game-card-image {
+            position: relative;
+            height: 200px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            overflow: hidden;
+        }
+
+        .game-card-image.mystery-bag {
+            background: linear-gradient(135deg, rgba(124, 58, 237, 0.2), rgba(167, 139, 250, 0.2));
+        }
+
+        .game-card-image.loot-box {
+            background: linear-gradient(135deg, rgba(251, 191, 36, 0.2), rgba(245, 158, 11, 0.2));
+        }
+
+        .bag-icon {
+            font-size: 6rem;
+            animation: bounce 2s ease-in-out infinite;
+            filter: drop-shadow(0 0 30px rgba(124, 58, 237, 0.5));
+        }
+
+        .box-icon {
+            font-size: 6rem;
+            animation: shake 3s ease-in-out infinite;
+            filter: drop-shadow(0 0 30px rgba(251, 191, 36, 0.5));
+        }
+
+        @keyframes bounce {
+            0%, 100% { transform: translateY(0) rotate(-5deg); }
+            50% { transform: translateY(-15px) rotate(5deg); }
+        }
+
+        @keyframes shake {
+            0%, 100% { transform: rotate(-3deg); }
+            50% { transform: rotate(3deg); }
+        }
+
+        .game-card-body { padding: 24px; }
+
+        .game-card-title {
+            font-family: 'Orbitron', sans-serif;
+            font-size: 1.3rem;
+            font-weight: 700;
+            margin-bottom: 8px;
+            color: var(--text);
+        }
+
+        .game-card-desc {
+            font-size: 0.9rem;
+            color: var(--text-muted);
+            margin-bottom: 20px;
+            line-height: 1.6;
+        }
+
+        .game-card-footer {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding-top: 16px;
+            border-top: 1px solid var(--border);
+        }
+
+        .game-card-price {
+            font-family: 'Orbitron', sans-serif;
+            font-size: 1.5rem;
+            font-weight: 800;
+            background: linear-gradient(135deg, var(--gold), var(--gold-light));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .game-card-btn {
+            padding: 12px 24px;
+            background: linear-gradient(135deg, var(--accent), var(--accent-dark));
+            border: none;
+            border-radius: 12px;
+            color: #fff;
+            font-size: 0.9rem;
+            font-weight: 700;
+            font-family: 'Rajdhani', sans-serif;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            box-shadow: 0 4px 20px rgba(124, 58, 237, 0.4);
+            transition: all 0.3s ease;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .game-card-btn:hover {
+            transform: scale(1.05);
+            box-shadow: 0 8px 30px rgba(124, 58, 237, 0.6);
+        }
+
+        .game-card-btn:disabled {
+            background: var(--text-dim);
+            cursor: not-allowed;
+            box-shadow: none;
+        }
+
+        .game-card-btn.spinning {
+            animation: pulse 0.5s ease infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.05); }
+        }
+
+        /* ========== COUNTDOWN TIMER ========== */
+        .countdown-section {
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: 20px;
+            padding: 32px;
+            text-align: center;
+            margin-bottom: 40px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .countdown-section::before {
+            content: '';
+            position: absolute;
+            inset: 0;
+            background: linear-gradient(135deg, rgba(124, 58, 237, 0.05), rgba(251, 191, 36, 0.05));
+            pointer-events: none;
+        }
+
+        .countdown-title {
+            font-family: 'Orbitron', sans-serif;
+            font-size: 1.2rem;
+            font-weight: 700;
+            margin-bottom: 16px;
+            color: var(--gold);
+        }
+
+        .countdown-timer {
+            display: flex;
+            justify-content: center;
+            gap: 16px;
+        }
+
+        .countdown-unit {
+            background: rgba(0, 0, 0, 0.3);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            padding: 16px 20px;
+            min-width: 80px;
+        }
+
+        .countdown-value {
+            font-family: 'Orbitron', sans-serif;
+            font-size: 2rem;
+            font-weight: 800;
+            color: var(--accent-light);
+            text-shadow: 0 0 20px var(--accent);
+        }
+
+        .countdown-label {
+            font-size: 0.75rem;
+            color: var(--text-muted);
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        /* ========== HISTORY SECTION ========== */
+        .history-section {
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: 20px;
+            padding: 32px;
+            margin-bottom: 40px;
+        }
+
+        .history-title {
+            font-family: 'Orbitron', sans-serif;
+            font-size: 1.3rem;
+            font-weight: 700;
+            margin-bottom: 24px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .history-title .icon { font-size: 1.5rem; }
+
+        .history-list {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+            max-height: 400px;
+            overflow-y: auto;
+        }
+
+        .history-item {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+            padding: 16px;
+            background: rgba(0, 0, 0, 0.2);
+            border-radius: 12px;
+            transition: all 0.3s ease;
+        }
+
+        .history-item:hover {
+            background: rgba(124, 58, 237, 0.1);
+        }
+
+        .history-icon {
+            width: 48px;
+            height: 48px;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.5rem;
+        }
+
+        .history-icon.win { background: rgba(0, 255, 136, 0.2); }
+        .history-icon.lose { background: rgba(255, 51, 51, 0.2); }
+
+        .history-content { flex: 1; }
+        .history-name { font-weight: 700; margin-bottom: 4px; }
+        .history-meta { font-size: 0.8rem; color: var(--text-muted); }
+
+        .history-rarity {
+            padding: 6px 12px;
+            border-radius: 8px;
+            font-size: 0.75rem;
+            font-weight: 700;
+            text-transform: uppercase;
+        }
+
+        .history-rarity.common { background: rgba(107, 114, 128, 0.3); color: #9ca3af; }
+        .history-rarity.rare { background: rgba(0, 245, 255, 0.2); color: var(--cyan); }
+        .history-rarity.legendary { background: rgba(251, 191, 36, 0.2); color: var(--gold); }
+
+        .history-empty {
+            text-align: center;
+            padding: 40px;
+            color: var(--text-muted);
+        }
+
+        /* ========== REWARD MODAL ========== */
+        .modal-overlay {
+            position: fixed;
+            inset: 0;
+            background: rgba(10, 10, 15, 0.9);
+            backdrop-filter: blur(10px);
+            display: none;
+            align-items: center;
+            justify-content: center;
+            z-index: 1000;
+            padding: 24px;
+        }
+
+        .modal-overlay.open { display: flex; }
+
+        .modal-content {
+            background: var(--bg-card);
+            border-radius: 24px;
+            width: min(500px, 95vw);
+            max-height: 90vh;
+            overflow: hidden;
+            animation: modalSlide 0.5s cubic-bezier(0.34, 1.56, 0.64, 1);
+            box-shadow: 0 30px 80px rgba(0, 0, 0, 0.5), 0 0 60px rgba(124, 58, 237, 0.2);
+            border: 1px solid var(--border);
+            text-align: center;
+        }
+
+        @keyframes modalSlide {
+            from { transform: translateY(50px) scale(0.9); opacity: 0; }
+            to { transform: translateY(0) scale(1); opacity: 1; }
+        }
+
+        .modal-header {
+            padding: 32px;
+            background: linear-gradient(135deg, rgba(124, 58, 237, 0.2), rgba(251, 191, 36, 0.2));
+        }
+
+        .modal-icon {
+            font-size: 5rem;
+            margin-bottom: 16px;
+            animation: celebrate 1s ease infinite;
+        }
+
+        @keyframes celebrate {
+            0%, 100% { transform: scale(1) rotate(-5deg); }
+            50% { transform: scale(1.1) rotate(5deg); }
+        }
+
+        .modal-title {
+            font-family: 'Orbitron', sans-serif;
+            font-size: 1.5rem;
+            font-weight: 800;
+            margin-bottom: 8px;
+        }
+
+        .modal-title.win { color: var(--gold); }
+        .modal-title.lose { color: var(--text-muted); }
+
+        .modal-body { padding: 32px; }
+
+        .reward-name {
+            font-family: 'Orbitron', sans-serif;
+            font-size: 1.3rem;
+            font-weight: 700;
+            margin-bottom: 12px;
+            color: var(--accent-light);
+        }
+
+        .reward-rarity {
+            display: inline-block;
+            padding: 8px 20px;
+            border-radius: 20px;
+            font-size: 0.85rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            margin-bottom: 16px;
+        }
+
+        .reward-desc {
+            color: var(--text-muted);
+            margin-bottom: 24px;
+            line-height: 1.6;
+        }
+
+        .reward-credentials {
+            background: rgba(0, 0, 0, 0.3);
+            border: 1px dashed var(--border);
+            border-radius: 12px;
+            padding: 16px;
+            margin-bottom: 24px;
+            font-family: monospace;
+            font-size: 0.9rem;
+            color: var(--green);
+            word-break: break-all;
+        }
+
+        .modal-close-btn {
+            width: 100%;
+            padding: 16px;
+            background: linear-gradient(135deg, var(--accent), var(--accent-dark));
+            border: none;
+            border-radius: 12px;
+            color: #fff;
+            font-size: 1rem;
+            font-weight: 700;
+            font-family: 'Rajdhani', sans-serif;
+            cursor: pointer;
+            box-shadow: 0 8px 25px rgba(124, 58, 237, 0.4);
+            transition: all 0.3s ease;
+        }
+
+        .modal-close-btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 12px 35px rgba(124, 58, 237, 0.6);
+        }
+
+        /* ========== SPINNING OVERLAY ========== */
+        .spinning-overlay {
+            position: fixed;
+            inset: 0;
+            background: rgba(10, 10, 15, 0.95);
+            backdrop-filter: blur(10px);
+            display: none;
+            align-items: center;
+            justify-content: center;
+            z-index: 999;
+            flex-direction: column;
+            gap: 32px;
+        }
+
+        .spinning-overlay.active { display: flex; }
+
+        .spinning-icon {
+            font-size: 8rem;
+            animation: spin 0.5s linear infinite;
+        }
+
+        @keyframes spin {
+            from { transform: rotate(0deg); }
+            to { transform: rotate(360deg); }
+        }
+
+        .spinning-text {
+            font-family: 'Orbitron', sans-serif;
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: var(--accent-light);
+            animation: pulse 1s ease infinite;
+        }
+
+        /* ========== FOOTER ========== */
+        .site-footer {
+            background: linear-gradient(180deg, transparent, rgba(124, 58, 237, 0.03));
+            padding: 60px 48px 30px;
+            margin-top: 100px;
+            position: relative;
+            z-index: 10;
+            border-top: 1px solid var(--border);
+        }
+
+        .site-footer::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 2px;
+            background: linear-gradient(90deg, transparent, var(--accent), var(--gold), var(--accent), transparent);
+        }
+
+        .footer-inner {
+            max-width: 1200px;
+            margin: 0 auto;
+            display: grid;
+            grid-template-columns: 1.5fr 1fr 1fr 1fr;
+            gap: 40px;
+        }
+
+        .footer-brand .footer-logo {
+            font-family: 'Orbitron', sans-serif;
+            font-size: 1.6rem;
+            font-weight: 800;
+            color: var(--accent-light);
+            margin-bottom: 16px;
+            text-shadow: 0 0 20px var(--accent);
+        }
+
+        .footer-brand .footer-desc {
+            color: var(--text-muted);
+            line-height: 1.8;
+            margin-bottom: 20px;
+        }
+
+        .footer-social { display: flex; gap: 10px; }
+
+        .footer-social a {
+            width: 44px;
+            height: 44px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: rgba(255, 255, 255, 0.03);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            color: var(--accent-light);
+            text-decoration: none;
+            font-size: 1.2rem;
+            transition: all 0.3s ease;
+        }
+
+        .footer-social a:hover {
+            background: rgba(124, 58, 237, 0.1);
+            border-color: var(--accent);
+            transform: translateY(-4px);
+            box-shadow: 0 8px 25px rgba(124, 58, 237, 0.3);
+        }
+
+        .footer-section h4 {
+            font-family: 'Orbitron', sans-serif;
+            font-size: 0.95rem;
+            font-weight: 700;
+            color: var(--text);
+            margin-bottom: 16px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .footer-section ul { list-style: none; }
+        .footer-section ul li { margin-bottom: 10px; }
+        .footer-section ul li a {
+            color: var(--text-muted);
+            text-decoration: none;
+            font-size: 0.9rem;
+            transition: color 0.3s ease;
+        }
+
+        .footer-section ul li a:hover { color: var(--accent-light); }
+
+        .footer-bottom {
+            max-width: 1200px;
+            margin: 40px auto 0;
+            padding-top: 24px;
+            border-top: 1px solid var(--border);
+            text-align: center;
+        }
+
+        .footer-bottom p {
+            color: var(--text-muted);
+            font-size: 0.85rem;
+            margin-bottom: 6px;
+        }
+
+        /* ========== RESPONSIVE ========== */
+        @media (max-width: 900px) {
+            .footer-inner { grid-template-columns: 1fr 1fr; }
+        }
+
+        @media (max-width: 640px) {
+            .header { padding: 0 20px; }
+            main { padding: 90px 20px 60px; }
+            .stats-bar { flex-direction: column; align-items: center; }
+            .game-grid { grid-template-columns: 1fr; }
+            .footer-inner { grid-template-columns: 1fr; gap: 30px; }
+            .site-footer { padding: 50px 20px 30px; }
+            .game-tabs { flex-direction: column; }
+            .game-tab { width: 100%; justify-content: center; }
+        }
+    </style>
+</head>
+<body th:attr="data-logged-in=${session.userId != null}" th:attrappend="data-user-id=${session.userId}">
+
+<!-- Background Effects -->
+<div class="bg-gaming"></div>
+<div class="grid-lines"></div>
+<div class="particles">
+    <span class="particle" style="left: 30%; top: 15%;"></span>
+    <span class="particle"></span>
+    <span class="particle"></span>
+    <span class="particle"></span>
+    <span class="particle"></span>
+    <span class="particle"></span>
+</div>
+
+<!-- Toast Container -->
+<div class="toast-container" id="toastContainer"></div>
+
+<!-- Header -->
+<header class="header">
+    <a class="brand" th:href="@{/}">
+        <div class="brand-icon">&#127918;</div>
+        <span>Gaming Zone</span>
+    </a>
+    <nav class="nav">
+        <a th:href="@{/}">Trang chủ</a>
+        <a th:href="@{/minigame}" class="active">&#127918; Mini Game</a>
+        <a th:href="@{/cart}">
+            Giỏ hàng
+            <span class="cart-badge" id="cart-count" th:text="${cartSummary.count}">0</span>
+        </a>
+        <a th:href="@{/wallet}" th:if="${session.userId != null}">&#128176; Nạp tiền</a>
+        <a th:href="@{/my-orders}" th:if="${session.userId != null}">Đơn mua</a>
+        <a th:href="@{/admin}" th:if="${session.role == 'ADMIN'}">Admin</a>
+        <a th:href="@{/auth/login}" th:if="${session.userId == null}">Đăng nhập</a>
+        <a class="btn-signup" th:href="@{/auth/register}" th:if="${session.userId == null}">Đăng ký</a>
+        <div class="user-menu" th:if="${session.userId != null}">
+            <button class="user-trigger" id="userMenuTrigger" type="button">
+                <img th:src="@{/images/user-avatar.png}" alt="User">
+            </button>
+            <div class="user-dropdown" id="userDropdown">
+                <div class="user-name" th:text="${session.username}">Username</div>
+                <div class="user-wallet" th:if="${session.wallet != null}">
+                    &#128176; Số dư: <span th:text="${session.wallet}">0</span>đ
+                </div>
+                <form th:action="@{/auth/logout}" method="post">
+                    <button class="user-logout" type="submit">Đăng xuất</button>
+                </form>
+            </div>
+        </div>
+    </nav>
+</header>
+
+<!-- Sound Toggle -->
+<button class="sound-toggle" id="soundToggle" title="Bật/Tắt âm thanh">
+    <span class="sound-icon" id="soundIcon">&#128263;</span>
+    <span class="sound-label" id="soundLabel">Bật nhạc</span>
+</button>
+
+<main>
+    <!-- Page Header -->
+    <div class="page-header">
+        <h1 class="page-title">MINI GAME</h1>
+        <p class="page-subtitle">Túi Mù & Rương May Mắn - Thử vận may để nhận tài khoản game giá trị!</p>
+    </div>
+
+    <!-- Stats Bar -->
+    <div class="stats-bar">
+        <div class="stat-card">
+            <span class="stat-icon">&#128176;</span>
+            <div class="stat-content">
+                <div class="stat-value" id="userBalance" th:text="${session.wallet != null ? session.wallet : 0}">0</div>
+                <div class="stat-label">Số dư ví</div>
+            </div>
+        </div>
+        <div class="stat-card">
+            <span class="stat-icon">&#127918;</span>
+            <div class="stat-content">
+                <div class="stat-value" id="totalSpins">0</div>
+                <div class="stat-label">Tổng lượt quay</div>
+            </div>
+        </div>
+        <div class="stat-card">
+            <span class="stat-icon">&#127941;</span>
+            <div class="stat-content">
+                <div class="stat-value" id="totalWins">0</div>
+                <div class="stat-label">Số lần trúng</div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Game Tabs -->
+    <div class="game-tabs">
+        <button class="game-tab active" data-tab="mystery-bag">
+            <span class="tab-icon">&#128717;</span>
+            <span>Túi Mù</span>
+        </button>
+        <button class="game-tab" data-tab="loot-box">
+            <span class="tab-icon">&#128295;</span>
+            <span>Rương May Mắn</span>
+        </button>
+    </div>
+
+    <!-- Mystery Bag Section -->
+    <section class="game-section active" id="mystery-bag-section">
+        <div class="game-grid" id="mysteryBagGrid">
+            <!-- Mystery bags will be loaded via API -->
+            <div class="loading-state" style="grid-column: 1/-1; text-align: center; padding: 40px; color: var(--text-muted);">
+                Đang tải...
+            </div>
+        </div>
+    </section>
+
+    <!-- Loot Box Section -->
+    <section class="game-section" id="loot-box-section">
+        <div class="game-grid" id="lootBoxGrid">
+            <!-- Loot boxes will be loaded via API -->
+            <div class="loading-state" style="grid-column: 1/-1; text-align: center; padding: 40px; color: var(--text-muted);">
+                Đang tải...
+            </div>
+        </div>
+    </section>
+
+    <!-- Countdown Timer -->
+    <div class="countdown-section" id="countdownSection">
+        <h3 class="countdown-title">&#9889; Sự kiện kết thúc sau:</h3>
+        <div class="countdown-timer">
+            <div class="countdown-unit">
+                <div class="countdown-value" id="countdownHours">00</div>
+                <div class="countdown-label">Giờ</div>
+            </div>
+            <div class="countdown-unit">
+                <div class="countdown-value" id="countdownMinutes">00</div>
+                <div class="countdown-label">Phút</div>
+            </div>
+            <div class="countdown-unit">
+                <div class="countdown-value" id="countdownSeconds">00</div>
+                <div class="countdown-label">Giây</div>
+            </div>
+        </div>
+    </div>
+
+    <!-- History Section -->
+    <div class="history-section">
+        <h3 class="history-title">
+            <span class="icon">&#128203;</span>
+            Lịch sử quay gần đây
+        </h3>
+        <div class="history-list" id="historyList">
+            <div class="history-empty">
+                <p>Chưa có lịch sử quay. Hãy thử vận may ngay!</p>
+            </div>
+        </div>
+    </div>
+</main>
+
+<!-- Reward Modal -->
+<div class="modal-overlay" id="rewardModal">
+    <div class="modal-content">
+        <div class="modal-header">
+            <div class="modal-icon" id="modalIcon">&#127942;</div>
+            <h2 class="modal-title" id="modalTitle">Chúc mừng!</h2>
+        </div>
+        <div class="modal-body">
+            <div class="reward-name" id="rewardName">-</div>
+            <div class="reward-rarity" id="rewardRarity">-</div>
+            <p class="reward-desc" id="rewardDesc">-</p>
+            <div class="reward-credentials" id="rewardCredentials" style="display: none;"></div>
+            <button class="modal-close-btn" onclick="closeRewardModal()">Đóng</button>
+        </div>
+    </div>
+</div>
+
+<!-- Spinning Overlay -->
+<div class="spinning-overlay" id="spinningOverlay">
+    <div class="spinning-icon" id="spinningIcon">&#127922;</div>
+    <div class="spinning-text">Đang quay...</div>
+</div>
+
+<!-- Footer -->
+<footer class="site-footer">
+    <div class="footer-inner">
+        <div class="footer-brand">
+            <div class="footer-logo">&#127918; Gaming Zone</div>
+            <p class="footer-desc">
+                Chuyên cung cấp tài khoản game chất lượng cao với giá cả hợp lý. 
+                Giao dịch nhanh chóng, an toàn và uy tín.
+            </p>
+            <div class="footer-social">
+                <a href="#">&#128100;</a>
+                <a href="#">&#128172;</a>
+                <a href="#">&#128241;</a>
+            </div>
+        </div>
+        
+        <div class="footer-section">
+            <h4>Dịch vụ</h4>
+            <ul>
+                <li><a th:href="@{/}">Mua tài khoản</a></li>
+                <li><a th:href="@{/cart}">Giỏ hàng</a></li>
+                <li><a th:href="@{/minigame}">Mini Game</a></li>
+                <li><a th:href="@{/wallet}">Nạp tiền</a></li>
+            </ul>
+        </div>
+        
+        <div class="footer-section">
+            <h4>Hỗ trợ</h4>
+            <ul>
+                <li><a href="#">Hướng dẫn mua</a></li>
+                <li><a href="#">Chính sách bảo hành</a></li>
+                <li><a href="#">Điều khoản</a></li>
+                <li><a href="#">Liên hệ</a></li>
+            </ul>
+        </div>
+        
+        <div class="footer-section">
+            <h4>Đánh giá</h4>
+            <ul>
+                <li><a href="#">&#11088;&#11088;&#11088;&#11088;&#11088; 4.9/5</a></li>
+                <li><a href="#">2000+ đánh giá</a></li>
+                <li><a href="#">Cam kết chất lượng</a></li>
+                <li><a href="#">Hoàn tiền nếu lỗi</a></li>
+            </ul>
+        </div>
+    </div>
+    
+    <div class="footer-bottom">
+        <p>&copy; 2026 Gaming Zone - Chuyên bán acc Genshin, Liên Quân Mobile và các game khác.</p>
+        <p>&#9889; Cam kết 100% tài khoản chính chủ, giao ngay trong 5 phút.</p>
+    </div>
+</footer>
+
+<script th:inline="javascript">
+    /*<![CDATA[*/
+    const GAME_CONFIG = {
+        mysteryBagApi: '/api/mysterybag',
+        lootBoxApi: '/api/lootbox',
+        userId: /*[[${session.userId != null ? session.userId : 'null'}]]*/ null,
+        username: /*[[${session.username != null ? session.username : 'null'}]]*/ null,
+        isLoggedIn: /*[[${session.userId != null}]]*/ false
+    };
+    /*]]>*/
+</script>
+
+<script>
+    // ========== TOAST NOTIFICATIONS ==========
+    function showToast(message, type = 'info', duration = 4000) {
+        const container = document.getElementById('toastContainer');
+        const toast = document.createElement('div');
+        toast.className = `toast ${type}`;
+        
+        const iconMap = {
+            success: '&#10004;',
+            error: '&#10006;',
+            warning: '&#9888;',
+            info: '&#8505;'
+        };
+        
+        toast.innerHTML = `
+            <span class="toast-icon">${iconMap[type] || iconMap.info}</span>
+            <span class="toast-message">${message}</span>
+            <button class="toast-close" onclick="this.parentElement.remove()">&times;</button>
+        `;
+        
+        container.appendChild(toast);
+        
+        setTimeout(() => {
+            toast.style.animation = 'toastOut 0.3s ease forwards';
+            setTimeout(() => toast.remove(), 300);
+        }, duration);
+    }
+
+    // ========== USER MENU ==========
+    function setupUserMenu() {
+        const userMenuTrigger = document.getElementById('userMenuTrigger');
+        const userDropdown = document.getElementById('userDropdown');
+        if (!userMenuTrigger || !userDropdown) return;
+        
+        userMenuTrigger.addEventListener('click', (e) => {
+            e.stopPropagation();
+            userDropdown.classList.toggle('open');
+        });
+        
+        document.addEventListener('click', (e) => {
+            if (!userDropdown.contains(e.target) && !userMenuTrigger.contains(e.target)) {
+                userDropdown.classList.remove('open');
+            }
+        });
+    }
+
+    // ========== GAME TABS ==========
+    function setupGameTabs() {
+        const tabs = document.querySelectorAll('.game-tab');
+        const sections = document.querySelectorAll('.game-section');
+        
+        tabs.forEach(tab => {
+            tab.addEventListener('click', () => {
+                tabs.forEach(t => t.classList.remove('active'));
+                tab.classList.add('active');
+                
+                const tabName = tab.dataset.tab;
+                sections.forEach(s => s.classList.remove('active'));
+                document.getElementById(`${tabName}-section`).classList.add('active');
+            });
+        });
+    }
+
+    // ========== LOAD MYSTERY BAGS ==========
+    async function loadMysteryBags() {
+        try {
+            const response = await fetch(`${GAME_CONFIG.mysteryBagApi}/list`);
+            const result = await response.json();
+            
+            if (result.success && result.data) {
+                renderMysteryBags(result.data);
+            }
+        } catch (error) {
+            console.error('Error loading mystery bags:', error);
+            showToast('Không thể tải túi mù', 'error');
+        }
+    }
+
+    function renderMysteryBags(bags) {
+        const grid = document.getElementById('mysteryBagGrid');
+        if (!bags || bags.length === 0) {
+            grid.innerHTML = `
+                <div class="history-empty" style="grid-column: 1/-1;">
+                    <p>Hiện không có túi mù nào khả dụng.</p>
+                </div>
+            `;
+            return;
+        }
+        
+        grid.innerHTML = bags.map(bag => `
+            <div class="game-card" data-id="${bag.id}" data-type="mystery-bag">
+                <span class="card-ribbon ${bag.tier ? bag.tier.toLowerCase() : 'common'}">
+                    ${getTierEmoji(bag.tier)} ${bag.tier || 'COMMON'}
+                </span>
+                <div class="game-card-image mystery-bag">
+                    <span class="bag-icon">&#128717;</span>
+                </div>
+                <div class="game-card-body">
+                    <h3 class="game-card-title">${bag.name}</h3>
+                    <p class="game-card-desc">${bag.description || 'Túi mù may mắn'}</p>
+                    <div class="game-card-footer">
+                        <span class="game-card-price">${formatCurrency(bag.price)}</span>
+                        <button class="game-card-btn" onclick="openMysteryBag(${bag.id})">
+                            <span>&#127922;</span> Quay
+                        </button>
+                    </div>
+                </div>
+            </div>
+        `).join('');
+    }
+
+    // ========== LOAD LOOT BOXES ==========
+    async function loadLootBoxes() {
+        try {
+            const response = await fetch(`${GAME_CONFIG.lootBoxApi}/list`);
+            const result = await response.json();
+            
+            if (result.success && result.data) {
+                renderLootBoxes(result.data);
+            }
+        } catch (error) {
+            console.error('Error loading loot boxes:', error);
+            showToast('Không thể tải rương', 'error');
+        }
+    }
+
+    function renderLootBoxes(boxes) {
+        const grid = document.getElementById('lootBoxGrid');
+        if (!boxes || boxes.length === 0) {
+            grid.innerHTML = `
+                <div class="history-empty" style="grid-column: 1/-1;">
+                    <p>Hiện không có rương nào khả dụng.</p>
+                </div>
+            `;
+            return;
+        }
+        
+        grid.innerHTML = boxes.map(box => `
+            <div class="game-card" data-id="${box.id}" data-type="loot-box">
+                <span class="card-ribbon ${box.tier ? box.tier.toLowerCase() : 'common'}">
+                    ${getTierEmoji(box.tier)} ${box.tier || 'COMMON'}
+                </span>
+                <div class="game-card-image loot-box">
+                    <span class="box-icon">&#128295;</span>
+                </div>
+                <div class="game-card-body">
+                    <h3 class="game-card-title">${box.name}</h3>
+                    <p class="game-card-desc">${box.description || 'Rương may mắn'}</p>
+                    <div class="game-card-footer">
+                        <span class="game-card-price">${formatCurrency(box.price)}</span>
+                        <button class="game-card-btn" onclick="openLootBox(${box.id})">
+                            <span>&#127922;</span> Mở rương
+                        </button>
+                    </div>
+                </div>
+            </div>
+        `).join('');
+    }
+
+    // ========== OPEN MYSTERY BAG ==========
+    async function openMysteryBag(bagId) {
+        if (!GAME_CONFIG.isLoggedIn) {
+            showToast('Vui lòng đăng nhập để chơi', 'warning');
+            setTimeout(() => window.location.href = '/auth/login', 1000);
+            return;
+        }
+
+        const card = document.querySelector(`.game-card[data-id="${bagId}"][data-type="mystery-bag"]`);
+        const btn = card.querySelector('.game-card-btn');
+        
+        btn.disabled = true;
+        btn.classList.add('spinning');
+        btn.innerHTML = '<span>&#127922;</span> Đang quay...';
+        
+        document.getElementById('spinningIcon').textContent = '🛍️';
+        document.getElementById('spinningOverlay').classList.add('active');
+        
+        playSound('spin');
+        
+        setTimeout(async () => {
+            try {
+                const response = await fetch(`${GAME_CONFIG.mysteryBagApi}/open`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        userId: GAME_CONFIG.userId,
+                        mysteryBagId: bagId
+                    })
+                });
+                
+                const result = await response.json();
+                
+                if (result.success) {
+                    document.getElementById('spinningOverlay').classList.remove('active');
+                    showRewardModal(result);
+                    updateBalance(result.newBalance);
+                    playSound('win');
+                    loadHistory();
+                } else {
+                    document.getElementById('spinningOverlay').classList.remove('active');
+                    showToast(result.message || 'Có lỗi xảy ra', 'error');
+                }
+            } catch (error) {
+                console.error('Error opening mystery bag:', error);
+                document.getElementById('spinningOverlay').classList.remove('active');
+                showToast('Có lỗi xảy ra', 'error');
+            }
+            
+            btn.disabled = false;
+            btn.classList.remove('spinning');
+            btn.innerHTML = '<span>&#127922;</span> Quay';
+        }, 2000);
+    }
+
+    // ========== OPEN LOOT BOX ==========
+    async function openLootBox(boxId) {
+        if (!GAME_CONFIG.isLoggedIn) {
+            showToast('Vui lòng đăng nhập để chơi', 'warning');
+            setTimeout(() => window.location.href = '/auth/login', 1000);
+            return;
+        }
+
+        const card = document.querySelector(`.game-card[data-id="${boxId}"][data-type="loot-box"]`);
+        const btn = card.querySelector('.game-card-btn');
+        
+        btn.disabled = true;
+        btn.classList.add('spinning');
+        btn.innerHTML = '<span>&#127922;</span> Đang mở...';
+        
+        document.getElementById('spinningIcon').textContent = '🗃️';
+        document.getElementById('spinningOverlay').classList.add('active');
+        
+        playSound('spin');
+        
+        setTimeout(async () => {
+            try {
+                const response = await fetch(`${GAME_CONFIG.lootBoxApi}/open`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        userId: GAME_CONFIG.userId,
+                        lootBoxId: boxId
+                    })
+                });
+                
+                const result = await response.json();
+                
+                if (result.success) {
+                    document.getElementById('spinningOverlay').classList.remove('active');
+                    showRewardModal(result);
+                    updateBalance(result.newBalance);
+                    playSound('win');
+                    loadHistory();
+                } else {
+                    document.getElementById('spinningOverlay').classList.remove('active');
+                    showToast(result.message || 'Có lỗi xảy ra', 'error');
+                }
+            } catch (error) {
+                console.error('Error opening loot box:', error);
+                document.getElementById('spinningOverlay').classList.remove('active');
+                showToast('Có lỗi xảy ra', 'error');
+            }
+            
+            btn.disabled = false;
+            btn.classList.remove('spinning');
+            btn.innerHTML = '<span>&#127922;</span> Mở rương';
+        }, 2000);
+    }
+
+    // ========== SHOW REWARD MODAL ==========
+    function showRewardModal(result) {
+        const modal = document.getElementById('rewardModal');
+        const icon = document.getElementById('modalIcon');
+        const title = document.getElementById('modalTitle');
+        const name = document.getElementById('rewardName');
+        const rarity = document.getElementById('rewardRarity');
+        const desc = document.getElementById('rewardDesc');
+        const credentials = document.getElementById('rewardCredentials');
+        
+        if (result.isWin) {
+            icon.textContent = '🎉';
+            title.textContent = 'Chúc mừng bạn!';
+            title.className = 'modal-title win';
+            name.textContent = result.rewardName || 'Phần thưởng';
+            
+            const rarityClass = (result.rewardRarity || 'COMMON').toLowerCase();
+            rarity.className = `reward-rarity ${rarityClass}`;
+            rarity.textContent = `${getRarityEmoji(result.rewardRarity)} ${result.rewardRarity || 'COMMON'}`;
+            
+            desc.textContent = result.rewardDescription || 'Bạn đã trúng một phần thưởng!';
+            
+            if (result.credentials) {
+                credentials.style.display = 'block';
+                credentials.textContent = `Tài khoản: ${result.credentials}`;
+            } else {
+                credentials.style.display = 'none';
+            }
+            
+            showToast(`Bạn đã trúng: ${result.rewardName}!`, 'success');
+        } else {
+            icon.textContent = '😢';
+            title.textContent = 'Chúc bạn may mắn lần sau!';
+            title.className = 'modal-title lose';
+            name.textContent = 'Không trúng thưởng';
+            rarity.className = 'reward-rarity';
+            rarity.textContent = '';
+            desc.textContent = 'Đừng nản lòng, hãy thử lại ngay!';
+            credentials.style.display = 'none';
+            
+            showToast('Không trúng thưởng lần này', 'warning');
+        }
+        
+        modal.classList.add('open');
+    }
+
+    function closeRewardModal() {
+        document.getElementById('rewardModal').classList.remove('open');
+    }
+
+    document.getElementById('rewardModal').addEventListener('click', (e) => {
+        if (e.target === document.getElementById('rewardModal')) {
+            closeRewardModal();
+        }
+    });
+
+    // ========== LOAD HISTORY ==========
+    async function loadHistory() {
+        try {
+            const [mysteryResponse, lootboxResponse] = await Promise.all([
+                fetch(`${GAME_CONFIG.mysteryBagApi}/history?limit=10`),
+                fetch(`${GAME_CONFIG.lootBoxApi}/history?limit=10`)
+            ]);
+            
+            const mysteryResult = await mysteryResponse.json();
+            const lootboxResult = await lootboxResponse.json();
+            
+            const mysteryHistory = mysteryResult.data || [];
+            const lootboxHistory = lootboxResult.data || [];
+            
+            const allHistory = [...mysteryHistory, ...lootboxHistory]
+                .sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt))
+                .slice(0, 20);
+            
+            renderHistory(allHistory);
+        } catch (error) {
+            console.error('Error loading history:', error);
+        }
+    }
+
+    function renderHistory(history) {
+        const list = document.getElementById('historyList');
+        
+        if (!history || history.length === 0) {
+            list.innerHTML = `
+                <div class="history-empty">
+                    <p>Chưa có lịch sử quay. Hãy thử vận may ngay!</p>
+                </div>
+            `;
+            return;
+        }
+        
+        list.innerHTML = history.map(item => {
+            const rarityClass = (item.rewardRarity || 'NONE').toLowerCase();
+            const isWin = item.win;
+            
+            return `
+                <div class="history-item">
+                    <div class="history-icon ${isWin ? 'win' : 'lose'}">
+                        ${isWin ? '🎁' : '💨'}
+                    </div>
+                    <div class="history-content">
+                        <div class="history-name">
+                            ${item.lootBoxName || item.mysteryBagName || 'Unknown'}
+                            - ${item.rewardName || 'Không trúng'}
+                        </div>
+                        <div class="history-meta">
+                            ${formatDate(item.createdAt)} • ${formatCurrency(item.price || 0)}
+                        </div>
+                    </div>
+                    <span class="history-rarity ${rarityClass}">
+                        ${getRarityEmoji(item.rewardRarity)} ${item.rewardRarity || 'NONE'}
+                    </span>
+                </div>
+            `;
+        }).join('');
+    }
+
+    // ========== COUNTDOWN TIMER ==========
+    function startCountdown() {
+        const endDate = new Date();
+        endDate.setDate(endDate.getDate() + 3); // 3 days from now
+        
+        function update() {
+            const now = new Date();
+            const diff = endDate - now;
+            
+            if (diff <= 0) {
+                document.getElementById('countdownHours').textContent = '00';
+                document.getElementById('countdownMinutes').textContent = '00';
+                document.getElementById('countdownSeconds').textContent = '00';
+                return;
+            }
+            
+            const hours = Math.floor(diff / (1000 * 60 * 60));
+            const minutes = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
+            const seconds = Math.floor((diff % (1000 * 60)) / 1000);
+            
+            document.getElementById('countdownHours').textContent = String(hours).padStart(2, '0');
+            document.getElementById('countdownMinutes').textContent = String(minutes).padStart(2, '0');
+            document.getElementById('countdownSeconds').textContent = String(seconds).padStart(2, '0');
+        }
+        
+        update();
+        setInterval(update, 1000);
+    }
+
+    // ========== UPDATE BALANCE ==========
+    function updateBalance(newBalance) {
+        document.getElementById('userBalance').textContent = formatCurrency(newBalance);
+    }
+
+    // ========== SOUND SYSTEM ==========
+    function playSound(type) {
+        const sounds = {
+            spin: document.getElementById('spinSound'),
+            win: document.getElementById('winSound'),
+            click: document.getElementById('clickSound')
+        };
+        
+        const sound = sounds[type];
+        if (sound) {
+            sound.currentTime = 0;
+            sound.play().catch(() => {});
+        }
+    }
+
+    // ========== UTILITY FUNCTIONS ==========
+    function getTierEmoji(tier) {
+        const emojis = {
+            'COMMON': '⭐',
+            'RARE': '💎',
+            'LEGENDARY': '👑'
+        };
+        return emojis[tier] || '⭐';
+    }
+
+    function getRarityEmoji(rarity) {
+        const emojis = {
+            'COMMON': '⭐',
+            'RARE': '💎',
+            'LEGENDARY': '👑',
+            'NONE': '💨'
+        };
+        return emojis[rarity] || '⭐';
+    }
+
+    function formatCurrency(amount) {
+        return new Intl.NumberFormat('vi-VN').format(amount) + 'đ';
+    }
+
+    function formatDate(dateString) {
+        if (!dateString) return '-';
+        const date = new Date(dateString);
+        return date.toLocaleString('vi-VN', {
+            day: '2-digit',
+            month: '2-digit',
+            hour: '2-digit',
+            minute: '2-digit'
+        });
+    }
+
+    // ========== SOUND TOGGLE ==========
+    function setupSoundToggle() {
+        const bgMusic = document.getElementById('bgMusic');
+        const soundToggle = document.getElementById('soundToggle');
+        const soundIcon = document.getElementById('soundIcon');
+        const soundLabel = document.getElementById('soundLabel');
+        
+        let isMuted = false;
+        
+        if (bgMusic) bgMusic.volume = 0.15;
+        
+        function startMusic() {
+            if (bgMusic) {
+                bgMusic.play().then(() => {
+                    soundToggle.classList.add('playing');
+                    soundIcon.innerHTML = '&#128264;';
+                    soundLabel.textContent = 'Tắt nhạc';
+                }).catch(() => {
+                    soundIcon.innerHTML = '&#128263;';
+                    soundLabel.textContent = 'Bật nhạc';
+                });
+            }
+        }
+        
+        startMusic();
+        
+        soundToggle.addEventListener('click', function() {
+            if (isMuted) {
+                isMuted = false;
+                if (bgMusic) bgMusic.muted = false;
+                soundToggle.classList.remove('muted');
+                soundToggle.classList.add('playing');
+                soundIcon.innerHTML = '&#128264;';
+                soundLabel.textContent = 'Tắt nhạc';
+            } else {
+                isMuted = true;
+                if (bgMusic) bgMusic.muted = true;
+                soundToggle.classList.remove('playing');
+                soundToggle.classList.add('muted');
+                soundIcon.innerHTML = '&#128263;';
+                soundLabel.textContent = 'Bật nhạc';
+            }
+        });
+        
+        // Click sound for buttons
+        document.addEventListener('click', function(e) {
+            const button = e.target.closest('button, .btn, .game-tab');
+            if (button && !button.disabled) {
+                playSound('click');
+            }
+        });
+    }
+
+    // ========== INITIALIZE ==========
+    document.addEventListener('DOMContentLoaded', function() {
+        setupUserMenu();
+        setupGameTabs();
+        setupSoundToggle();
+        loadMysteryBags();
+        loadLootBoxes();
+        loadHistory();
+        startCountdown();
+    });
+</script>
+
+</body>
+</html>

@@ -1,0 +1,185 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title th:text="${subject}">Email</title>
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #f4f4f4;
+        }
+        .email-container {
+            max-width: 600px;
+            margin: 20px auto;
+            background: #ffffff;
+            border-radius: 12px;
+            overflow: hidden;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.1);
+        }
+        .email-header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 30px;
+            text-align: center;
+        }
+        .email-header h1 {
+            margin: 0;
+            font-size: 24px;
+            font-weight: 600;
+        }
+        .email-body {
+            padding: 30px;
+            color: #333333;
+        }
+        .email-body h2 {
+            color: #667eea;
+            margin-top: 0;
+        }
+        .email-body h3 {
+            color: #667eea;
+            margin-top: 25px;
+        }
+        .order-summary {
+            background: #f8f9fa;
+            border-radius: 8px;
+            padding: 20px;
+            margin: 20px 0;
+        }
+        .order-item {
+            display: flex;
+            justify-content: space-between;
+            padding: 10px 0;
+            border-bottom: 1px solid #e9ecef;
+        }
+        .order-item:last-child {
+            border-bottom: none;
+        }
+        .order-total {
+            display: flex;
+            justify-content: space-between;
+            font-weight: bold;
+            font-size: 18px;
+            color: #667eea;
+            margin-top: 15px;
+            padding-top: 15px;
+            border-top: 2px solid #667eea;
+        }
+        .credentials-box {
+            background: #2d3748;
+            color: #48bb78;
+            padding: 20px;
+            border-radius: 8px;
+            font-family: 'Courier New', monospace;
+            margin: 20px 0;
+            word-break: break-all;
+        }
+        .credentials-box .label {
+            color: #a0aec0;
+            font-family: 'Segoe UI', sans-serif;
+            font-size: 12px;
+            margin-bottom: 8px;
+        }
+        .btn {
+            display: inline-block;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 12px 30px;
+            text-decoration: none;
+            border-radius: 6px;
+            font-weight: 600;
+            margin: 10px 5px;
+        }
+        .btn-secondary {
+            background: #e2e8f0;
+            color: #4a5568;
+        }
+        .email-footer {
+            background: #f8f9fa;
+            padding: 20px;
+            text-align: center;
+            color: #718096;
+            font-size: 12px;
+        }
+        .status-badge {
+            display: inline-block;
+            padding: 6px 16px;
+            border-radius: 20px;
+            font-weight: 600;
+            font-size: 14px;
+        }
+        .status-pending { background: #f6e05e; color: #744210; }
+        .status-paid { background: #48bb78; color: white; }
+        .status-refunded { background: #fc8181; color: white; }
+        .warning-box {
+            background: #fffaf0;
+            border-left: 4px solid #ed8936;
+            padding: 15px;
+            margin: 20px 0;
+        }
+        .highlight {
+            color: #667eea;
+            font-weight: 600;
+        }
+    </style>
+</head>
+<body>
+    <div class="email-container">
+        <div class="email-header">
+            <h1> Genshin Cute Shop</h1>
+        </div>
+        <div class="email-body">
+            <h2>🎉 Chúc mừng, <span th:text="${username}">User</span>!</h2>
+            <p>Thanh toán của bạn đã được xác nhận thành công!</p>
+            
+            <p>Đơn hàng <strong>#<span th:text="${orderId}">123</span></strong> đã được thanh toán. Dưới đây là thông tin tài khoản game bạn đã mua:</p>
+            
+            <div class="order-summary">
+                <p><strong>Ngày thanh toán:</strong> <span th:text="${paidDate}">01/01/2026</span></p>
+                <p><strong>Phương thức:</strong> <span th:text="${paymentMethod}">Ví điện tử</span></p>
+                <p><strong>Trạng thái:</strong> <span class="status-badge status-paid">Đã thanh toán</span></p>
+                
+                <hr style="border: none; border-top: 1px solid #e9ecef; margin: 15px 0;">
+                
+                <div th:each="item : ${orderItems}">
+                    <h3 style="color: #667eea; margin: 15px 0 10px;" th:text="${item.name}">Tài khoản Genshin AR60</h3>
+                    
+                    <div class="credentials-box">
+                        <div class="label">📧 TÀI KHOẢN:</div>
+                        <span th:text="${item.username}">user@example.com</span>
+                        <br><br>
+                        <div class="label">🔐 MẬT KHẨU:</div>
+                        <span th:text="${item.password}">••••••••</span>
+                    </div>
+                    
+                    <div style="font-size: 14px; color: #718096; margin-top: 10px;">
+                        <p><strong>Giá:</strong> <span th:text="${#numbers.formatInteger(item.price, 0, 'COMMA')}">500,000</span>đ</p>
+                    </div>
+                </div>
+                
+                <div class="order-total">
+                    <span>Tổng cộng:</span>
+                    <span><span th:text="${#numbers.formatInteger(totalAmount, 0, 'COMMA')}">500,000</span>đ</span>
+                </div>
+            </div>
+            
+            <div class="warning-box">
+                <strong>🔒 Bảo mật:</strong>
+                <p style="margin: 10px 0 0 0;">Vui lòng <span class="highlight">đổi mật khẩu ngay</span> sau khi đăng nhập để bảo vệ tài khoản. Không chia sẻ thông tin đăng nhập với bất kỳ ai.</p>
+            </div>
+            
+            <p style="text-align: center; margin-top: 30px;">
+                <a th:href="${shopUrl}" class="btn">Xem đơn hàng</a>
+                <a th:href="${supportUrl}" class="btn btn-secondary">Liên hệ hỗ trợ</a>
+            </p>
+        </div>
+        <div class="email-footer">
+            <p>Email này được gửi tự động từ Genshin Cute Shop</p>
+            <p>Nếu bạn có câu hỏi, vui lòng liên hệ bộ phận hỗ trợ.</p>
+            <p>© 2026 Genshin Cute Shop. All rights reserved.</p>
+        </div>
+    </div>
+</body>
+</html>

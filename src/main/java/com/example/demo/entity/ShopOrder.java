@@ -31,6 +31,9 @@ public class ShopOrder {
     @Column(length = 32)
     private String paymentMethod;
 
+    @Column(length = 64)
+    private String transactionNo;
+
     private Date createdAt;
     private Date paidAt;
 

@@ -119,7 +119,7 @@ public class AuthenticationController {
             session.setAttribute("username", accountResponse.getUsername());
             session.setAttribute("role", accountResponse.getRole() != null ? accountResponse.getRole().name() : "USER");
             session.setAttribute("token", accountResponse.getToken());
-            session.setAttribute("walletFormatted", shopCatalogService.formatPrice(accountResponse.getWallet()));
+            session.setAttribute("wallet", shopCatalogService.formatPrice(accountResponse.getWallet()));
             session.setMaxInactiveInterval(10 * 60);
             redirectAttributes.addFlashAttribute("successMessage", "Đăng nhập thành công.");
             return "redirect:/";

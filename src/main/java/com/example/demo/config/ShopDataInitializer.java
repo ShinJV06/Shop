@@ -6,18 +6,19 @@ import com.example.demo.entity.Enum.ModerationStatus;
 import com.example.demo.entity.Enum.Role;
 import com.example.demo.entity.Game;
 import com.example.demo.entity.InventoryItem;
+import com.example.demo.entity.MysteryBag;
+import com.example.demo.entity.MysteryBagReward;
 import com.example.demo.entity.Product;
-import com.example.demo.repository.AccountRepository;
-import com.example.demo.repository.GameRepository;
-import com.example.demo.repository.InventoryItemRepository;
-import com.example.demo.repository.ProductRepository;
+import com.example.demo.repository.*;
 import com.example.demo.util.CredentialHasher;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Component;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Date;
+import java.util.List;
 import java.util.UUID;
 
 @Component
@@ -36,9 +37,16 @@ public class ShopDataInitializer implements CommandLineRunner {
     private GameRepository gameRepository;
 
     @Autowired
+    private MysteryBagRepository mysteryBagRepository;
+
+    @Autowired
+    private MysteryBagRewardRepository rewardRepository;
+
+    @Autowired
     private PasswordEncoder passwordEncoder;
 
     @Override
+    @Transactional
     public void run(String... args) {
         // Seed Games
         Game genshin = getOrCreateGame("genshin-impact", "Genshin Impact", "/images/genshin-banner.png", "Mua acc Genshin Impact giá rẻ");
@@ -46,7 +54,6 @@ public class ShopDataInitializer implements CommandLineRunner {
 
         // Seed Products
         if (productRepository.count() == 0) {
-            // Genshin Products
             seedProduct("starter-archon", "Acc Khởi Đầu Archon", 199_000L,
                     "AR 25+, có nhân vật 5★ ngẫu nhiên. Phù hợp để bắt đầu hành trình Teyvat!",
                     "/images/genshin-1.png", genshin);
@@ -56,8 +63,6 @@ public class ShopDataInitializer implements CommandLineRunner {
             seedProduct("endgame-vip", "Acc Endgame VIP", 1_290_000L,
                     "AR 55+, nhiều vũ khí trấn, đã clear abyss 36★. Dành cho game thủ đỉnh cao!",
                     "/images/genshin-1.png", genshin);
-
-            // Liên Quân Products
             seedProduct("lq-dong-bac", "Acc Đồng/Bạc/Vàng", 99_000L,
                     "Tài khoản rank Đồng, Bạc, Vàng - Phù hợp cho người mới chơi.",
                     "/images/lienquan-banner.png", lienquan);
@@ -101,6 +106,80 @@ public class ShopDataInitializer implements CommandLineRunner {
             admin.setCreatedAt(new Date());
             accountRepository.save(admin);
         }
+
+        // Tạo user test cho lootbox
+        if (accountRepository.count() == 1) {
+            Account testUser = new Account();
+            testUser.setUsername("testuser");
+            testUser.setEmail("test@localhost.local");
+            testUser.setPhone("0900000001");
+            testUser.setPassword(passwordEncoder.encode("Test@123"));
+            testUser.setRole(Role.USER);
+            testUser.setLocked(false);
+            testUser.setCreatedAt(new Date());
+            testUser.setWallet(50000L);
+            accountRepository.save(testUser);
+        }
+
+        // Khởi tạo Mystery Bags
+        if (mysteryBagRepository.count() == 0) {
+            initMysteryBags();
+        }
+    }
+
+    private void initMysteryBags() {
+        // Lấy product để gán cho rewards
+        List<Product> products = productRepository.findAll();
+        Product commonProduct = products.isEmpty() ? null : products.get(0);
+        Product rareProduct = products.size() > 1 ? products.get(1) : commonProduct;
+        Product legendaryProduct = products.size() > 2 ? products.get(2) : rareProduct;
+
+        // Túi Cơ Bản - 5K
+        MysteryBag basic = new MysteryBag();
+        basic.setName("Túi Cơ Bản");
+        basic.setPrice(5000);
+        basic.setDescription("Tỷ lệ cao nhận Acc 4★");
+        basic = mysteryBagRepository.save(basic);
+
+        createReward(basic, "Acc 3★ Ngẫu Nhiên", "COMMON", 60, 10, commonProduct);
+        createReward(basic, "Acc 4★ Hiếm", "RARE", 30, 5, rareProduct);
+        createReward(basic, "Acc 5★ Huyền Thoại", "LEGENDARY", 10, 1, legendaryProduct);
+
+        // Túi Đặc Biệt - 10K
+        MysteryBag special = new MysteryBag();
+        special.setName("Túi Đặc Biệt");
+        special.setPrice(10000);
+        special.setDescription("Cơ hội nhận Acc 5★");
+        special = mysteryBagRepository.save(special);
+
+        createReward(special, "Acc 3★ Ngẫu Nhiên", "COMMON", 40, 10, commonProduct);
+        createReward(special, "Acc 4★ Hiếm", "RARE", 40, 5, rareProduct);
+        createReward(special, "Acc 5★ Huyền Thoại", "LEGENDARY", 20, 2, legendaryProduct);
+
+        // Túi Huyền Thoại - 20K
+        MysteryBag legendary = new MysteryBag();
+        legendary.setName("Túi Huyền Thoại");
+        legendary.setPrice(20000);
+        legendary.setDescription("Tỷ lệ cao nhận Acc Limited");
+        legendary = mysteryBagRepository.save(legendary);
+
+        createReward(legendary, "Acc 4★ Hiếm", "RARE", 50, 5, rareProduct);
+        createReward(legendary, "Acc 5★ Huyền Thoại", "LEGENDARY", 50, 3, legendaryProduct);
+    }
+
+    private void createReward(MysteryBag bag, String name, String rarity, int chance, int quantity, Product product) {
+        MysteryBagReward reward = new MysteryBagReward();
+        reward.setMysteryBag(bag);
+        reward.setName(name);
+        reward.setRarity(rarity);
+        reward.setChance(chance);
+        reward.setQuantity(quantity);
+        reward.setDescription(name);
+        reward.setProduct(product);
+        if (product != null) {
+            reward.setProductNameSnapshot(product.getName());
+        }
+        rewardRepository.save(reward);
     }
 
     private Game getOrCreateGame(String slug, String name, String imagePath, String description) {

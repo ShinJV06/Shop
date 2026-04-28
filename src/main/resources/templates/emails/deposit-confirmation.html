@@ -1,0 +1,124 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title th:text="${subject}">Email</title>
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #f4f4f4;
+        }
+        .email-container {
+            max-width: 600px;
+            margin: 20px auto;
+            background: #ffffff;
+            border-radius: 12px;
+            overflow: hidden;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.1);
+        }
+        .email-header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 30px;
+            text-align: center;
+        }
+        .email-header h1 {
+            margin: 0;
+            font-size: 24px;
+            font-weight: 600;
+        }
+        .email-body {
+            padding: 30px;
+            color: #333333;
+        }
+        .email-body h2 {
+            color: #667eea;
+            margin-top: 0;
+        }
+        .order-summary {
+            background: #f8f9fa;
+            border-radius: 8px;
+            padding: 20px;
+            margin: 20px 0;
+        }
+        .btn {
+            display: inline-block;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 12px 30px;
+            text-decoration: none;
+            border-radius: 6px;
+            font-weight: 600;
+            margin: 10px 5px;
+        }
+        .email-footer {
+            background: #f8f9fa;
+            padding: 20px;
+            text-align: center;
+            color: #718096;
+            font-size: 12px;
+        }
+        .status-badge {
+            display: inline-block;
+            padding: 6px 16px;
+            border-radius: 20px;
+            font-weight: 600;
+            font-size: 14px;
+        }
+        .status-pending { background: #f6e05e; color: #744210; }
+        .status-paid { background: #48bb78; color: white; }
+        .warning-box {
+            background: #fffaf0;
+            border-left: 4px solid #ed8936;
+            padding: 15px;
+            margin: 20px 0;
+        }
+        .highlight {
+            color: #667eea;
+            font-weight: 600;
+        }
+    </style>
+</head>
+<body>
+    <div class="email-container">
+        <div class="email-header">
+            <h1> Genshin Cute Shop</h1>
+        </div>
+        <div class="email-body">
+            <h2>💳 Xác nhận nạp tiền</h2>
+            <p>Xin chào <span th:text="${username}">User</span>,</p>
+            
+            <p>Chúng tôi đã ghi nhận yêu cầu nạp tiền vào tài khoản của bạn.</p>
+            
+            <div class="order-summary">
+                <p><strong>Số tiền nạp:</strong> <span class="highlight" style="font-size: 20px;"><span th:text="${#numbers.formatInteger(amount, 0, 'COMMA')}">500,000</span>đ</span></p>
+                <p><strong>Mã giao dịch:</strong> #<span th:text="${transactionId}">TXN123456</span></p>
+                <p><strong>Phương thức:</strong> <span th:text="${paymentMethod}">Chuyển khoản ngân hàng</span></p>
+                <p><strong>Thời gian:</strong> <span th:text="${depositDate}">01/01/2026</span></p>
+                <p><strong>Trạng thái:</strong> <span class="status-badge status-pending">Đang xử lý</span></p>
+            </div>
+            
+            <div class="warning-box">
+                <strong>📝 Hướng dẫn:</strong>
+                <p style="margin: 10px 0 0 0;">Vui lòng chuyển khoản với nội dung: <span class="highlight" th:text="${transferContent}">NAPTIEN 123456</span></p>
+                <p style="margin: 5px 0 0 0;">đến số tài khoản: <span th:text="${bankAccount}">1234567890</span></p>
+                <p style="margin: 5px 0 0 0;">tại ngân hàng: <span th:text="${bankName}">Vietcombank</span></p>
+            </div>
+            
+            <p>Sau khi chúng tôi xác nhận thanh toán, số dư ví của bạn sẽ được cập nhật tự động.</p>
+            
+            <p style="text-align: center; margin-top: 30px;">
+                <a th:href="${walletUrl}" class="btn">Xem ví của tôi</a>
+            </p>
+        </div>
+        <div class="email-footer">
+            <p>Email này được gửi tự động từ Genshin Cute Shop</p>
+            <p>Nếu bạn có câu hỏi, vui lòng liên hệ bộ phận hỗ trợ.</p>
+            <p>© 2026 Genshin Cute Shop. All rights reserved.</p>
+        </div>
+    </div>
+</body>
+</html>

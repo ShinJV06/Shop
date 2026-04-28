@@ -1,11 +1,13 @@
 FROM eclipse-temurin:21-jdk-alpine AS build
 
+RUN apk add --no-cache maven
+
 WORKDIR /app
 
 COPY pom.xml .
 COPY src ./src
 
-RUN ./mvnw clean package -DskipTests
+RUN mvn clean package -DskipTests
 
 FROM eclipse-temurin:21-jre-alpine
 

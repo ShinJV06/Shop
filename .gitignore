@@ -19,6 +19,13 @@ target/
 *.iml
 *.ipr
 
+### Sensitive Files ###
+application.properties
+application-production.properties
+application-dev.properties
+*.env
+.env
+
 ### NetBeans ###
 /nbproject/private/
 /nbbuild/

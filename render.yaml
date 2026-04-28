@@ -1,0 +1,72 @@
+services:
+  - type: web
+    name: demo-app
+    env: java
+    region: singapore
+    plan: free
+    buildCommand: ./mvnw clean package -DskipTests
+    startCommand: java -jar target/demo-0.0.1-SNAPSHOT.jar
+    healthCheckPath: /
+    envVars:
+      - key: JAVA_OPTS
+        value: "-Xmx512m -Xms256m"
+      - key: SPRING_PROFILES_ACTIVE
+        value: production
+
+      # Database Configuration (PostgreSQL on Render)
+      - key: SPRING_DATASOURCE_URL
+        sync: false
+      - key: SPRING_DATASOURCE_USERNAME
+        sync: false
+      - key: SPRING_DATASOURCE_PASSWORD
+        sync: false
+
+      # JPA Settings for PostgreSQL
+      - key: SPRING_JPA_DATABASE_PLATFORM
+        value: org.hibernate.dialect.PostgreSQLDialect
+      - key: SPRING_JPA_HIBERNATE_DDL_AUTO
+        value: update
+
+      # Server Config
+      - key: SERVER_PORT
+        value: "10000"
+
+      # Application Base URL (thay đổi sau khi deploy)
+      - key: APP_BASE_URL
+        sync: false
+
+      # Email Config
+      - key: SPRING_MAIL_HOST
+        value: smtp.gmail.com
+      - key: SPRING_MAIL_PORT
+        value: "587"
+      - key: SPRING_MAIL_USERNAME
+        sync: false
+      - key: SPRING_MAIL_PASSWORD
+        sync: false
+
+      # OAuth2 Google
+      - key: SPRING_SECURITY_OAUTH2_CLIENT_REGISTRATION_GOOGLE_CLIENT_ID
+        sync: false
+      - key: SPRING_SECURITY_OAUTH2_CLIENT_REGISTRATION_GOOGLE_CLIENT_SECRET
+        sync: false
+
+      # VNPay
+      - key: Vnpay_MERCHANT_CODE
+        sync: false
+      - key: Vnpay_MERCHANT_HASH_SECRET
+        sync: false
+
+      # MoMo
+      - key: MOMO_PARTNER_CODE
+        sync: false
+      - key: MOMO_ACCESS_KEY
+        sync: false
+      - key: MOMO_SECRET_KEY
+        sync: false
+
+      # Payment URLs
+      - key: Vnpay_RETURN_URL
+        sync: false
+      - key: MOMO_RETURN_URL
+        sync: false

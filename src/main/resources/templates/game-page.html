@@ -174,6 +174,13 @@
             color: var(--accent-purple-light);
         }
 
+        .brand-img {
+            width: 42px;
+            height: 42px;
+            border-radius: 12px;
+            object-fit: cover;
+        }
+
         .brand-icon {
             width: 40px;
             height: 40px;
@@ -1393,21 +1400,11 @@
     <div class="bg-gaming"></div>
     <div class="bg-particles" id="particles"></div>
 
-    <!-- Audio -->
-    <audio id="bgMusic" loop preload="none">
-        <source th:src="@{/audio/Pokiwar Music.mp3}" type="audio/mpeg">
-    </audio>
-
-    <!-- Sound Toggle Button -->
-    <button class="sound-toggle" id="soundToggle" title="Bật/Tắt âm thanh">
-        <span class="sound-icon" id="soundIcon">&#128264;</span>
-        <span class="sound-label" id="soundLabel">Bật nhạc</span>
-    </button>
-
     <!-- Header -->
     <header class="header">
         <a class="brand" th:href="@{/}">
-            <span class="brand-icon">&#127918;</span>
+        <a th:href="@{/}">
+            <img class="brand-img" src="/images/logo.png" alt="Logo">
             Genshin Cute Shop
         </a>
         <nav class="nav">
@@ -1433,6 +1430,10 @@
                         &#128176; Số dư: <span th:text="${session.wallet}">0</span>
                     </div>
                     <a th:href="@{/my-orders}" style="display:block;padding:10px 0;font-weight:700;color:var(--accent-purple-light);text-decoration:none;font-size:0.9rem">&#128203; Lịch sử mua</a>
+                    <button class="sound-toggle" id="soundToggle" style="width:100%;margin:8px 0;padding:10px;border:none;border-radius:10px;background:linear-gradient(135deg,#667eea,#764ba2);color:#fff;font-weight:700;font-size:0.85rem;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:8px;transition:all 0.3s ease;font-family:inherit;position:static">
+                        <span class="sound-icon" id="soundIcon">🔊</span>
+                        <span class="sound-label" id="soundLabel">Tắt nhạc</span>
+                    </button>
                     <form th:action="@{/auth/logout}" method="post">
                         <button class="user-logout" type="submit">Đăng xuất</button>
                     </form>
@@ -1680,37 +1681,65 @@
         }
 
         // Sound Toggle
-        let isMuted = false;
-        if (bgMusic) bgMusic.volume = 0.15;
+        const audioSource = '/audio/Pokiwar Music.mp3';
+        let bgMusic = null;
+        let audioCreated = false;
+        let isMuted = localStorage.getItem('musicMuted') === 'true';
 
-        function startMusic() {
-            if (bgMusic) {
-                bgMusic.play().then(() => {
-                    soundToggle.classList.add('playing');
-                    soundIcon.innerHTML = '&#128264;';
-                    soundLabel.textContent = 'Tắt nhạc';
-                }).catch(() => {
-                    soundIcon.innerHTML = '&#128263;';
-                    soundLabel.textContent = 'Bật nhạc';
-                });
+        function createAudio() {
+            if (audioCreated) return;
+            bgMusic = document.createElement('audio');
+            bgMusic.loop = true;
+            bgMusic.preload = 'none';
+            bgMusic.innerHTML = '<source src="' + audioSource + '" type="audio/mpeg">';
+            bgMusic.volume = 0.15;
+            document.body.appendChild(bgMusic);
+            audioCreated = true;
+        }
+
+        function updateSoundUI() {
+            if (isMuted) {
+                soundIcon.textContent = '🔇';
+                soundLabel.textContent = 'Bật nhạc';
+                soundToggle.style.background = 'linear-gradient(135deg, #9ca3af, #6b7280)';
+            } else {
+                soundIcon.textContent = '🔊';
+                soundLabel.textContent = 'Tắt nhạc';
+                soundToggle.style.background = 'linear-gradient(135deg, #667eea, #764ba2)';
             }
         }
 
         soundToggle.addEventListener('click', function() {
+            createAudio();
+            isMuted = !isMuted;
+            localStorage.setItem('musicMuted', isMuted);
             if (isMuted) {
-                isMuted = false;
-                if (bgMusic) bgMusic.muted = false;
-                soundToggle.classList.remove('muted');
-                soundToggle.classList.add('playing');
-                soundIcon.innerHTML = '&#128264;';
-                soundLabel.textContent = 'Tắt nhạc';
+                bgMusic.pause();
             } else {
-                isMuted = true;
-                if (bgMusic) bgMusic.muted = true;
-                soundToggle.classList.remove('playing');
-                soundToggle.classList.add('muted');
-                soundIcon.innerHTML = '&#128263;';
-                soundLabel.textContent = 'Bật nhạc';
+                bgMusic.play().catch(() => {});
+            }
+            updateSoundUI();
+        });
+
+        // Initialize UI
+        updateSoundUI();
+
+        // Auto play music on first interaction
+        if (!isMuted) {
+            document.addEventListener('click', function initMusic() {
+                createAudio();
+                bgMusic.play().catch(() => {});
+                document.removeEventListener('click', initMusic);
+            }, { once: true });
+        }
+
+        // Listen for storage changes
+        window.addEventListener('storage', function(e) {
+            if (e.key === 'musicMuted' && bgMusic) {
+                isMuted = e.newValue === 'true';
+                if (isMuted) bgMusic.pause();
+                else bgMusic.play().catch(() => {});
+                updateSoundUI();
             }
         });
 

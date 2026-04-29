@@ -249,6 +249,11 @@ public class ShopController {
         return "cart";
     }
 
+    @GetMapping("/contact")
+    public String contactPage() {
+        return "contact";
+    }
+
     @GetMapping("/my-orders")
     public String myOrders(HttpSession session, Model model, RedirectAttributes ra) {
         Long userId = (Long) session.getAttribute("userId");

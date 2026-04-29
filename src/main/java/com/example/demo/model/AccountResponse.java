@@ -16,4 +16,5 @@ public class AccountResponse {
     Date createdAt;
     double wallet;
     String provider;
+    String avatarUrl;
 }

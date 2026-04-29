@@ -6,145 +6,922 @@
     <title>Nạp tiền</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=M+PLUS+Rounded+1c:wght@400;500;700;800&family=Quicksand:wght@500;700&display=swap" rel="stylesheet">
-    <link rel="stylesheet" th:href="@{/css/auth-cute.css}">
+    <link href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@400;500;600;700;800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Be Vietnam Pro', sans-serif;
+            min-height: 100vh;
+            background: linear-gradient(135deg, #fce7f3 0%, #fbcfe8 25%, #f9a8d4 50%, #f472b6 75%, #ec4899 100%);
+            background-size: 400% 400%;
+            animation: gradientShift 15s ease infinite;
+            padding: 20px;
+            position: relative;
+            overflow-x: hidden;
+        }
+
+        @keyframes gradientShift {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
+        }
+
+        /* Floating decorations */
+        .decoration {
+            position: fixed;
+            pointer-events: none;
+            z-index: 0;
+        }
+
+        .sparkle {
+            width: 8px;
+            height: 8px;
+            background: #fff;
+            border-radius: 50%;
+            animation: sparkle 2s ease-in-out infinite;
+        }
+
+        .sparkle:nth-child(1) { top: 10%; left: 10%; animation-delay: 0s; }
+        .sparkle:nth-child(2) { top: 20%; right: 15%; animation-delay: 0.3s; }
+        .sparkle:nth-child(3) { top: 60%; left: 5%; animation-delay: 0.6s; }
+        .sparkle:nth-child(4) { top: 80%; right: 10%; animation-delay: 0.9s; }
+        .sparkle:nth-child(5) { top: 40%; right: 5%; animation-delay: 1.2s; }
+        .sparkle:nth-child(6) { bottom: 20%; left: 15%; animation-delay: 1.5s; }
+
+        @keyframes sparkle {
+            0%, 100% { transform: scale(1); opacity: 0.3; }
+            50% { transform: scale(1.5); opacity: 1; }
+        }
+
+        .bubble {
+            border-radius: 50%;
+            background: rgba(255, 255, 255, 0.15);
+            animation: float 6s ease-in-out infinite;
+        }
+
+        .bubble:nth-child(7) { width: 100px; height: 100px; top: 15%; right: -30px; animation-delay: 0s; }
+        .bubble:nth-child(8) { width: 60px; height: 60px; top: 50%; left: -20px; animation-delay: 1s; }
+        .bubble:nth-child(9) { width: 80px; height: 80px; bottom: 10%; right: 10%; animation-delay: 2s; }
+
+        @keyframes float {
+            0%, 100% { transform: translateY(0) rotate(0deg); }
+            50% { transform: translateY(-20px) rotate(5deg); }
+        }
+
+        .back-btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            padding: 12px 24px;
+            background: rgba(255, 255, 255, 0.95);
+            border: none;
+            border-radius: 50px;
+            color: #ec4899;
+            font-size: 0.95rem;
+            font-weight: 700;
+            text-decoration: none;
+            box-shadow: 0 4px 20px rgba(236, 72, 153, 0.3);
+            transition: all 0.3s ease;
+            position: relative;
+            z-index: 10;
+            backdrop-filter: blur(10px);
+        }
+
+        .back-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 30px rgba(236, 72, 153, 0.4);
+        }
+
+        .back-btn i {
+            transition: transform 0.3s ease;
+        }
+
+        .back-btn:hover i {
+            transform: translateX(-4px);
+        }
+
+        .container {
+            max-width: 520px;
+            margin: 30px auto;
+            position: relative;
+            z-index: 10;
+        }
+
+        .card {
+            background: rgba(255, 255, 255, 0.98);
+            border-radius: 28px;
+            padding: 32px;
+            box-shadow: 
+                0 20px 60px rgba(236, 72, 153, 0.2),
+                0 0 0 1px rgba(255, 255, 255, 0.5);
+            backdrop-filter: blur(20px);
+            animation: cardAppear 0.6s ease-out;
+        }
+
+        @keyframes cardAppear {
+            from {
+                opacity: 0;
+                transform: translateY(30px) scale(0.95);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0) scale(1);
+            }
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 28px;
+        }
+
+        .icon-wrap {
+            width: 80px;
+            height: 80px;
+            background: linear-gradient(135deg, #fce7f3, #fbcfe8, #f9a8d4);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 16px;
+            box-shadow: 0 8px 30px rgba(236, 72, 153, 0.3);
+            animation: pulse 2s ease-in-out infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.05); }
+        }
+
+        .icon-wrap i {
+            font-size: 32px;
+            background: linear-gradient(135deg, #ec4899, #be185d);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .header h1 {
+            font-size: 1.8rem;
+            font-weight: 800;
+            background: linear-gradient(135deg, #ec4899, #be185d, #9333ea);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            margin-bottom: 4px;
+        }
+
+        .header p {
+            color: #9d6580;
+            font-size: 0.9rem;
+            font-weight: 500;
+        }
+
+        .balance-card {
+            background: linear-gradient(135deg, #fce7f3 0%, #fbcfe8 50%, #f9a8d4 100%);
+            border-radius: 20px;
+            padding: 24px;
+            text-align: center;
+            margin-bottom: 24px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .balance-card::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: radial-gradient(circle, rgba(255,255,255,0.3) 0%, transparent 60%);
+            animation: shine 3s ease-in-out infinite;
+        }
+
+        @keyframes shine {
+            0%, 100% { transform: translate(-30%, -30%); }
+            50% { transform: translate(30%, 30%); }
+        }
+
+        .balance-label {
+            font-size: 0.85rem;
+            font-weight: 600;
+            color: #9d6580;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin-bottom: 8px;
+            position: relative;
+        }
+
+        .balance-amount {
+            font-size: 2.5rem;
+            font-weight: 800;
+            background: linear-gradient(135deg, #be185d, #ec4899, #9333ea);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            position: relative;
+        }
+
+        .section-title {
+            font-size: 1rem;
+            font-weight: 700;
+            color: #4a2040;
+            margin-bottom: 14px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .section-title i {
+            color: #ec4899;
+        }
+
+        .amount-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 10px;
+            margin-bottom: 16px;
+        }
+
+        .amount-btn {
+            padding: 14px 8px;
+            border: 2px solid #fbcfe8;
+            border-radius: 14px;
+            background: #fff;
+            color: #4a2040;
+            font-weight: 700;
+            font-size: 0.9rem;
+            font-family: inherit;
+            cursor: pointer;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .amount-btn::before {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            width: 0;
+            height: 0;
+            background: linear-gradient(135deg, #fce7f3, #fbcfe8);
+            border-radius: 50%;
+            transform: translate(-50%, -50%);
+            transition: width 0.4s ease, height 0.4s ease;
+        }
+
+        .amount-btn:hover {
+            border-color: #f472b6;
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(244, 114, 182, 0.3);
+        }
+
+        .amount-btn:hover::before {
+            width: 200%;
+            height: 200%;
+        }
+
+        .amount-btn.active {
+            border-color: #ec4899;
+            background: linear-gradient(135deg, #ec4899, #be185d);
+            color: #fff;
+            box-shadow: 0 6px 25px rgba(236, 72, 153, 0.4);
+        }
+
+        .amount-btn.active::before {
+            background: linear-gradient(135deg, rgba(255,255,255,0.2), rgba(255,255,255,0.1));
+        }
+
+        .amount-btn span {
+            position: relative;
+            z-index: 1;
+        }
+
+        .custom-input-wrap {
+            position: relative;
+            margin-top: 16px;
+        }
+
+        .custom-input-wrap label {
+            display: block;
+            font-size: 0.9rem;
+            font-weight: 600;
+            color: #4a2040;
+            margin-bottom: 10px;
+        }
+
+        .input-wrapper {
+            position: relative;
+        }
+
+        .input-wrapper input {
+            width: 100%;
+            padding: 16px 50px 16px 20px;
+            border: 2px solid #fbcfe8;
+            border-radius: 14px;
+            font-size: 1rem;
+            font-weight: 600;
+            font-family: inherit;
+            color: #4a2040;
+            background: #fff;
+            outline: none;
+            transition: all 0.3s ease;
+        }
+
+        .input-wrapper input:focus {
+            border-color: #ec4899;
+            box-shadow: 0 0 0 4px rgba(236, 72, 153, 0.15);
+        }
+
+        .input-wrapper input::placeholder {
+            color: #d4a5bb;
+        }
+
+        .input-wrapper .currency {
+            position: absolute;
+            right: 16px;
+            top: 50%;
+            transform: translateY(-50%);
+            font-weight: 700;
+            color: #ec4899;
+            font-size: 1rem;
+        }
+
+        .submit-btn {
+            width: 100%;
+            padding: 18px;
+            margin-top: 24px;
+            border: none;
+            border-radius: 16px;
+            background: linear-gradient(135deg, #ec4899, #be185d);
+            color: #fff;
+            font-size: 1.1rem;
+            font-weight: 700;
+            font-family: inherit;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+            box-shadow: 0 8px 30px rgba(236, 72, 153, 0.4);
+        }
+
+        .submit-btn::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.3), transparent);
+            transition: left 0.5s ease;
+        }
+
+        .submit-btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 12px 40px rgba(236, 72, 153, 0.5);
+        }
+
+        .submit-btn:hover::before {
+            left: 100%;
+        }
+
+        .submit-btn:active {
+            transform: translateY(-1px);
+        }
+
+        .submit-btn i {
+            margin-right: 8px;
+        }
+
+        .guide-card {
+            background: linear-gradient(135deg, #fce7f3, #fdf2f8);
+            border-radius: 16px;
+            padding: 20px;
+            margin-top: 24px;
+            border: 1px solid #fbcfe8;
+        }
+
+        .guide-title {
+            font-size: 0.95rem;
+            font-weight: 700;
+            color: #be185d;
+            margin-bottom: 12px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .guide-title i {
+            animation: bounce 1s ease-in-out infinite;
+        }
+
+        @keyframes bounce {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-3px); }
+        }
+
+        .guide-list {
+            list-style: none;
+            counter-reset: guide-counter;
+        }
+
+        .guide-list li {
+            counter-increment: guide-counter;
+            font-size: 0.85rem;
+            color: #4a2040;
+            font-weight: 500;
+            padding: 8px 0;
+            padding-left: 32px;
+            position: relative;
+            line-height: 1.5;
+        }
+
+        .guide-list li::before {
+            content: counter(guide-counter);
+            position: absolute;
+            left: 0;
+            top: 50%;
+            transform: translateY(-50%);
+            width: 22px;
+            height: 22px;
+            background: linear-gradient(135deg, #ec4899, #be185d);
+            color: #fff;
+            border-radius: 50%;
+            font-size: 0.75rem;
+            font-weight: 700;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .history-section {
+            margin-top: 28px;
+            padding-top: 24px;
+            border-top: 2px dashed #fbcfe8;
+        }
+
+        .history-title {
+            font-size: 1rem;
+            font-weight: 700;
+            color: #4a2040;
+            margin-bottom: 16px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .history-title i {
+            color: #9333ea;
+        }
+
+        .history-empty {
+            text-align: center;
+            padding: 30px;
+            color: #9d6580;
+            font-weight: 600;
+            font-size: 0.9rem;
+        }
+
+        .history-empty i {
+            font-size: 2.5rem;
+            margin-bottom: 10px;
+            opacity: 0.5;
+        }
+
+        .history-item {
+            display: flex;
+            align-items: center;
+            gap: 14px;
+            padding: 14px 0;
+            border-bottom: 1px solid #fce7f3;
+            transition: background 0.2s ease;
+        }
+
+        .history-item:last-child {
+            border-bottom: none;
+        }
+
+        .history-item:hover {
+            background: rgba(252, 231, 243, 0.5);
+            margin: 0 -16px;
+            padding-left: 16px;
+            padding-right: 16px;
+            border-radius: 12px;
+        }
+
+        .history-icon {
+            width: 44px;
+            height: 44px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-shrink: 0;
+        }
+
+        .history-icon.deposit {
+            background: linear-gradient(135deg, #dcfce7, #bbf7d0);
+            color: #16a34a;
+        }
+
+        .history-icon.withdraw {
+            background: linear-gradient(135deg, #fee2e2, #fecaca);
+            color: #dc2626;
+        }
+
+        .history-icon i {
+            font-size: 1rem;
+        }
+
+        .history-info {
+            flex: 1;
+            min-width: 0;
+        }
+
+        .history-detail {
+            font-weight: 600;
+            color: #4a2040;
+            font-size: 0.9rem;
+            margin-bottom: 2px;
+        }
+
+        .history-date {
+            font-size: 0.8rem;
+            color: #9d6580;
+            font-weight: 500;
+        }
+
+        .history-amount {
+            font-weight: 800;
+            font-size: 0.95rem;
+        }
+
+        .history-amount.deposit {
+            color: #16a34a;
+        }
+
+        .history-amount.withdraw {
+            color: #dc2626;
+        }
+
+        .msg {
+            padding: 14px 18px;
+            border-radius: 12px;
+            font-weight: 600;
+            font-size: 0.9rem;
+            margin-bottom: 16px;
+            display: none;
+            animation: slideIn 0.3s ease-out;
+        }
+
+        @keyframes slideIn {
+            from {
+                opacity: 0;
+                transform: translateY(-10px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .msg.success {
+            background: linear-gradient(135deg, #dcfce7, #bbf7d0);
+            color: #16a34a;
+            border: 1px solid #86efac;
+        }
+
+        .msg.error {
+            background: linear-gradient(135deg, #fee2e2, #fecaca);
+            color: #dc2626;
+            border: 1px solid #fca5a5;
+        }
+
+        .footer-links {
+            display: flex;
+            justify-content: center;
+            gap: 24px;
+            margin-top: 24px;
+            padding-top: 20px;
+            border-top: 2px dashed #fbcfe8;
+        }
+
+        .footer-links a {
+            color: #ec4899;
+            text-decoration: none;
+            font-weight: 600;
+            font-size: 0.9rem;
+            transition: all 0.2s ease;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .footer-links a:hover {
+            color: #be185d;
+            transform: translateY(-2px);
+        }
+
+        .footer-links a i {
+            font-size: 0.85rem;
+        }
+
+        /* Responsive */
+        @media (max-width: 480px) {
+            body {
+                padding: 12px;
+            }
+
+            .card {
+                padding: 24px 20px;
+                border-radius: 24px;
+            }
+
+            .icon-wrap {
+                width: 70px;
+                height: 70px;
+            }
+
+            .icon-wrap i {
+                font-size: 28px;
+            }
+
+            .header h1 {
+                font-size: 1.5rem;
+            }
+
+            .balance-amount {
+                font-size: 2rem;
+            }
+
+            .amount-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+
+            .amount-btn {
+                padding: 12px 8px;
+                font-size: 0.85rem;
+            }
+        }
+    </style>
 </head>
 <body>
-<div class="falling-hearts" aria-hidden="true">
-    <span>❤</span><span>✿</span><span>❤</span><span>❀</span><span>❤</span>
-    <span>✿</span><span>❤</span><span>❀</span><span>❤</span><span>✿</span>
-</div>
-<a class="page-back" th:href="@{/}">← Về trang chủ</a>
+    <!-- Floating decorations -->
+    <div class="decoration sparkle"></div>
+    <div class="decoration sparkle"></div>
+    <div class="decoration sparkle"></div>
+    <div class="decoration sparkle"></div>
+    <div class="decoration sparkle"></div>
+    <div class="decoration sparkle"></div>
+    <div class="decoration bubble"></div>
+    <div class="decoration bubble"></div>
+    <div class="decoration bubble"></div>
 
-<div class="page-wrap" style="padding-top:20px">
-    <div class="card" style="max-width:520px">
-        <div class="badge">💰 Ví của bạn</div>
-        <h2 class="title">Nạp tiền</h2>
+    <a class="back-btn" th:href="@{/}">
+        <i class="fas fa-arrow-left"></i>
+        Về trang chủ
+    </a>
 
-        <div class="wallet-balance" style="text-align:center;margin:20px 0">
-            <div style="font-size:0.85rem;color:#9d6580;font-weight:700;margin-bottom:4px">Số dư hiện tại</div>
-            <div id="walletBalance" style="font-size:2.2rem;font-weight:900;background:linear-gradient(135deg,#be185d,#a855f7);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text" th:text="${wallet}">0đ</div>
-        </div>
-
-        <div class="msg success" id="msgSuccess" style="display:none"></div>
-        <div class="msg error" id="msgError" style="display:none"></div>
-
-        <div style="margin:20px 0">
-            <label style="font-weight:700;color:#4a2040;display:block;margin-bottom:8px">Chọn số tiền nạp:</label>
-            <div class="amount-options" style="display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-bottom:16px">
-                <button type="button" class="amount-btn active" onclick="selectAmount(10000)" data-amount="10000">10.000đ</button>
-                <button type="button" class="amount-btn" onclick="selectAmount(20000)" data-amount="20000">20.000đ</button>
-                <button type="button" class="amount-btn" onclick="selectAmount(50000)" data-amount="50000">50.000đ</button>
-                <button type="button" class="amount-btn" onclick="selectAmount(100000)" data-amount="100000">100.000đ</button>
-                <button type="button" class="amount-btn" onclick="selectAmount(200000)" data-amount="200000">200.000đ</button>
-                <button type="button" class="amount-btn" onclick="selectAmount(500000)" data-amount="500000">500.000đ</button>
-            </div>
-            <label style="font-weight:700;color:#4a2040;display:block;margin-bottom:8px">Hoặc nhập số tiền khác:</label>
-            <input type="number" id="customAmount" min="1000" step="1000" placeholder="Nhập số tiền..." style="width:100%;padding:10px 14px;border:2px solid #fbcfe8;border-radius:12px;font-size:1rem;font-family:inherit;font-weight:700;color:#4a2040;background:#fff7f9;outline:none" oninput="clearAmountSelection()">
-        </div>
-
-        <button class="btn" style="width:100%;font-size:1rem;padding:13px;margin-top:8px" onclick="submitDeposit()">
-            <i class="fas fa-wallet"></i> Nạp tiền ngay
-        </button>
-
-        <div style="margin-top:20px;padding:14px;background:#fce7f3;border-radius:14px;border:1px solid #fbcfe8">
-            <div style="font-weight:800;color:#be185d;margin-bottom:8px;font-size:0.9rem">📌 Hướng dẫn nạp tiền</div>
-            <ol style="font-size:0.82rem;color:#4a2040;font-weight:600;padding-left:16px;line-height:1.8">
-                <li>Chọn hoặc nhập số tiền muốn nạp</li>
-                <li>Bấm "Nạp tiền ngay"</li>
-                <li>Chuyển khoản qua Momo/ZaloBank theo thông tin hiển thị</li>
-                <li>Admin sẽ cộng tiền vào tài khoản trong vài phút</li>
-            </ol>
-        </div>
-
-        <div style="margin-top:24px">
-            <div style="font-weight:800;color:#4a2040;margin-bottom:12px">📜 Lịch sử giao dịch</div>
-            <div th:if="${#lists.isEmpty(transactions)}" style="text-align:center;color:#9d6580;font-weight:700;padding:20px 0;font-size:0.88rem">Chưa có giao dịch nào.</div>
-            <div th:each="tx : ${transactions}" style="display:flex;align-items:center;gap:10px;padding:10px 0;border-bottom:1px solid #fbcfe8">
-                <div style="width:36px;height:36px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:0.9rem"
-                     th:style="${tx.type == 'DEPOSIT'} ? 'background:#dcfce7;color:#16a34a' : 'background:#fee2e2;color:#dc2626'">
-                    <i class="fas" th:class="${tx.type == 'DEPOSIT'} ? 'fa-arrow-down' : 'fa-arrow-up'"></i>
+    <div class="container">
+        <div class="card">
+            <!-- Header -->
+            <div class="header">
+                <div class="icon-wrap">
+                    <i class="fas fa-wallet"></i>
                 </div>
-                <div style="flex:1">
-                    <div style="font-weight:700;font-size:0.85rem;color:#4a2040" th:text="${tx.detail}">Nạp tiền</div>
-                    <div style="font-size:0.75rem;color:#9d6580" th:text="${#dates.format(tx.createdAt, 'dd/MM/yyyy HH:mm')}">-</div>
-                </div>
-                <div style="font-weight:800;font-size:0.9rem"
-                     th:style="${tx.type == 'DEPOSIT'} ? 'color:#16a34a' : 'color:#dc2626'"
-                     th:text="${tx.type == 'DEPOSIT'} ? '+' + ${#numbers.formatDecimal(tx.amount != null ? tx.amount : 0, 0, 'COMMA', 0, 'POINT')} + 'đ' : '-' + ${#numbers.formatDecimal(tx.amount != null ? tx.amount : 0, 0, 'COMMA', 0, 'POINT')} + 'đ'">0đ</div>
+                <h1>Nạp tiền</h1>
+                <p>Ví của bạn</p>
             </div>
-        </div>
 
-        <div class="links" style="margin-top:20px">
-            <a th:href="@{/profile}">Chỉnh sửa profile</a>
-            <a th:href="@{/}">Trang chủ</a>
+            <!-- Messages -->
+            <div class="msg success" id="msgSuccess"></div>
+            <div class="msg error" id="msgError"></div>
+
+            <!-- Balance Card -->
+            <div class="balance-card">
+                <div class="balance-label">Số dư hiện tại</div>
+                <div class="balance-amount" id="walletBalance" th:text="${wallet}">0đ</div>
+            </div>
+
+            <!-- Amount Selection -->
+            <div class="section-title">
+                <i class="fas fa-coins"></i>
+                Chọn số tiền nạp
+            </div>
+
+            <div class="amount-grid">
+                <button type="button" class="amount-btn active" onclick="selectAmount(10000)" data-amount="10000">
+                    <span>10.000đ</span>
+                </button>
+                <button type="button" class="amount-btn" onclick="selectAmount(20000)" data-amount="20000">
+                    <span>20.000đ</span>
+                </button>
+                <button type="button" class="amount-btn" onclick="selectAmount(50000)" data-amount="50000">
+                    <span>50.000đ</span>
+                </button>
+                <button type="button" class="amount-btn" onclick="selectAmount(100000)" data-amount="100000">
+                    <span>100.000đ</span>
+                </button>
+                <button type="button" class="amount-btn" onclick="selectAmount(200000)" data-amount="200000">
+                    <span>200.000đ</span>
+                </button>
+                <button type="button" class="amount-btn" onclick="selectAmount(500000)" data-amount="500000">
+                    <span>500.000đ</span>
+                </button>
+            </div>
+
+            <!-- Custom Amount -->
+            <div class="custom-input-wrap">
+                <label>Hoặc nhập số tiền khác:</label>
+                <div class="input-wrapper">
+                    <input type="number" id="customAmount" min="1000" step="1000" placeholder="Nhập số tiền..." oninput="clearAmountSelection()">
+                    <span class="currency">đ</span>
+                </div>
+            </div>
+
+            <!-- Submit Button -->
+            <button class="submit-btn" onclick="submitDeposit()">
+                <i class="fas fa-paper-plane"></i>
+                Nạp tiền ngay
+            </button>
+
+            <!-- Guide -->
+            <div class="guide-card">
+                <div class="guide-title">
+                    <i class="fas fa-lightbulb"></i>
+                    Hướng dẫn nạp tiền
+                </div>
+                <ol class="guide-list">
+                    <li>Chọn hoặc nhập số tiền muốn nạp</li>
+                    <li>Bấm "Nạp tiền ngay"</li>
+                    <li>Chuyển khoản qua Momo/ZaloBank theo thông tin hiển thị</li>
+                    <li>Admin sẽ cộng tiền vào tài khoản trong vài phút</li>
+                </ol>
+            </div>
+
+            <!-- Transaction History -->
+            <div class="history-section">
+                <div class="history-title">
+                    <i class="fas fa-history"></i>
+                    Lịch sử giao dịch
+                </div>
+
+                <div th:if="${#lists.isEmpty(transactions)}" class="history-empty">
+                    <i class="fas fa-receipt"></i>
+                    <div>Chưa có giao dịch nào</div>
+                </div>
+
+                <div th:each="tx : ${transactions}" class="history-item">
+                    <div class="history-icon" th:class="${tx.type == 'DEPOSIT'} ? 'deposit' : 'withdraw'">
+                        <i class="fas" th:class="${tx.type == 'DEPOSIT'} ? 'fa-arrow-down' : 'fa-arrow-up'"></i>
+                    </div>
+                    <div class="history-info">
+                        <div class="history-detail" th:text="${tx.detail}">Nạp tiền</div>
+                        <div class="history-date" th:text="${#dates.format(tx.createdAt, 'dd/MM/yyyy HH:mm')}">-</div>
+                    </div>
+                    <div class="history-amount" 
+                         th:class="${tx.type == 'DEPOSIT'} ? 'deposit' : 'withdraw'"
+                         th:text="${tx.type == 'DEPOSIT'} ? '+' + ${#numbers.formatDecimal(tx.amount != null ? tx.amount : 0, 0, 'COMMA', 0, 'POINT')} + 'đ' : '-' + ${#numbers.formatDecimal(tx.amount != null ? tx.amount : 0, 0, 'COMMA', 0, 'POINT')} + 'đ'">
+                        0đ
+                    </div>
+                </div>
+            </div>
+
+            <!-- Footer Links -->
+            <div class="footer-links">
+                <a th:href="@{/profile}">
+                    <i class="fas fa-user"></i>
+                    Profile
+                </a>
+                <a th:href="@{/}">
+                    <i class="fas fa-home"></i>
+                    Trang chủ
+                </a>
+            </div>
         </div>
     </div>
-</div>
 
-<style>
-.amount-btn {
-    padding: 10px 8px;
-    border: 2px solid #fbcfe8;
-    border-radius: 12px;
-    background: #fff;
-    color: #4a2040;
-    font-weight: 800;
-    font-size: 0.88rem;
-    font-family: inherit;
-    cursor: pointer;
-    transition: all 0.2s;
-}
-.amount-btn:hover, .amount-btn.active {
-    border-color: #f472b6;
-    background: #fce7f3;
-    color: #be185d;
-}
-</style>
+    <script th:inline="javascript">
+        let selectedAmount = 10000;
 
-<script th:inline="javascript">
-let selectedAmount = 10000;
-function selectAmount(amount) {
-    selectedAmount = amount;
-    document.getElementById('customAmount').value = '';
-    document.querySelectorAll('.amount-btn').forEach(b => b.classList.remove('active'));
-    document.querySelector(`.amount-btn[data-amount="${amount}"]`).classList.add('active');
-}
-function clearAmountSelection() {
-    document.querySelectorAll('.amount-btn').forEach(b => b.classList.remove('active'));
-    const val = document.getElementById('customAmount').value;
-    if (val) selectedAmount = parseInt(val);
-}
-function submitDeposit() {
-    const amount = selectedAmount;
-    if (!amount || amount < 1000) {
-        showMsg('error', 'Số tiền tối thiểu là 1.000đ');
-        return;
-    }
-    const conf = confirm('Bạn muốn nạp ' + amount.toLocaleString('vi-VN') + 'đ?\n\nAdmin sẽ cộng tiền vào tài khoản sau khi bạn chuyển khoản.');
-    if (!conf) return;
-
-    fetch('/wallet/deposit', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ amount: amount })
-    })
-    .then(res => res.json())
-    .then(data => {
-        if (data.message) {
-            showMsg('success', data.message + ' Số dư: ' + data.newBalance);
-            document.getElementById('walletBalance').textContent = data.newBalance;
+        function selectAmount(amount) {
+            selectedAmount = amount;
+            document.getElementById('customAmount').value = '';
+            document.querySelectorAll('.amount-btn').forEach(b => b.classList.remove('active'));
+            document.querySelector(`.amount-btn[data-amount="${amount}"]`).classList.add('active');
         }
-    })
-    .catch(() => showMsg('error', 'Lỗi kết nối!'));
-}
-function showMsg(type, text) {
-    const el = document.getElementById(type === 'success' ? 'msgSuccess' : 'msgError');
-    el.textContent = text;
-    el.style.display = 'block';
-    setTimeout(() => { el.style.display = 'none'; }, 6000);
-}
-</script>
+
+        function clearAmountSelection() {
+            document.querySelectorAll('.amount-btn').forEach(b => b.classList.remove('active'));
+            const val = document.getElementById('customAmount').value;
+            if (val) selectedAmount = parseInt(val);
+        }
+
+        function submitDeposit() {
+            const amount = selectedAmount;
+            if (!amount || amount < 1000) {
+                showMsg('error', 'Số tiền tối thiểu là 1.000đ');
+                return;
+            }
+            const conf = confirm('Bạn muốn nạp ' + amount.toLocaleString('vi-VN') + 'đ?\n\nAdmin sẽ cộng tiền vào tài khoản sau khi bạn chuyển khoản.');
+            if (!conf) return;
+
+            fetch('/wallet/deposit', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ amount: amount })
+            })
+            .then(res => res.json())
+            .then(data => {
+                if (data.message) {
+                    showMsg('success', data.message + ' Số dư: ' + data.newBalance);
+                    document.getElementById('walletBalance').textContent = data.newBalance;
+                }
+            })
+            .catch(() => showMsg('error', 'Lỗi kết nối!'));
+        }
+
+        function showMsg(type, text) {
+            const el = document.getElementById(type === 'success' ? 'msgSuccess' : 'msgError');
+            el.textContent = text;
+            el.style.display = 'block';
+            setTimeout(() => { el.style.display = 'none'; }, 6000);
+        }
+    </script>
+
+    <!-- Music Control -->
+    <script>
+        (function() {
+            const audioSource = '/audio/Pokiwar Music.mp3';
+            let bgMusic = null;
+            let audioCreated = false;
+
+            function createAudio() {
+                if (audioCreated) return;
+                bgMusic = document.createElement('audio');
+                bgMusic.loop = true;
+                bgMusic.preload = 'none';
+                bgMusic.innerHTML = '<source src="' + audioSource + '" type="audio/mpeg">';
+                bgMusic.volume = 0.15;
+                document.body.appendChild(bgMusic);
+                audioCreated = true;
+            }
+
+            let isMuted = localStorage.getItem('musicMuted') === 'true';
+
+            function toggleMusic() {
+                createAudio();
+                isMuted = !isMuted;
+                localStorage.setItem('musicMuted', isMuted);
+                const icon = document.getElementById('musicBtnIcon');
+                const label = document.getElementById('musicBtnLabel');
+                if (isMuted) {
+                    bgMusic.pause();
+                    icon.textContent = '🔇';
+                    label.textContent = 'Bật nhạc';
+                } else {
+                    bgMusic.play().catch(() => {});
+                    icon.textContent = '🔊';
+                    label.textContent = 'Tắt nhạc';
+                }
+            }
+
+            // Create floating music button
+            document.addEventListener('DOMContentLoaded', function() {
+                const btn = document.createElement('button');
+                btn.id = 'musicBtn';
+                btn.style.cssText = 'position:fixed;bottom:20px;right:20px;z-index:9999;padding:12px 18px;border:none;border-radius:50px;background:linear-gradient(135deg,#667eea,#764ba2);color:#fff;font-weight:700;font-size:0.85rem;cursor:pointer;box-shadow:0 4px 20px rgba(102,126,234,0.4);display:flex;align-items:center;gap:8px;transition:all 0.3s ease;font-family:inherit;';
+                btn.innerHTML = '<span id="musicBtnIcon">' + (isMuted ? '🔇' : '🔊') + '</span><span id="musicBtnLabel">' + (isMuted ? 'Bật nhạc' : 'Tắt nhạc') + '</span>';
+                btn.onclick = toggleMusic;
+                btn.title = 'Bật/Tắt nhạc nền';
+                document.body.appendChild(btn);
+
+                // Auto play music
+                if (!isMuted) {
+                    document.addEventListener('click', function init() {
+                        createAudio();
+                        bgMusic.play().catch(() => {});
+                        document.removeEventListener('click', init);
+                    }, { once: true });
+                }
+            });
+
+            window.addEventListener('storage', function(e) {
+                if (e.key === 'musicMuted' && bgMusic) {
+                    isMuted = e.newValue === 'true';
+                    if (isMuted) bgMusic.pause();
+                    else bgMusic.play().catch(() => {});
+                    const icon = document.getElementById('musicBtnIcon');
+                    const label = document.getElementById('musicBtnLabel');
+                    if (icon) icon.textContent = isMuted ? '🔇' : '🔊';
+                    if (label) label.textContent = isMuted ? 'Bật nhạc' : 'Tắt nhạc';
+                }
+            });
+        })();
+    </script>
 </body>
 </html>

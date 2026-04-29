@@ -52,6 +52,8 @@ public class Account {
 
     private String provider; // google, facebook, local
 
+    private String avatarUrl;
+
     @PrePersist
     void prePersistDefaults() {
         if (role == null) {

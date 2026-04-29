@@ -511,5 +511,56 @@
             </table>
         </div>
     </div>
+<!-- Music Control -->
+<script>
+(function() {
+    const audioSource = '/audio/Pokiwar Music.mp3';
+    let bgMusic = null;
+    let audioCreated = false;
+    function createAudio() {
+        if (audioCreated) return;
+        bgMusic = document.createElement('audio');
+        bgMusic.loop = true;
+        bgMusic.preload = 'none';
+        bgMusic.innerHTML = '<source src="' + audioSource + '" type="audio/mpeg">';
+        bgMusic.volume = 0.15;
+        document.body.appendChild(bgMusic);
+        audioCreated = true;
+    }
+    let isMuted = localStorage.getItem('musicMuted') === 'true';
+    function toggleMusic() {
+        createAudio();
+        isMuted = !isMuted;
+        localStorage.setItem('musicMuted', isMuted);
+        const icon = document.getElementById('musicBtnIcon');
+        const label = document.getElementById('musicBtnLabel');
+        if (isMuted) { bgMusic.pause(); icon.textContent = '🔇'; label.textContent = 'Bật nhạc'; }
+        else { bgMusic.play().catch(() => {}); icon.textContent = '🔊'; label.textContent = 'Tắt nhạc'; }
+    }
+    document.addEventListener('DOMContentLoaded', function() {
+        const btn = document.createElement('button');
+        btn.id = 'musicBtn';
+        btn.style.cssText = 'position:fixed;bottom:20px;right:20px;z-index:9999;padding:12px 18px;border:none;border-radius:50px;background:linear-gradient(135deg,#667eea,#764ba2);color:#fff;font-weight:700;font-size:0.85rem;cursor:pointer;box-shadow:0 4px 20px rgba(102,126,234,0.4);display:flex;align-items:center;gap:8px;transition:all 0.3s ease;font-family:inherit;';
+        btn.innerHTML = '<span id="musicBtnIcon">' + (isMuted ? '🔇' : '🔊') + '</span><span id="musicBtnLabel">' + (isMuted ? 'Bật nhạc' : 'Tắt nhạc') + '</span>';
+        btn.onclick = toggleMusic;
+        btn.title = 'Bật/Tắt nhạc nền';
+        document.body.appendChild(btn);
+        if (!isMuted) {
+            document.addEventListener('click', function init() { createAudio(); bgMusic.play().catch(() => {}); document.removeEventListener('click', init); }, { once: true });
+        }
+    });
+    window.addEventListener('storage', function(e) {
+        if (e.key === 'musicMuted' && bgMusic) {
+            isMuted = e.newValue === 'true';
+            if (isMuted) bgMusic.pause();
+            else bgMusic.play().catch(() => {});
+            const icon = document.getElementById('musicBtnIcon');
+            const label = document.getElementById('musicBtnLabel');
+            if (icon) icon.textContent = isMuted ? '🔇' : '🔊';
+            if (label) label.textContent = isMuted ? 'Bật nhạc' : 'Tắt nhạc';
+        }
+    });
+})();
+</script>
 </body>
 </html>

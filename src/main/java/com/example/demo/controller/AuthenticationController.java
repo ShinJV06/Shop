@@ -18,12 +18,19 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.multipart.MultipartFile;
 import jakarta.servlet.http.HttpSession;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.nio.file.StandardCopyOption;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.UUID;
 
 
 @Controller
@@ -120,6 +127,11 @@ public class AuthenticationController {
             session.setAttribute("role", accountResponse.getRole() != null ? accountResponse.getRole().name() : "USER");
             session.setAttribute("token", accountResponse.getToken());
             session.setAttribute("wallet", shopCatalogService.formatPrice(accountResponse.getWallet()));
+            session.setAttribute("avatarUrl", accountResponse.getAvatarUrl());
+            session.setAttribute("phone", accountResponse.getPhone());
+            session.setAttribute("email", accountResponse.getEmail());
+            session.setAttribute("provider", accountResponse.getProvider());
+            session.setAttribute("createdAt", accountResponse.getCreatedAt());
             session.setMaxInactiveInterval(10 * 60);
             redirectAttributes.addFlashAttribute("successMessage", "Đăng nhập thành công.");
             return "redirect:/";
@@ -192,6 +204,50 @@ public class AuthenticationController {
             return ResponseEntity.ok(Map.of("message", "Cập nhật thông tin thành công!"));
         } catch (Exception ex) {
             return ResponseEntity.badRequest().body(Map.of("message", ex.getMessage()));
+        }
+    }
+
+    @PostMapping("/profile/upload-avatar")
+    @ResponseBody
+    public ResponseEntity<?> uploadAvatar(@RequestParam("file") MultipartFile file, HttpSession session) {
+        Object userId = session.getAttribute("userId");
+        if (userId == null) {
+            return ResponseEntity.status(401).body(Map.of("error", "Cần đăng nhập."));
+        }
+        try {
+            if (file.isEmpty()) {
+                return ResponseEntity.badRequest().body(Map.of("error", "Vui lòng chọn file."));
+            }
+            String contentType = file.getContentType();
+            if (contentType == null || !contentType.startsWith("image/")) {
+                return ResponseEntity.badRequest().body(Map.of("error", "Chỉ chấp nhận file hình ảnh."));
+            }
+            if (file.getSize() > 5 * 1024 * 1024) {
+                return ResponseEntity.badRequest().body(Map.of("error", "File quá lớn. Tối đa 5MB."));
+            }
+
+            String uploadDir = System.getProperty("user.dir") + "/uploads/avatars/";
+            Path uploadPath = Paths.get(uploadDir);
+            if (!Files.exists(uploadPath)) {
+                Files.createDirectories(uploadPath);
+            }
+
+            String originalFilename = file.getOriginalFilename();
+            String ext = "";
+            if (originalFilename != null && originalFilename.contains(".")) {
+                ext = originalFilename.substring(originalFilename.lastIndexOf("."));
+            }
+            String newFilename = "avatar_" + userId + "_" + UUID.randomUUID().toString().substring(0, 8) + ext;
+            Path filePath = uploadPath.resolve(newFilename);
+            Files.copy(file.getInputStream(), filePath, StandardCopyOption.REPLACE_EXISTING);
+
+            String avatarUrl = "/uploads/avatars/" + newFilename;
+            authenticationService.updateAvatar((Long) userId, avatarUrl);
+            session.setAttribute("avatarUrl", avatarUrl);
+
+            return ResponseEntity.ok(Map.of("avatarUrl", avatarUrl));
+        } catch (Exception ex) {
+            return ResponseEntity.badRequest().body(Map.of("error", "Lỗi upload: " + ex.getMessage()));
         }
     }
 

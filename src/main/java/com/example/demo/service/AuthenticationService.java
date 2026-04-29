@@ -151,6 +151,7 @@ public class AuthenticationService {
         response.setCreatedAt(account.getCreatedAt());
         response.setWallet(account.getWallet());
         response.setProvider(account.getProvider());
+        response.setAvatarUrl(account.getAvatarUrl());
         return response;
     }
 
@@ -162,6 +163,15 @@ public class AuthenticationService {
         if (phone != null && !phone.isBlank()) {
             account.setPhone(phone.trim());
         }
+        accountRepository.save(account);
+    }
+
+    public void updateAvatar(long userId, String avatarUrl) {
+        Account account = accountRepository.findAccountById(userId);
+        if (account == null) {
+            throw new AccountNotFoundException("Account not found");
+        }
+        account.setAvatarUrl(avatarUrl);
         accountRepository.save(account);
     }
 }

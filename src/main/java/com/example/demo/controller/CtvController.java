@@ -115,7 +115,7 @@ public class CtvController {
         try {
             BigDecimal customPrice = (price != null && price > 0) ? new BigDecimal(price) : null;
 
-            // Build full extraInfo from all fields
+
             StringBuilder fullInfo = new StringBuilder();
             if (accountName != null && !accountName.isBlank()) fullInfo.append("Tên ACC: ").append(accountName).append("\n");
             if (accountDesc != null && !accountDesc.isBlank()) fullInfo.append("Mô tả: ").append(accountDesc).append("\n");
@@ -128,7 +128,7 @@ public class CtvController {
             if (extraInfo != null && !extraInfo.isBlank()) fullInfo.append(extraInfo).append("\n");
             if (adminUser != null && !adminUser.isBlank()) fullInfo.append("TK Admin: ").append(adminUser);
 
-            // Lấy game từ product
+
             String gameName = null;
             Product product = productRepository.findById(productId).orElse(null);
             if (product != null && product.getGame() != null) {

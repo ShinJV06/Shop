@@ -7,43 +7,433 @@
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=M+PLUS+Rounded+1c:wght@400;500;700;800&family=Quicksand:wght@500;700&display=swap" rel="stylesheet">
-    <link rel="stylesheet" th:href="@{/css/auth-cute.css}">
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: "M PLUS Rounded 1c", "Quicksand", "Segoe UI", sans-serif;
+            background: #0a0a14;
+            color: #e0e0e0;
+            min-height: 100vh;
+            position: relative;
+            overflow: hidden;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        /* Background grid */
+        .bg-grid {
+            position: fixed;
+            inset: 0;
+            background-image:
+                linear-gradient(rgba(220, 50, 50, 0.03) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(220, 50, 50, 0.03) 1px, transparent 1px);
+            background-size: 50px 50px;
+            z-index: 0;
+        }
+
+        /* Background glow effects */
+        .bg-glow {
+            position: fixed;
+            width: 500px;
+            height: 500px;
+            border-radius: 50%;
+            filter: blur(120px);
+            opacity: 0.25;
+            z-index: 0;
+            animation: float 8s ease-in-out infinite;
+        }
+
+        .bg-glow.red {
+            background: #dc2626;
+            top: -150px;
+            left: -150px;
+        }
+
+        .bg-glow.crimson {
+            background: #991b1b;
+            bottom: -150px;
+            right: -150px;
+            animation-delay: -4s;
+        }
+
+        @keyframes float {
+            0%, 100% { transform: translateY(0) scale(1); }
+            50% { transform: translateY(-30px) scale(1.05); }
+        }
+
+        /* Floating particles */
+        .particles {
+            position: fixed;
+            inset: 0;
+            pointer-events: none;
+            z-index: 1;
+            overflow: hidden;
+        }
+
+        .particle {
+            position: absolute;
+            width: 4px;
+            height: 4px;
+            background: #dc2626;
+            border-radius: 50%;
+            opacity: 0.4;
+            animation: floatParticle linear infinite;
+        }
+
+        .particle:nth-child(odd) { background: #ef4444; }
+        .particle:nth-child(3n) { background: #f97316; width: 3px; height: 3px; }
+
+        @keyframes floatParticle {
+            0% { transform: translateY(100vh) scale(0); opacity: 0; }
+            10% { opacity: 0.5; }
+            90% { opacity: 0.5; }
+            100% { transform: translateY(-100vh) scale(1); opacity: 0; }
+        }
+
+        /* Main card */
+        .card {
+            width: 100%;
+            max-width: 420px;
+            background: rgba(15, 15, 25, 0.95);
+            border: 1px solid rgba(220, 50, 50, 0.3);
+            border-radius: 20px;
+            padding: 36px 32px;
+            backdrop-filter: blur(20px);
+            position: relative;
+            z-index: 10;
+            box-shadow:
+                0 0 50px rgba(220, 50, 50, 0.1),
+                0 25px 50px rgba(0, 0, 0, 0.5);
+            animation: slideUp 0.6s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+
+        /* Card top border gradient */
+        .card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 3px;
+            background: linear-gradient(90deg, transparent, #dc2626, #ef4444, #f97316, transparent);
+            border-radius: 20px 20px 0 0;
+        }
+
+        /* Badge */
+        .badge {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            background: rgba(220, 50, 50, 0.15);
+            border: 1px solid rgba(220, 50, 50, 0.3);
+            color: #fca5a5;
+            border-radius: 999px;
+            padding: 8px 18px;
+            font-size: 12px;
+            font-weight: 700;
+            margin-bottom: 20px;
+            letter-spacing: 1px;
+            text-transform: uppercase;
+            width: 100%;
+        }
+
+        .badge-icon {
+            font-size: 14px;
+            animation: sparkle 2s ease-in-out infinite;
+        }
+
+        @keyframes sparkle {
+            0%, 100% { transform: scale(1) rotate(0deg); opacity: 1; }
+            50% { transform: scale(1.2) rotate(180deg); opacity: 0.7; }
+        }
+
+        .title {
+            text-align: center;
+            margin: 0 0 6px;
+            font-size: 26px;
+            font-weight: 800;
+            background: linear-gradient(135deg, #fef2f2 0%, #fca5a5 50%, #f87171 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .subtitle {
+            text-align: center;
+            margin: 0 0 24px;
+            color: #9ca3af;
+            font-size: 14px;
+        }
+
+        /* Form */
+        .form-group {
+            margin-bottom: 18px;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            font-size: 12px;
+            font-weight: 700;
+            color: #d1d5db;
+            letter-spacing: 0.5px;
+            text-transform: uppercase;
+        }
+
+        .form-input {
+            width: 100%;
+            border: 2px solid rgba(220, 50, 50, 0.15);
+            background: rgba(10, 10, 20, 0.9);
+            color: #f3f4f6;
+            border-radius: 10px;
+            padding: 13px 16px;
+            font-size: 14px;
+            font-family: inherit;
+            outline: none;
+            transition: all 0.3s ease;
+        }
+
+        .form-input::placeholder {
+            color: #6b7280;
+        }
+
+        .form-input:focus {
+            border-color: #dc2626;
+            background: rgba(15, 15, 25, 0.95);
+            box-shadow: 0 0 0 3px rgba(220, 50, 50, 0.15);
+        }
+
+        /* Submit button */
+        .btn {
+            width: 100%;
+            margin-top: 24px;
+            border: none;
+            border-radius: 12px;
+            padding: 14px;
+            font-weight: 800;
+            font-size: 15px;
+            font-family: inherit;
+            cursor: pointer;
+            color: white;
+            background: linear-gradient(135deg, #dc2626 0%, #b91c1c 100%);
+            box-shadow: 0 8px 25px rgba(220, 50, 50, 0.35);
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+            letter-spacing: 0.5px;
+        }
+
+        .btn::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.25), transparent);
+            transition: left 0.5s ease;
+        }
+
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 12px 35px rgba(220, 50, 50, 0.45);
+        }
+
+        .btn:hover::before {
+            left: 100%;
+        }
+
+        .btn:active {
+            transform: translateY(0);
+        }
+
+        /* Links */
+        .links {
+            margin-top: 24px;
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+            align-items: center;
+            padding-top: 20px;
+            border-top: 1px solid rgba(220, 50, 50, 0.1);
+        }
+
+        .links a {
+            text-decoration: none;
+            color: #9ca3af;
+            font-size: 13px;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            padding: 6px 12px;
+        }
+
+        .links a:hover {
+            color: #fca5a5;
+        }
+
+        .links a.primary {
+            color: #fca5a5;
+            font-weight: 700;
+        }
+
+        /* Messages */
+        .msg {
+            border-radius: 10px;
+            padding: 12px 14px;
+            margin-bottom: 16px;
+            font-size: 14px;
+            font-weight: 600;
+        }
+
+        .msg.error {
+            background: rgba(239, 68, 68, 0.15);
+            color: #fca5a5;
+            border: 1px solid rgba(239, 68, 68, 0.25);
+        }
+
+        .msg.success {
+            background: rgba(34, 197, 94, 0.15);
+            color: #86efac;
+            border: 1px solid rgba(34, 197, 94, 0.25);
+        }
+
+        /* Firework effect */
+        .firework {
+            position: fixed;
+            width: 6px;
+            height: 6px;
+            border-radius: 50%;
+            pointer-events: none;
+            z-index: 100;
+        }
+
+        @keyframes fireworkExplode {
+            0% { transform: scale(0); opacity: 1; }
+            100% { transform: scale(1); opacity: 0; }
+        }
+
+        /* Responsive */
+        @media (max-width: 480px) {
+            .card {
+                margin: 16px;
+                padding: 28px 20px;
+            }
+            .title {
+                font-size: 22px;
+            }
+        }
+    </style>
 </head>
 <body>
-<div class="falling-hearts" aria-hidden="true">
-    <span>❤</span><span>✿</span><span>❤</span><span>❀</span><span>❤</span>
-    <span>✿</span><span>❤</span><span>❀</span><span>❤</span><span>✿</span>
-</div>
-<div class="page-wrap">
+    <!-- Background Effects -->
+    <div class="bg-grid"></div>
+    <div class="bg-glow red"></div>
+    <div class="bg-glow crimson"></div>
+
+    <!-- Floating Particles -->
+    <div class="particles" id="particles"></div>
+
     <div class="card">
-        <div class="badge">❤ Sparkle Register ❤</div>
+        <div class="badge">
+            <span class="badge-icon">&#10022;</span>
+            Đăng ký tài khoản
+            <span class="badge-icon">&#10022;</span>
+        </div>
         <h2 class="title">Tạo tài khoản mới</h2>
-        <p class="subtitle">Vui lòng nhập thông tin của bạn.</p>
+        <p class="subtitle">Tham gia ngay để nhận ưu đãi đặc biệt</p>
 
         <div class="msg error" th:if="${errorMessage}" th:text="${errorMessage}"></div>
         <div class="msg success" th:if="${successMessage}" th:text="${successMessage}"></div>
 
-        <form th:action="@{/auth/register}" method="post">
-            <label>Username</label>
-            <input type="text" name="username" required>
+        <form th:action="@{/auth/register}" method="post" id="registerForm">
+            <div class="form-group">
+                <label>Username</label>
+                <input type="text" name="username" class="form-input" placeholder="Nhập tên đăng nhập" required>
+            </div>
 
-            <label>Password</label>
-            <input type="password" name="password" required>
+            <div class="form-group">
+                <label>Password</label>
+                <input type="password" name="password" class="form-input" placeholder="Nhập mật khẩu" required>
+            </div>
 
-            <label>Phone</label>
-            <input type="text" name="phone" required>
+            <div class="form-group">
+                <label>Phone</label>
+                <input type="text" name="phone" class="form-input" placeholder="Nhập số điện thoại" required>
+            </div>
 
-            <label>Email</label>
-            <input type="email" name="email" required>
+            <div class="form-group">
+                <label>Email</label>
+                <input type="email" name="email" class="form-input" placeholder="Nhập địa chỉ email" required>
+            </div>
 
-            <button class="btn" type="submit">Đăng ký</button>
+            <button class="btn" type="submit" id="submitBtn">Đăng ký ngay</button>
         </form>
 
         <div class="links">
-            <a th:href="@{/auth/login}">Đăng nhập</a>
-            <a th:href="@{/auth}">Trang chính</a>
+            <a th:href="@{/auth/login}" class="primary">Đã có tài khoản? Đăng nhập</a>
+            <a th:href="@{/}">Quay lại trang chủ</a>
         </div>
     </div>
-</div>
+
+    <script>
+        // Create floating particles
+        function createParticles() {
+            const container = document.getElementById('particles');
+            const particleCount = 25;
+
+            for (let i = 0; i < particleCount; i++) {
+                const particle = document.createElement('div');
+                particle.className = 'particle';
+                particle.style.left = Math.random() * 100 + '%';
+                particle.style.animationDuration = (Math.random() * 12 + 8) + 's';
+                particle.style.animationDelay = (Math.random() * 6) + 's';
+                container.appendChild(particle);
+            }
+        }
+
+        // Firework effect
+        function createFirework(x, y) {
+            const colors = ['#dc2626', '#ef4444', '#f97316', '#fbbf24', '#fca5a5'];
+
+            for (let i = 0; i < 12; i++) {
+                const spark = document.createElement('div');
+                spark.className = 'firework';
+                spark.style.left = x + 'px';
+                spark.style.top = y + 'px';
+                spark.style.background = colors[Math.floor(Math.random() * colors.length)];
+
+                const angle = (i / 12) * Math.PI * 2;
+                const distance = 40 + Math.random() * 60;
+
+                spark.animate([
+                    { transform: 'scale(0) translate(0, 0)', opacity: 1 },
+                    { transform: `scale(1) translate(${Math.cos(angle) * distance}px, ${Math.sin(angle) * distance}px)`, opacity: 0 }
+                ], {
+                    duration: 800 + Math.random() * 400,
+                    easing: 'ease-out'
+                });
+
+                document.body.appendChild(spark);
+                setTimeout(() => spark.remove(), 1200);
+            }
+        }
+
+        // Form submission effect
+        document.getElementById('registerForm').addEventListener('submit', function(e) {
+            const btn = document.getElementById('submitBtn');
+            const rect = btn.getBoundingClientRect();
+            createFirework(rect.left + rect.width / 2, rect.top + rect.height / 2);
+        });
+
+        // Initialize
+        createParticles();
+    </script>
 </body>
 </html>

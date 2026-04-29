@@ -9,42 +9,786 @@
     <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;500;600;700;800;900&family=Rajdhani:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/sockjs-client/1.5.4/sockjs.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/stomp.js/2.3.4/stomp.min.js"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
     <style>
         *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
         html { scroll-behavior: smooth; }
-        body { font-family: 'Rajdhani', 'Segoe UI', 'Arial Unicode MS', sans-serif; background: #f0f4f8; color: #1e293b; min-height: 100vh; line-height: 1.6; }
+        body { font-family: 'Rajdhani', 'Segoe UI', 'Arial Unicode MS', sans-serif; background: #fef2f2; color: #1e293b; min-height: 100vh; line-height: 1.6; }
 
-        .header { position: sticky; top: 0; z-index: 100; display: flex; align-items: center; justify-content: space-between; padding: 0 32px; height: 60px; background: #fff; border-bottom: 1px solid #e2e8f0; }
-        .brand { font-size: 1.1rem; font-weight: 700; font-family: 'Orbitron', sans-serif; color: #2563eb; text-decoration: none; display: flex; align-items: center; gap: 8px; }
-        .brand-icon { width: 32px; height: 32px; background: linear-gradient(135deg, #2563eb, #3b82f6); border-radius: 6px; display: flex; align-items: center; justify-content: center; font-size: 1rem; color: #fff; }
-        .nav { display: flex; align-items: center; gap: 4px; }
-        .nav a { text-decoration: none; color: #64748b; font-size: 0.88rem; font-weight: 600; padding: 6px 12px; border-radius: 6px; transition: all 0.2s; }
-        .nav a:hover { color: #2563eb; background: #dbeafe; }
-        .nav .cta { background: linear-gradient(135deg, #2563eb, #3b82f6); color: #fff !important; padding: 6px 14px; border-radius: 6px; font-weight: 600; }
-        .nav .cta:hover { opacity: 0.9; }
-        .cart-badge { min-width: 18px; height: 18px; padding: 0 4px; border-radius: 999px; background: #f59e0b; color: #fff; display: inline-flex; align-items: center; justify-content: center; font-size: 0.65rem; font-weight: 700; }
+        /* ===== MEGA STUNNING HEADER ===== */
+        
+        /* ===== HEADER ===== */
+        .header { 
+            position: sticky; 
+            top: 0; 
+            z-index: 100; 
+            display: flex; 
+            align-items: center; 
+            justify-content: space-between; 
+            padding: 0 32px; 
+            height: 68px;
+            background: rgba(255, 255, 255, 0.98);
+            backdrop-filter: blur(15px);
+            -webkit-backdrop-filter: blur(15px);
+            border-bottom: 3px solid transparent;
+            background-image: 
+                linear-gradient(rgba(255,255,255,0.98), rgba(255,255,255,0.98)),
+                linear-gradient(90deg, #ff6b6b, #ff8e53, #ffb347, #ffd93d, #4ecdc4, #ff6b6b);
+            background-origin: padding-box, border-box;
+            background-clip: padding-box, border-box;
+            background-size: 100% 100%, 400% 100%;
+            animation: borderFlowSummer 4s linear infinite;
+            box-shadow: 
+                0 4px 20px rgba(255, 107, 107, 0.15),
+                0 8px 40px rgba(78, 205, 196, 0.1);
+            transition: box-shadow 0.3s ease;
+        }
+
+        .header:hover {
+            box-shadow: 
+                0 6px 30px rgba(255, 107, 107, 0.2),
+                0 12px 50px rgba(78, 205, 196, 0.15);
+        }
+
+        @keyframes borderFlowSummer {
+            0% { background-position: 0 0, 0 50%; }
+            100% { background-position: 0 0, 400% 50%; }
+        }
+
+        .logo-wrapper {
+            position: relative;
+            width: 50px;
+            height: 50px;
+            animation: logoFloat 3s ease-in-out infinite;
+        }
+
+        @keyframes logoFloat {
+            0%, 100% { transform: translateY(0) rotate(0deg); }
+            25% { transform: translateY(-4px) rotate(2deg); }
+            50% { transform: translateY(-6px) rotate(0deg); }
+            75% { transform: translateY(-4px) rotate(-2deg); }
+        }
+
+        .brand-img {
+            width: 50px;
+            height: 50px;
+            border-radius: 12px;
+            object-fit: cover;
+            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+            position: relative;
+            z-index: 2;
+            box-shadow:
+                0 0 0 3px rgba(255,255,255,0.95),
+                0 0 25px rgba(255, 107, 107, 0.6),
+                0 0 50px rgba(255, 183, 77, 0.3);
+            animation: logoShine 2s ease-in-out infinite;
+        }
+
+        @keyframes logoShine {
+            0%, 100% {
+                filter: brightness(1) saturate(1);
+                box-shadow:
+                    0 0 0 3px rgba(255,255,255,0.95),
+                    0 0 25px rgba(255, 107, 107, 0.6),
+                    0 0 50px rgba(255, 183, 77, 0.3);
+            }
+            50% {
+                filter: brightness(1.1) saturate(1.15);
+                box-shadow:
+                    0 0 0 3px rgba(255,255,255,0.95),
+                    0 0 35px rgba(255, 107, 107, 0.8),
+                    0 0 60px rgba(255, 183, 77, 0.5),
+                    0 0 80px rgba(78, 205, 196, 0.3);
+            }
+        }
+
+        .logo-glow {
+            position: absolute;
+            inset: -6px;
+            border-radius: 16px;
+            z-index: 1;
+            background: linear-gradient(135deg,
+                #ff6b6b 0%,
+                #ff8e53 20%,
+                #ffb347 40%,
+                #ffd93d 60%,
+                #6bcb77 75%,
+                #4ecdc4 90%,
+                #ff6b6b 100%
+            );
+            background-size: 300% 300%;
+            animation: summerGradient 4s ease infinite, borderPulse 2s ease-in-out infinite;
+            opacity: 0.7;
+            filter: blur(3px);
+        }
+
+        @keyframes summerGradient {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
+        }
+
+        .logo-engine {
+            position: absolute;
+            bottom: -6px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 22px;
+            height: 8px;
+            background: linear-gradient(to top, #ff6b6b, #ffb347, #ffd93d, transparent);
+            border-radius: 50%;
+            z-index: 1;
+            animation: summerFlicker 0.6s ease-in-out infinite alternate;
+            filter: blur(1px);
+        }
+
+        @keyframes summerFlicker {
+            0% { opacity: 0.6; transform: translateX(-50%) scaleX(0.85); filter: blur(1px) hue-rotate(0deg); }
+            100% { opacity: 1; transform: translateX(-50%) scaleX(1.15); filter: blur(1.5px) hue-rotate(15deg); }
+        }
+
+        /* Sparkle effects */
+        .logo-wrapper::before,
+        .logo-wrapper::after {
+            content: '✦';
+            position: absolute;
+            font-size: 8px;
+            color: #ffd93d;
+            animation: sparkle 1.5s ease-in-out infinite;
+            z-index: 3;
+            text-shadow: 0 0 6px #ffd93d, 0 0 12px #ffb347;
+        }
+
+        .logo-wrapper::before {
+            top: -2px;
+            right: -4px;
+            animation-delay: 0s;
+        }
+
+        .logo-wrapper::after {
+            bottom: -4px;
+            left: -2px;
+            animation-delay: 0.75s;
+        }
+
+        @keyframes sparkle {
+            0%, 100% { opacity: 0; transform: scale(0) rotate(0deg); }
+            50% { opacity: 1; transform: scale(1.2) rotate(180deg); }
+        }
+
+        .brand-img:hover {
+            transform: scale(1.12) rotate(3deg);
+            box-shadow:
+                0 0 0 3px #fff,
+                0 0 40px rgba(255, 107, 107, 0.9),
+                0 0 70px rgba(255, 183, 77, 0.6),
+                0 0 100px rgba(78, 205, 196, 0.4);
+        }
+
+        .brand {
+            font-size: 1.15rem;
+            font-weight: 800;
+            font-family: 'Orbitron', sans-serif;
+            color: #fff;
+            text-decoration: none;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            position: relative;
+            z-index: 1;
+        }
+
+        .brand-text {
+            background: linear-gradient(135deg,
+                #ff6b6b 0%,
+                #ff8e53 15%,
+                #ffb347 30%,
+                #ffd93d 45%,
+                #4ecdc4 60%,
+                #45b7d1 75%,
+                #96ceb4 85%,
+                #ff6b6b 100%
+            );
+            background-size: 300% 300%;
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            animation: summerText 4s ease-in-out infinite, textPulse 2s ease-in-out infinite;
+            font-weight: 800;
+            font-size: 1.25rem;
+            letter-spacing: 0.5px;
+            filter: drop-shadow(0 0 15px rgba(255, 183, 77, 0.8)) drop-shadow(0 2px 4px rgba(0,0,0,0.3));
+            position: relative;
+        }
+
+        @keyframes summerText {
+            0% { background-position: 0% 50%; filter: drop-shadow(0 0 15px rgba(255, 107, 107, 0.8)) drop-shadow(0 2px 4px rgba(0,0,0,0.3)); }
+            25% { filter: drop-shadow(0 0 20px rgba(255, 183, 77, 0.9)) drop-shadow(0 2px 4px rgba(0,0,0,0.3)); }
+            50% { background-position: 100% 50%; filter: drop-shadow(0 0 25px rgba(78, 205, 196, 0.9)) drop-shadow(0 2px 4px rgba(0,0,0,0.3)); }
+            75% { filter: drop-shadow(0 0 20px rgba(255, 142, 83, 0.9)) drop-shadow(0 2px 4px rgba(0,0,0,0.3)); }
+            100% { background-position: 0% 50%; filter: drop-shadow(0 0 15px rgba(255, 107, 107, 0.8)) drop-shadow(0 2px 4px rgba(0,0,0,0.3)); }
+        }
+
+        @keyframes textPulse {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.02); }
+        }
+
+        /* Summer icons decoration */
+        .brand-text::before,
+        .brand-text::after {
+            content: '🌴';
+            position: absolute;
+            font-size: 14px;
+            -webkit-text-fill-color: initial;
+            animation: palmSway 2.5s ease-in-out infinite;
+        }
+
+        .brand-text::before {
+            left: -20px;
+            top: 50%;
+            transform: translateY(-50%);
+            animation-delay: 0s;
+        }
+
+        .brand-text::after {
+            right: -20px;
+            top: 50%;
+            transform: translateY(-50%);
+            animation-delay: 1.25s;
+        }
+
+        @keyframes palmSway {
+            0%, 100% { transform: translateY(-50%) rotate(-5deg); }
+            50% { transform: translateY(-55%) rotate(5deg); }
+        }
+
+        .brand-icon {
+            width: 50px;
+            height: 50px;
+            background: linear-gradient(135deg,
+                #ff6b6b 0%,
+                #ff8e53 25%,
+                #ffb347 50%,
+                #ffd93d 75%,
+                #4ecdc4 100%
+            );
+            background-size: 200% 200%;
+            animation: summerBrandBg 3s ease infinite;
+            border-radius: 14px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.3rem;
+            color: #fff;
+            box-shadow:
+                0 4px 20px rgba(255, 107, 107, 0.5),
+                0 0 20px rgba(255, 183, 77, 0.4),
+                0 0 30px rgba(78, 205, 196, 0.3),
+                inset 0 2px 4px rgba(255, 255, 255, 0.4);
+            animation: summerBrandBg 3s ease infinite, brandPulseSummer 1.5s ease-in-out infinite;
+            position: relative;
+            overflow: visible;
+        }
+
+        @keyframes summerBrandBg {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
+        }
+
+        .brand-icon::before {
+            content: '';
+            position: absolute;
+            inset: 0;
+            background: linear-gradient(135deg, rgba(255,255,255,0.5), transparent 50%);
+            animation: iconShineSummer 2s ease-in-out infinite;
+            border-radius: 14px;
+        }
+
+        .brand-icon::after {
+            content: '';
+            position: absolute;
+            bottom: -10px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 35px;
+            height: 15px;
+            background: radial-gradient(ellipse at center,
+                rgba(255, 183, 77, 1) 0%,
+                rgba(255, 142, 83, 0.8) 30%,
+                rgba(255, 107, 107, 0.5) 60%,
+                transparent 80%
+            );
+            animation: engineGlowSummer 0.5s ease-in-out infinite alternate;
+            border-radius: 50%;
+            filter: blur(3px);
+        }
+
+        @keyframes brandPulseSummer {
+            0%, 100% {
+                transform: scale(1) rotate(0deg);
+                box-shadow:
+                    0 4px 25px rgba(255, 107, 107, 0.5),
+                    0 0 20px rgba(255, 183, 77, 0.4),
+                    0 0 30px rgba(78, 205, 196, 0.3);
+            }
+            50% {
+                transform: scale(1.08) rotate(1deg);
+                box-shadow:
+                    0 6px 35px rgba(255, 107, 107, 0.7),
+                    0 0 35px rgba(255, 183, 77, 0.6),
+                    0 0 50px rgba(78, 205, 196, 0.4);
+            }
+        }
+
+        @keyframes iconShineSummer {
+            0%, 100% { opacity: 0.4; transform: translateX(-5px); }
+            50% { opacity: 1; transform: translateX(5px); }
+        }
+
+        @keyframes engineGlowSummer {
+            0% { opacity: 0.7; transform: translateX(-50%) scaleX(0.8); filter: blur(2px) hue-rotate(-10deg); }
+            100% { opacity: 1; transform: translateX(-50%) scaleX(1.2); filter: blur(4px) hue-rotate(10deg); }
+        }
+
+        .nav { 
+            display: flex; 
+            align-items: center; 
+            gap: 4px;
+            position: relative;
+            z-index: 1;
+        }
+
+        .nav a { 
+            text-decoration: none; 
+            color: #475569; 
+            font-size: 0.88rem; 
+            font-weight: 700; 
+            padding: 10px 16px; 
+            border-radius: 12px; 
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .nav a::before {
+            content: '';
+            position: absolute;
+            inset: 0;
+            background: linear-gradient(135deg, rgba(220,38,38,0.15), rgba(249,115,22,0.1));
+            border-radius: 12px;
+            opacity: 0;
+            transform: scale(0.8);
+            transition: all 0.3s ease;
+        }
+
+        .nav a:hover { 
+            color: #dc2626;
+            transform: translateY(-2px);
+        }
+
+        .nav a:hover::before {
+            opacity: 1;
+            transform: scale(1);
+        }
+
+        .nav a span {
+            position: relative;
+            z-index: 1;
+        }
+
+        .nav .cta { 
+            background: linear-gradient(135deg, #dc2626, #ef4444);
+            color: #fff !important; 
+            padding: 12px 22px; 
+            border-radius: 14px;
+            font-weight: 700;
+            box-shadow: 
+                0 4px 20px rgba(220, 38, 38, 0.4),
+                inset 0 1px 0 rgba(255, 255, 255, 0.2);
+            transition: all 0.3s ease;
+        }
+
+        .nav .cta:hover { 
+            transform: translateY(-3px) scale(1.02);
+            box-shadow: 
+                0 8px 30px rgba(220, 38, 38, 0.5),
+                inset 0 1px 0 rgba(255, 255, 255, 0.2);
+        }
+
+        .nav .cta::before {
+            display: none;
+        }
+
+        .cart-badge { 
+            min-width: 22px; 
+            height: 22px; 
+            padding: 0 6px; 
+            border-radius: 999px; 
+            background: linear-gradient(135deg, #f59e0b, #fbbf24);
+            color: #fff; 
+            display: inline-flex; 
+            align-items: center; 
+            justify-content: center; 
+            font-size: 0.7rem; 
+            font-weight: 700;
+            box-shadow: 0 2px 10px rgba(245, 158, 11, 0.5);
+            animation: badgeBounce 2s ease-in-out infinite;
+        }
+
+        @keyframes badgeBounce {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.1); }
+        }
+
         .user-menu { position: relative; }
-        .user-trigger { width: 36px; height: 36px; border: 2px solid #e2e8f0; border-radius: 50%; background: #fff; cursor: pointer; overflow: hidden; transition: all 0.2s; }
-        .user-trigger:hover { border-color: #2563eb; }
+
+        .user-trigger { 
+            width: 42px; 
+            height: 42px; 
+            border: 2px solid rgba(220, 38, 38, 0.2); 
+            border-radius: 50%; 
+            background: linear-gradient(135deg, #fef2f2, #fee2e2);
+            cursor: pointer; 
+            overflow: hidden; 
+            transition: all 0.3s ease;
+            display: flex; 
+            align-items: center; 
+            justify-content: center;
+            box-shadow: 0 4px 15px rgba(220, 38, 38, 0.15);
+        }
+
+        .user-trigger:hover { 
+            border-color: #dc2626;
+            transform: scale(1.08);
+            box-shadow: 0 6px 25px rgba(220, 38, 38, 0.3);
+        }
+
         .user-trigger img { width: 100%; height: 100%; object-fit: cover; }
-        .user-dropdown { position: absolute; top: calc(100% + 8px); right: 0; min-width: 160px; background: #fff; border: 1px solid #e2e8f0; border-radius: 10px; padding: 10px; box-shadow: 0 10px 15px rgba(0,0,0,0.1); display: none; }
+
+        .user-trigger .default-avatar { 
+            width: 100%; 
+            height: 100%; 
+            display: flex; 
+            align-items: center; 
+            justify-content: center; 
+            background: linear-gradient(135deg, #fef2f2, #fee2e2);
+        }
+
+        .user-trigger .default-avatar i { color: #dc2626; font-size: 1.1rem; }
+
+        .user-dropdown { 
+            position: absolute; 
+            top: calc(100% + 14px); 
+            right: 0; 
+            min-width: 220px; 
+            background: rgba(255, 255, 255, 0.98);
+            backdrop-filter: blur(20px);
+            border: 1px solid rgba(220, 38, 38, 0.15);
+            border-radius: 18px; 
+            padding: 18px;
+            box-shadow: 
+                0 20px 50px rgba(0, 0, 0, 0.15),
+                0 0 0 1px rgba(220, 38, 38, 0.1);
+            display: none;
+            animation: dropdownPop 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+        }
+
+        @keyframes dropdownPop {
+            from { opacity: 0; transform: scale(0.9) translateY(-10px); }
+            to { opacity: 1; transform: scale(1) translateY(0); }
+        }
+
         .user-dropdown.open { display: block; }
-        .user-name { color: #2563eb; font-size: 0.8rem; font-weight: 700; margin-bottom: 6px; padding-bottom: 6px; border-bottom: 1px solid #e2e8f0; font-family: 'Orbitron', sans-serif; }
-        .user-wallet { background: rgba(22,163,74,0.1); border: 1px solid rgba(22,163,74,0.2); border-radius: 6px; padding: 6px 8px; margin-bottom: 6px; font-size: 0.8rem; font-weight: 700; color: #16a34a; text-align: center; }
-        .user-logout { width: 100%; border: none; border-radius: 6px; padding: 8px; background: #dc2626; color: #fff; font-weight: 600; font-family: inherit; cursor: pointer; font-size: 0.8rem; transition: all 0.2s; }
-        .user-logout:hover { opacity: 0.9; }
-        .nav-compare { display: inline-flex; align-items: center; gap: 4px; background: #dbeafe; border: 1px solid rgba(37,99,235,0.2); border-radius: 6px; padding: 4px 10px; font-size: 0.8rem; font-weight: 600; color: #2563eb; text-decoration: none; transition: all 0.2s; }
-        .nav-compare:hover { background: #2563eb; color: #fff; }
-        .compare-badge { min-width: 16px; height: 16px; padding: 0 3px; border-radius: 999px; background: #2563eb; color: #fff; display: inline-flex; align-items: center; justify-content: center; font-size: 0.6rem; font-weight: 700; }
+
+        .user-name { 
+            color: #dc2626; 
+            font-size: 0.9rem; 
+            font-weight: 700; 
+            margin-bottom: 12px; 
+            padding-bottom: 12px; 
+            border-bottom: 2px solid rgba(220, 38, 38, 0.1);
+            font-family: 'Orbitron', sans-serif;
+            text-align: center;
+        }
+
+        .user-wallet { 
+            background: linear-gradient(135deg, rgba(22,163,74,0.12), rgba(22,163,74,0.05));
+            border: 1px solid rgba(22,163,74,0.25); 
+            border-radius: 12px; 
+            padding: 12px 14px; 
+            margin-bottom: 14px; 
+            font-size: 0.88rem; 
+            font-weight: 700; 
+            color: #16a34a; 
+            text-align: center;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            box-shadow: 0 4px 15px rgba(22, 163, 74, 0.1);
+        }
+
+        .user-wallet::before {
+            content: '💰';
+        }
+
+        .user-logout { 
+            width: 100%; 
+            border: none; 
+            border-radius: 12px; 
+            padding: 12px;
+            background: linear-gradient(135deg, #dc2626, #ef4444);
+            color: #fff; 
+            font-weight: 700; 
+            font-family: inherit; 
+            cursor: pointer; 
+            font-size: 0.88rem; 
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 15px rgba(220, 38, 38, 0.3);
+        }
+
+        .user-logout:hover { 
+            transform: translateY(-2px);
+            box-shadow: 0 6px 25px rgba(220, 38, 38, 0.4);
+        }
+
+        .nav-compare { 
+            display: inline-flex; 
+            align-items: center; 
+            gap: 6px; 
+            background: rgba(220, 38, 38, 0.08);
+            border: 1px solid rgba(220, 38, 38, 0.2); 
+            border-radius: 12px; 
+            padding: 10px 14px; 
+            font-size: 0.85rem; 
+            font-weight: 700; 
+            color: #dc2626; 
+            text-decoration: none; 
+            transition: all 0.3s ease;
+        }
+
+        .nav-compare:hover { 
+            background: linear-gradient(135deg, #dc2626, #ef4444);
+            color: #fff;
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(220, 38, 38, 0.35);
+        }
+
+        .compare-badge { 
+            min-width: 20px; 
+            height: 20px; 
+            padding: 0 6px; 
+            border-radius: 999px; 
+            background: linear-gradient(135deg, #dc2626, #ef4444);
+            color: #fff; 
+            display: inline-flex; 
+            align-items: center; 
+            justify-content: center; 
+            font-size: 0.68rem; 
+            font-weight: 700;
+            box-shadow: 0 2px 8px rgba(220, 38, 38, 0.3);
+        }
+
+        /* ===== GUIDE MODAL ===== */
+        .guide-modal-overlay {
+            position: fixed;
+            inset: 0;
+            background: rgba(0, 0, 0, 0.7);
+            backdrop-filter: blur(6px);
+            z-index: 9999;
+            display: none;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+
+        .guide-modal-overlay.show {
+            display: flex;
+        }
+
+        .guide-modal {
+            background: #fff;
+            border-radius: 20px;
+            width: 100%;
+            max-width: 650px;
+            max-height: 85vh;
+            overflow-y: auto;
+            box-shadow: 0 25px 60px rgba(0, 0, 0, 0.25);
+            animation: guideModalIn 0.4s ease;
+        }
+
+        @keyframes guideModalIn {
+            from { transform: scale(0.9) translateY(20px); opacity: 0; }
+            to { transform: scale(1) translateY(0); opacity: 1; }
+        }
+
+        .guide-header {
+            background: linear-gradient(135deg, #dc2626, #ef4444);
+            padding: 24px 28px;
+            border-radius: 20px 20px 0 0;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            position: sticky;
+            top: 0;
+            z-index: 1;
+        }
+
+        .guide-header h2 {
+            font-family: 'Orbitron', sans-serif;
+            font-size: 1.1rem;
+            color: #fff;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .guide-close {
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            background: rgba(255, 255, 255, 0.2);
+            border: none;
+            color: #fff;
+            font-size: 1.2rem;
+            cursor: pointer;
+            transition: all 0.25s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .guide-close:hover {
+            background: rgba(255, 255, 255, 0.3);
+            transform: scale(1.1);
+        }
+
+        .guide-body {
+            padding: 24px 28px;
+        }
+
+        .guide-section {
+            margin-bottom: 24px;
+        }
+
+        .guide-section:last-child {
+            margin-bottom: 0;
+        }
+
+        .guide-section-title {
+            font-family: 'Orbitron', sans-serif;
+            font-size: 0.95rem;
+            color: #dc2626;
+            margin-bottom: 14px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            padding-bottom: 8px;
+            border-bottom: 2px solid rgba(220, 38, 38, 0.1);
+        }
+
+        .guide-step {
+            display: flex;
+            gap: 14px;
+            margin-bottom: 16px;
+            padding: 14px;
+            background: #fef2f2;
+            border-radius: 12px;
+            border: 1px solid rgba(220, 38, 38, 0.08);
+            transition: all 0.25s;
+        }
+
+        .guide-step:hover {
+            border-color: rgba(220, 38, 38, 0.2);
+            transform: translateX(5px);
+        }
+
+        .guide-step-num {
+            width: 32px;
+            height: 32px;
+            min-width: 32px;
+            background: linear-gradient(135deg, #dc2626, #ef4444);
+            color: #fff;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 700;
+            font-size: 0.85rem;
+        }
+
+        .guide-step-content h4 {
+            font-size: 0.92rem;
+            font-weight: 700;
+            color: #1e293b;
+            margin-bottom: 4px;
+        }
+
+        .guide-step-content p {
+            font-size: 0.85rem;
+            color: #64748b;
+            line-height: 1.5;
+        }
+
+        .guide-tip {
+            background: linear-gradient(135deg, rgba(22, 163, 74, 0.08), rgba(22, 163, 74, 0.04));
+            border: 1px solid rgba(22, 163, 74, 0.2);
+            border-radius: 12px;
+            padding: 14px;
+            margin-top: 16px;
+        }
+
+        .guide-tip-title {
+            font-weight: 700;
+            color: #16a34a;
+            font-size: 0.88rem;
+            margin-bottom: 6px;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .guide-tip p {
+            font-size: 0.82rem;
+            color: #64748b;
+            line-height: 1.5;
+        }
+
+        .guide-footer {
+            padding: 16px 28px 24px;
+            text-align: center;
+        }
+
+        .guide-btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            background: linear-gradient(135deg, #dc2626, #ef4444);
+            color: #fff;
+            padding: 12px 28px;
+            border-radius: 12px;
+            font-weight: 700;
+            font-size: 0.92rem;
+            text-decoration: none;
+            transition: all 0.25s;
+            box-shadow: 0 4px 15px rgba(220, 38, 38, 0.35);
+        }
+
+        .guide-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 25px rgba(220, 38, 38, 0.45);
+        }
 
         main { position: relative; z-index: 1; max-width: 1200px; margin: 0 auto; padding: 0 32px 60px; }
 
-        .hero { 
-            text-align: center; 
-            padding: 80px 24px; 
-            background: url('/images/LHBT.png') center center / cover no-repeat; 
-            border-radius: 14px; 
-            margin-bottom: 32px; 
+        .hero {
+            text-align: center;
+            padding: 80px 24px;
+            background: url('/images/LHBT.png') center center / cover no-repeat;
+            border-radius: 14px;
+            margin-bottom: 32px;
             position: relative;
             min-height: 350px;
             display: flex;
@@ -61,15 +805,15 @@
             z-index: 0;
         }
         .hero > * { position: relative; z-index: 1; }
-        .hero-badge { display: inline-flex; align-items: center; gap: 6px; background: linear-gradient(135deg, #2563eb, #3b82f6); color: #fff; font-size: 0.75rem; font-weight: 600; padding: 6px 14px; border-radius: 20px; margin-bottom: 12px; font-family: 'Orbitron', sans-serif; box-shadow: 0 4px 15px rgba(37, 99, 235, 0.3); }
+        .hero-badge { display: inline-flex; align-items: center; gap: 6px; background: linear-gradient(135deg, #dc2626, #ef4444); color: #fff; font-size: 0.75rem; font-weight: 600; padding: 6px 14px; border-radius: 20px; margin-bottom: 12px; font-family: 'Orbitron', sans-serif; box-shadow: 0 4px 15px rgba(220, 38, 38, 0.3); }
         .hero h1 { font-size: clamp(1.8rem, 5vw, 2.6rem); font-weight: 700; line-height: 1.3; font-family: 'Orbitron', sans-serif; color: #1e293b; margin-bottom: 10px; text-shadow: 0 2px 10px rgba(255,255,255,0.8); }
         .hero p { font-size: 1rem; color: #334155; max-width: 500px; margin: 0 auto 20px; font-weight: 500; text-shadow: 0 1px 5px rgba(255,255,255,0.6); }
         .hero-actions { display: flex; gap: 12px; justify-content: center; flex-wrap: wrap; }
         .btn { display: inline-flex; align-items: center; gap: 6px; padding: 12px 24px; border-radius: 8px; font-size: 0.9rem; font-weight: 600; font-family: inherit; text-decoration: none; cursor: pointer; border: none; transition: all 0.2s; }
-        .btn-primary { background: linear-gradient(135deg, #2563eb, #3b82f6); color: #fff; box-shadow: 0 4px 15px rgba(37, 99, 235, 0.35); }
-        .btn-primary:hover { opacity: 0.9; transform: translateY(-2px); box-shadow: 0 6px 20px rgba(37, 99, 235, 0.45); }
-        .btn-outline { display: inline-flex; align-items: center; gap: 6px; padding: 12px 24px; border-radius: 8px; font-size: 0.9rem; font-weight: 600; font-family: inherit; text-decoration: none; cursor: pointer; border: 2px solid #2563eb; color: #2563eb; background: rgba(255,255,255,0.8); transition: all 0.2s; }
-        .btn-outline:hover { background: #2563eb; color: #fff; transform: translateY(-2px); }
+        .btn-primary { background: linear-gradient(135deg, #dc2626, #ef4444); color: #fff; box-shadow: 0 4px 15px rgba(220, 38, 38, 0.35); }
+        .btn-primary:hover { opacity: 0.9; transform: translateY(-2px); box-shadow: 0 6px 20px rgba(220, 38, 38, 0.45); }
+        .btn-outline { display: inline-flex; align-items: center; gap: 6px; padding: 12px 24px; border-radius: 8px; font-size: 0.9rem; font-weight: 600; font-family: inherit; text-decoration: none; cursor: pointer; border: 2px solid #dc2626; color: #dc2626; background: rgba(255,255,255,0.8); transition: all 0.2s; }
+        .btn-outline:hover { background: #dc2626; color: #fff; transform: translateY(-2px); }
 
         .section-title { text-align: center; font-family: 'Orbitron', sans-serif; font-size: 1.1rem; font-weight: 700; color: #1e293b; margin: 24px 0 20px; }
 
@@ -81,7 +825,7 @@
             inset: 0;
             border-radius: 16px;
             padding: 2px;
-            background: linear-gradient(135deg, #2563eb, #9333ea, #ec4899, #2563eb);
+            background: linear-gradient(135deg, #dc2626, #f97316, #fbbf24, #dc2626);
             background-size: 300% 300%;
             -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
             mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
@@ -105,11 +849,11 @@
             border-radius: 12px;
             overflow: hidden;
             background: linear-gradient(135deg, #1e293b, #334155);
-            box-shadow: 
-                0 0 0 2px rgba(37, 99, 235, 0.2),
+            box-shadow:
+                0 0 0 2px rgba(220, 38, 38, 0.2),
                 0 4px 6px -1px rgba(0, 0, 0, 0.15),
                 0 10px 20px -5px rgba(0, 0, 0, 0.2),
-                0 0 20px rgba(37, 99, 235, 0.1);
+                0 0 20px rgba(220, 38, 38, 0.1);
             transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
         }
         .card-image-wrap::before {
@@ -117,7 +861,7 @@
             position: absolute;
             inset: -2px;
             border-radius: 14px;
-            background: linear-gradient(135deg, #2563eb, #9333ea, #ec4899, #3b82f6, #8b5cf6);
+            background: linear-gradient(135deg, #dc2626, #ef4444, #f97316, #fbbf24);
             background-size: 400% 400%;
             z-index: -1;
             opacity: 0;
@@ -130,23 +874,23 @@
         }
         .card:hover .card-image-wrap {
             transform: perspective(1000px) rotateX(3deg) rotateY(-3deg) scale(1.05);
-            box-shadow: 
-                0 0 0 3px rgba(37, 99, 235, 0.5),
-                0 15px 30px -5px rgba(37, 99, 235, 0.4),
-                0 0 40px rgba(37, 99, 235, 0.3),
+            box-shadow:
+                0 0 0 3px rgba(220, 38, 38, 0.5),
+                0 15px 30px -5px rgba(220, 38, 38, 0.4),
+                0 0 40px rgba(220, 38, 38, 0.3),
                 0 25px 50px -12px rgba(0, 0, 0, 0.3);
         }
         .card:hover .card-image-wrap::before { opacity: 1; }
         .card-image { position: relative; height: 100%; overflow: hidden; }
         .card-image img { width: 100%; height: 100%; object-fit: cover; transition: transform 0.5s cubic-bezier(0.4, 0, 0.2, 1), filter 0.35s ease; }
         .card:hover .card-image img { transform: scale(1.1); filter: brightness(1.1) saturate(1.2); }
-        .card-image::after { 
-            content: ''; 
-            position: absolute; 
-            bottom: 0; left: 0; right: 0; 
-            height: 80px; 
-            background: linear-gradient(to top, rgba(30, 41, 59, 0.9), transparent); 
-            pointer-events: none; 
+        .card-image::after {
+            content: '';
+            position: absolute;
+            bottom: 0; left: 0; right: 0;
+            height: 80px;
+            background: linear-gradient(to top, rgba(30, 41, 59, 0.9), transparent);
+            pointer-events: none;
             transition: height 0.4s ease;
         }
         .card:hover .card-image::after { height: 100px; }
@@ -157,7 +901,7 @@
             width: 100%;
             height: 100%;
             transform: translate(-50%, -50%);
-            background: radial-gradient(ellipse, rgba(37, 99, 235, 0.3) 0%, rgba(147, 51, 234, 0.2) 40%, transparent 70%);
+            background: radial-gradient(ellipse, rgba(220, 38, 38, 0.3) 0%, rgba(249, 115, 22, 0.2) 40%, transparent 70%);
             pointer-events: none;
             opacity: 0;
             transition: opacity 0.4s ease;
@@ -183,15 +927,15 @@
         }
         .card:hover .card-image-shine { transform: translateX(100%); }
         .card-body { padding: 12px 16px 16px; }
-        .card-tag { display: inline-block; font-size: 0.6rem; font-weight: 700; padding: 3px 8px; border-radius: 6px; margin-bottom: 8px; background: linear-gradient(135deg, #2563eb, #3b82f6); color: #fff; font-family: 'Orbitron', sans-serif; text-transform: uppercase; letter-spacing: 1px; box-shadow: 0 2px 8px rgba(37, 99, 235, 0.3); }
+        .card-tag { display: inline-block; font-size: 0.6rem; font-weight: 700; padding: 3px 8px; border-radius: 6px; margin-bottom: 8px; background: linear-gradient(135deg, #dc2626, #ef4444); color: #fff; font-family: 'Orbitron', sans-serif; text-transform: uppercase; letter-spacing: 1px; box-shadow: 0 2px 8px rgba(220, 38, 38, 0.3); }
         .card-tag.gold { background: linear-gradient(135deg, #f59e0b, #fbbf24); box-shadow: 0 2px 8px rgba(245, 158, 11, 0.3); }
         .card-tag.purple { background: linear-gradient(135deg, #9333ea, #a855f7); box-shadow: 0 2px 8px rgba(147, 51, 234, 0.3); }
         .card h3 { font-size: 0.95rem; font-weight: 700; color: #1e293b; margin-bottom: 8px; line-height: 1.3; }
         .card-desc { font-size: 0.75rem; color: #64748b; margin-bottom: 8px; line-height: 1.4; }
         .card-footer { display: flex; align-items: center; justify-content: space-between; padding-top: 10px; border-top: 1px solid #f1f5f9; }
-        .card-price { font-family: 'Orbitron', sans-serif; font-size: 1rem; font-weight: 700; color: #2563eb; }
-        .card-buy { background: linear-gradient(135deg, #2563eb, #3b82f6); color: #fff; border: none; padding: 8px 14px; border-radius: 8px; font-size: 0.8rem; font-weight: 600; cursor: pointer; transition: all 0.2s; box-shadow: 0 4px 12px rgba(37, 99, 235, 0.3); }
-        .card-buy:hover { transform: translateY(-2px); box-shadow: 0 6px 16px rgba(37, 99, 235, 0.4); }
+        .card-price { font-family: 'Orbitron', sans-serif; font-size: 1rem; font-weight: 700; color: #dc2626; }
+        .card-buy { background: linear-gradient(135deg, #dc2626, #ef4444); color: #fff; border: none; padding: 8px 14px; border-radius: 8px; font-size: 0.8rem; font-weight: 600; cursor: pointer; transition: all 0.2s; box-shadow: 0 4px 12px rgba(220, 38, 38, 0.3); }
+        .card-buy:hover { transform: translateY(-2px); box-shadow: 0 6px 16px rgba(220, 38, 38, 0.4); }
         .card-actions { display: flex; gap: 6px; }
 
         .warehouse-wrap { max-width: 1100px; margin: 0 auto; }
@@ -204,23 +948,35 @@
         .cards.cards-center .card-image-wrap { height: 130px; margin: 10px; }
         .cards.cards-center .card-body { padding: 10px; text-align: center; }
 
-        .holiday-bar { background: linear-gradient(135deg, #2563eb, #3b82f6); padding: 8px 0; overflow: hidden; }
-        .marquee-wrapper { overflow: hidden; white-space: nowrap; }
-        .marquee-content { display: inline-block; animation: marquee 30s linear infinite; }
-        .holiday-item { display: inline-flex; align-items: center; gap: 4px; padding: 0 20px; font-size: 0.75rem; font-weight: 600; color: #fff; }
-        .holiday-date { background: rgba(255,255,255,0.25); padding: 1px 6px; border-radius: 8px; font-size: 0.65rem; }
-        .holiday-divider { color: rgba(255,255,255,0.5); padding: 0 6px; }
+        .holiday-bar { background: linear-gradient(135deg, #dc2626, #ef4444, #dc2626); padding: 10px 0; overflow: hidden; position: relative; }
+        .holiday-bar::before, .holiday-bar::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            width: 100px;
+            height: 100%;
+            z-index: 2;
+        }
+        .holiday-bar::before { left: 0; background: linear-gradient(to right, #dc2626, transparent); }
+        .holiday-bar::after { right: 0; background: linear-gradient(to left, #dc2626, transparent); }
+        .marquee-wrapper { overflow: hidden; white-space: nowrap; position: relative; z-index: 1; }
+        .marquee-content { display: inline-block; white-space: nowrap; animation: marquee 40s linear infinite; }
+        .marquee-content:hover { animation-play-state: paused; }
+        .holiday-item { display: inline-flex; align-items: center; gap: 6px; padding: 0 24px; font-size: 0.8rem; font-weight: 600; color: #fff; text-shadow: 0 1px 2px rgba(0,0,0,0.2); }
+        .holiday-date { background: rgba(255,255,255,0.25); padding: 2px 8px; border-radius: 6px; font-size: 0.7rem; cursor: pointer; transition: all 0.2s; }
+        .holiday-item:hover .holiday-date { background: rgba(255,255,255,0.5); transform: scale(1.05); }
+        .holiday-divider { color: rgba(255,255,255,0.5); padding: 0 8px; font-weight: 300; }
         @keyframes marquee { 0% { transform: translateX(0); } 100% { transform: translateX(-50%); } }
 
         .stats { display: grid; grid-template-columns: repeat(4, 1fr); gap: 16px; max-width: 900px; margin: 0 auto 40px; }
-        .stat { background: linear-gradient(135deg, rgba(37,99,235,0.08), rgba(59,130,246,0.05)); border: 1px solid rgba(37,99,235,0.15); border-radius: 12px; padding: 20px 16px; text-align: center; transition: all 0.3s; }
-        .stat:hover { transform: translateY(-4px); border-color: #3b82f6; box-shadow: 0 8px 25px rgba(37,99,235,0.15); }
-        .stat-num { font-family: 'Orbitron', sans-serif; font-size: 1.5rem; font-weight: 800; color: #2563eb; text-shadow: 0 0 20px rgba(37,99,235,0.3); margin-bottom: 4px; }
+        .stat { background: linear-gradient(135deg, rgba(220,38,38,0.08), rgba(239,68,68,0.05)); border: 1px solid rgba(220,38,38,0.15); border-radius: 12px; padding: 20px 16px; text-align: center; transition: all 0.3s; }
+        .stat:hover { transform: translateY(-4px); border-color: #ef4444; box-shadow: 0 8px 25px rgba(220,38,38,0.15); }
+        .stat-num { font-family: 'Orbitron', sans-serif; font-size: 1.5rem; font-weight: 800; color: #dc2626; text-shadow: 0 0 20px rgba(220,38,38,0.3); margin-bottom: 4px; }
         .stat-label { font-size: 0.8rem; color: #64748b; font-weight: 600; }
 
-        .cart-showcase { display: grid; grid-template-columns: 1fr 1fr; gap: 24px; background: linear-gradient(135deg, rgba(37,99,235,0.05), rgba(191,0,255,0.05)); border: 1px solid rgba(37,99,235,0.15); border-radius: 16px; padding: 32px; margin: 40px 0; align-items: center; }
+        .cart-showcase { display: grid; grid-template-columns: 1fr 1fr; gap: 24px; background: linear-gradient(135deg, rgba(220,38,38,0.05), rgba(239,68,68,0.05)); border: 1px solid rgba(220,38,38,0.15); border-radius: 16px; padding: 32px; margin: 40px 0; align-items: center; }
         .cart-copy { display: flex; flex-direction: column; gap: 12px; }
-        .cart-kicker { display: inline-flex; align-items: center; gap: 6px; background: rgba(37,99,235,0.1); color: #2563eb; font-size: 0.75rem; font-weight: 700; padding: 4px 12px; border-radius: 20px; width: fit-content; font-family: 'Orbitron', sans-serif; }
+        .cart-kicker { display: inline-flex; align-items: center; gap: 6px; background: rgba(220,38,38,0.1); color: #dc2626; font-size: 0.75rem; font-weight: 700; padding: 4px 12px; border-radius: 20px; width: fit-content; font-family: 'Orbitron', sans-serif; }
         .cart-copy h3 { font-family: 'Orbitron', sans-serif; font-size: 1.1rem; color: #1e293b; line-height: 1.4; }
         .cart-copy p { font-size: 0.88rem; color: #64748b; line-height: 1.6; }
         .cart-meta { display: flex; gap: 8px; flex-wrap: wrap; }
@@ -229,76 +985,76 @@
         .cart-art { display: flex; justify-content: center; }
         .cart-art img { max-width: 100%; border-radius: 12px; }
 
-        .sold-overlay { 
-            position: absolute; 
-            inset: 0; 
-            background: rgba(0,0,0,0.75); 
-            display: flex; 
-            align-items: center; 
-            justify-content: center; 
-            color: #fff; 
-            font-weight: 700; 
-            font-family: 'Orbitron', sans-serif; 
-            font-size: 0.9rem; 
-            letter-spacing: 2px; 
+        .sold-overlay {
+            position: absolute;
+            inset: 0;
+            background: rgba(0,0,0,0.75);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #fff;
+            font-weight: 700;
+            font-family: 'Orbitron', sans-serif;
+            font-size: 0.9rem;
+            letter-spacing: 2px;
             z-index: 10;
             backdrop-filter: blur(2px);
         }
         .card.sold .card-image img { filter: grayscale(100%); opacity: 0.5; }
-        .card-explore-btn { display: inline-block; padding: 6px 14px; border-radius: 6px; font-size: 0.78rem; font-weight: 600; background: linear-gradient(135deg, #2563eb, #3b82f6); color: #fff; transition: all 0.2s; }
+        .card-explore-btn { display: inline-block; padding: 6px 14px; border-radius: 6px; font-size: 0.78rem; font-weight: 600; background: linear-gradient(135deg, #dc2626, #ef4444); color: #fff; transition: all 0.2s; }
         .card-explore-btn:hover { opacity: 0.9; transform: translateY(-1px); }
         .card-explore-btn.sold-btn { background: #94a3b8; cursor: not-allowed; }
 
         .acc-detail-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.5); display: none; align-items: center; justify-content: center; z-index: 999; padding: 16px; }
         .acc-detail-overlay.open { display: flex; }
         .acc-detail-modal { background: #fff; border-radius: 14px; width: min(700px, 95vw); max-height: 90vh; overflow-y: auto; box-shadow: 0 20px 25px rgba(0,0,0,0.12); position: relative; }
-        .acc-detail-close { position: absolute; top: 10px; right: 10px; background: #fff; border: 1px solid #e2e8f0; color: #64748b; width: 32px; height: 32px; border-radius: 50%; cursor: pointer; display: flex; align-items: center; justify-content: center; transition: all 0.2s; z-index: 10; }
+        .acc-detail-close { position: absolute; top: 10px; right: 10px; background: #fff; border: 1px solid #fecaca; color: #64748b; width: 32px; height: 32px; border-radius: 50%; cursor: pointer; display: flex; align-items: center; justify-content: center; transition: all 0.2s; z-index: 10; }
         .acc-detail-close:hover { background: #dc2626; border-color: #dc2626; color: #fff; }
-        .acc-detail-image { padding: 16px; display: flex; align-items: center; justify-content: center; background: #f0f4f8; }
+        .acc-detail-image { padding: 16px; display: flex; align-items: center; justify-content: center; background: #fef2f2; }
         .acc-detail-image img { width: 100%; max-height: 300px; object-fit: contain; border-radius: 10px; }
         .acc-detail-info { padding: 16px; }
         .acc-detail-info h2 { font-family: 'Orbitron', sans-serif; font-size: 1.1rem; color: #1e293b; margin-bottom: 8px; }
-        .acc-detail-tag { display: inline-block; padding: 4px 10px; border-radius: 6px; font-size: 0.7rem; font-weight: 700; background: rgba(37,99,235,0.1); color: #2563eb; margin-bottom: 8px; }
+        .acc-detail-tag { display: inline-block; padding: 4px 10px; border-radius: 6px; font-size: 0.7rem; font-weight: 700; background: rgba(220,38,38,0.1); color: #dc2626; margin-bottom: 8px; }
         .acc-detail-specs { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; margin-bottom: 16px; }
-        .acc-detail-spec { background: #f8fafc; border-radius: 8px; padding: 12px; text-align: center; }
+        .acc-detail-spec { background: #fef2f2; border-radius: 8px; padding: 12px; text-align: center; }
         .spec-label { display: block; font-size: 0.65rem; color: #64748b; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 4px; }
         .spec-value { font-size: 0.88rem; font-weight: 700; color: #1e293b; }
         .acc-detail-desc { color: #64748b; line-height: 1.6; font-size: 0.9rem; margin-bottom: 16px; }
         .acc-detail-desc h4 { font-size: 0.9rem; margin-bottom: 6px; }
-        .acc-detail-price { font-family: 'Orbitron', sans-serif; font-size: 1.4rem; font-weight: 700; color: #2563eb; margin-bottom: 12px; }
-        .acc-detail-footer { display: flex; align-items: center; justify-content: space-between; padding-top: 12px; border-top: 1px solid #e2e8f0; }
+        .acc-detail-price { font-family: 'Orbitron', sans-serif; font-size: 1.4rem; font-weight: 700; color: #dc2626; margin-bottom: 12px; }
+        .acc-detail-footer { display: flex; align-items: center; justify-content: space-between; padding-top: 12px; border-top: 1px solid #fecaca; }
 
-        .sound-toggle { position: fixed; top: 80px; right: 20px; z-index: 9999; display: flex; align-items: center; gap: 8px; background: #fff; border: 1px solid #e2e8f0; border-radius: 10px; padding: 8px 14px; cursor: pointer; transition: all 0.2s; box-shadow: 0 4px 15px rgba(0,0,0,0.08); }
-        .sound-toggle:hover { border-color: #2563eb; transform: scale(1.02); }
+        .sound-toggle { position: fixed; top: 80px; right: 20px; z-index: 9999; display: flex; align-items: center; gap: 8px; background: #fff; border: 1px solid #fecaca; border-radius: 10px; padding: 8px 14px; cursor: pointer; transition: all 0.2s; box-shadow: 0 4px 15px rgba(0,0,0,0.08); }
+        .sound-toggle:hover { border-color: #dc2626; transform: scale(1.02); }
         .sound-toggle .sound-icon { font-size: 1.1rem; }
         .sound-toggle.playing .sound-icon { animation: soundPulse 1s ease-in-out infinite; }
         @keyframes soundPulse { 0%, 100% { transform: scale(1); } 50% { transform: scale(1.2); } }
         .sound-toggle .sound-label { color: #64748b; font-size: 0.78rem; font-weight: 600; }
-        .sound-toggle.playing .sound-label { color: #2563eb; }
+        .sound-toggle.playing .sound-label { color: #dc2626; }
         .sound-toggle.muted { opacity: 0.6; }
 
-        .chat-fab { position: fixed; bottom: 24px; right: 24px; z-index: 9998; width: 54px; height: 54px; border-radius: 50%; background: linear-gradient(135deg, #2563eb, #3b82f6); border: none; font-size: 1.5rem; cursor: pointer; box-shadow: 0 4px 15px rgba(37,99,235,0.35); transition: all 0.2s; }
-        .chat-fab:hover { transform: scale(1.08); box-shadow: 0 6px 20px rgba(37,99,235,0.45); }
-        .chat-window { position: fixed; bottom: 90px; right: 24px; z-index: 9997; width: 340px; max-width: calc(100vw - 48px); background: #fff; border-radius: 14px; box-shadow: 0 20px 60px rgba(0,0,0,0.15); display: none; overflow: hidden; border: 1px solid #e2e8f0; }
+        .chat-fab { position: fixed; bottom: 24px; right: 24px; z-index: 9998; width: 54px; height: 54px; border-radius: 50%; background: linear-gradient(135deg, #dc2626, #ef4444); border: none; font-size: 1.5rem; cursor: pointer; box-shadow: 0 4px 15px rgba(220,38,38,0.35); transition: all 0.2s; }
+        .chat-fab:hover { transform: scale(1.08); box-shadow: 0 6px 20px rgba(220,38,38,0.45); }
+        .chat-window { position: fixed; bottom: 90px; right: 24px; z-index: 9997; width: 340px; max-width: calc(100vw - 48px); background: #fff; border-radius: 14px; box-shadow: 0 20px 60px rgba(0,0,0,0.15); display: none; overflow: hidden; border: 1px solid #fecaca; }
         .chat-window.open { display: block; }
-        .chat-header { background: linear-gradient(135deg, #2563eb, #3b82f6); color: #fff; padding: 14px 16px; display: flex; justify-content: space-between; align-items: center; font-weight: 600; font-family: 'Orbitron', sans-serif; font-size: 0.85rem; }
+        .chat-header { background: linear-gradient(135deg, #dc2626, #ef4444); color: #fff; padding: 14px 16px; display: flex; justify-content: space-between; align-items: center; font-weight: 600; font-family: 'Orbitron', sans-serif; font-size: 0.85rem; }
         .chat-close { background: none; border: none; color: #fff; font-size: 1.2rem; cursor: pointer; padding: 0; line-height: 1; }
-        .chat-messages { max-height: 300px; overflow-y: auto; padding: 16px; background: #f8fafc; }
+        .chat-messages { max-height: 300px; overflow-y: auto; padding: 16px; background: #fef2f2; }
         .chat-msg { display: flex; flex-direction: column; margin-bottom: 12px; }
         .chat-msg.admin { align-items: flex-start; }
         .chat-msg.user { align-items: flex-end; }
         .chat-bubble { max-width: 80%; padding: 10px 14px; border-radius: 12px; font-size: 0.85rem; line-height: 1.5; }
-        .chat-msg.admin .chat-bubble { background: #fff; border: 1px solid #e2e8f0; color: #1e293b; border-bottom-left-radius: 4px; }
-        .chat-msg.user .chat-bubble { background: linear-gradient(135deg, #2563eb, #3b82f6); color: #fff; border-bottom-right-radius: 4px; }
+        .chat-msg.admin .chat-bubble { background: #fff; border: 1px solid #fecaca; color: #1e293b; border-bottom-left-radius: 4px; }
+        .chat-msg.user .chat-bubble { background: linear-gradient(135deg, #dc2626, #ef4444); color: #fff; border-bottom-right-radius: 4px; }
         .chat-meta { font-size: 0.68rem; color: #94a3b8; margin-top: 4px; padding: 0 4px; }
-        .chat-input-area { display: flex; gap: 8px; padding: 12px; border-top: 1px solid #e2e8f0; background: #fff; }
-        .chat-input { flex: 1; padding: 10px 14px; border: 1px solid #e2e8f0; border-radius: 8px; font-size: 0.85rem; font-family: inherit; outline: none; transition: border-color 0.2s; }
-        .chat-input:focus { border-color: #2563eb; }
-        .chat-send-btn { background: linear-gradient(135deg, #2563eb, #3b82f6); border: none; color: #fff; width: 40px; height: 40px; border-radius: 8px; font-size: 1rem; cursor: pointer; transition: all 0.2s; }
+        .chat-input-area { display: flex; gap: 8px; padding: 12px; border-top: 1px solid #fecaca; background: #fff; }
+        .chat-input { flex: 1; padding: 10px 14px; border: 1px solid #fecaca; border-radius: 8px; font-size: 0.85rem; font-family: inherit; outline: none; transition: border-color 0.2s; }
+        .chat-input:focus { border-color: #dc2626; }
+        .chat-send-btn { background: linear-gradient(135deg, #dc2626, #ef4444); border: none; color: #fff; width: 40px; height: 40px; border-radius: 8px; font-size: 1rem; cursor: pointer; transition: all 0.2s; }
         .chat-send-btn:hover { opacity: 0.9; transform: scale(1.05); }
         .chat-login-msg { padding: 20px; text-align: center; }
         .chat-login-msg p { font-size: 0.85rem; color: #64748b; margin-bottom: 12px; }
-        .chat-login-btn { display: inline-block; padding: 10px 20px; background: linear-gradient(135deg, #2563eb, #3b82f6); color: #fff; text-decoration: none; border-radius: 6px; font-weight: 600; font-size: 0.85rem; }
+        .chat-login-btn { display: inline-block; padding: 10px 20px; background: linear-gradient(135deg, #dc2626, #ef4444); color: #fff; text-decoration: none; border-radius: 6px; font-weight: 600; font-size: 0.85rem; }
 
         .daily-login-modal { position: fixed; inset: 0; z-index: 9999; display: none; align-items: center; justify-content: center; }
         .daily-login-modal.open { display: flex; }
@@ -309,16 +1065,16 @@
         .daily-login-icon { font-size: 3rem; margin-bottom: 12px; }
         .daily-login-header h2 { font-family: 'Orbitron', sans-serif; font-size: 1.2rem; color: #fff; margin-bottom: 4px; }
         .daily-login-header p { font-size: 0.85rem; color: #94a3b8; }
-        .daily-login-streak { background: linear-gradient(135deg, rgba(37,99,235,0.2), rgba(191,0,255,0.2)); border-radius: 12px; padding: 16px; margin: 20px 0; }
+        .daily-login-streak { background: linear-gradient(135deg, rgba(220,38,38,0.2), rgba(239,68,68,0.2)); border-radius: 12px; padding: 16px; margin: 20px 0; }
         .streak-display { display: flex; flex-direction: column; align-items: center; }
         .streak-number { font-family: 'Orbitron', sans-serif; font-size: 3rem; font-weight: 800; color: #fbbf24; text-shadow: 0 0 20px rgba(251,191,36,0.5); }
         .streak-label { font-size: 0.85rem; color: #94a3b8; }
         .daily-login-progress { margin-bottom: 20px; }
         .progress-label { display: flex; justify-content: space-between; font-size: 0.8rem; color: #94a3b8; margin-bottom: 8px; }
         .progress-bar { background: rgba(255,255,255,0.1); border-radius: 10px; height: 8px; overflow: hidden; }
-        .progress-fill { background: linear-gradient(90deg, #2563eb, #9333ea); height: 100%; border-radius: 10px; transition: width 0.5s ease; }
-        .checkin-btn { width: 100%; padding: 14px; background: linear-gradient(135deg, #2563eb, #9333ea); border: none; border-radius: 10px; color: #fff; font-size: 1rem; font-weight: 700; cursor: pointer; transition: all 0.2s; font-family: inherit; }
-        .checkin-btn:hover { transform: translateY(-2px); box-shadow: 0 8px 25px rgba(37,99,235,0.4); }
+        .progress-fill { background: linear-gradient(90deg, #dc2626, #ef4444); height: 100%; border-radius: 10px; transition: width 0.5s ease; }
+        .checkin-btn { width: 100%; padding: 14px; background: linear-gradient(135deg, #dc2626, #ef4444); border: none; border-radius: 10px; color: #fff; font-size: 1rem; font-weight: 700; cursor: pointer; transition: all 0.2s; font-family: inherit; }
+        .checkin-btn:hover { transform: translateY(-2px); box-shadow: 0 8px 25px rgba(220,38,38,0.4); }
         .checkin-btn:disabled { opacity: 0.6; cursor: not-allowed; transform: none; }
         .daily-login-message { margin-top: 16px; font-size: 0.85rem; padding: 10px; border-radius: 8px; }
         .daily-login-message.error { background: rgba(239,68,68,0.1); color: #ef4444; }
@@ -330,30 +1086,30 @@
         .success-icon { font-size: 4rem; margin-bottom: 16px; }
         .success-content h2 { font-family: 'Orbitron', sans-serif; font-size: 1.3rem; color: #22c55e; margin-bottom: 12px; }
         .success-content p { color: #94a3b8; font-size: 0.95rem; }
-        .success-close-btn { margin-top: 20px; padding: 12px 32px; background: linear-gradient(135deg, #2563eb, #9333ea); border: none; border-radius: 10px; color: #fff; font-size: 0.9rem; font-weight: 700; cursor: pointer; transition: all 0.2s; font-family: inherit; }
+        .success-close-btn { margin-top: 20px; padding: 12px 32px; background: linear-gradient(135deg, #dc2626, #ef4444); border: none; border-radius: 10px; color: #fff; font-size: 0.9rem; font-weight: 700; cursor: pointer; transition: all 0.2s; font-family: inherit; }
         .success-close-btn:hover { transform: translateY(-2px); }
 
-        .site-footer { background: #fff; border-top: 1px solid #e2e8f0; padding: 32px 32px 20px; margin-top: 40px; }
+        .site-footer { background: #fff; border-top: 1px solid #fecaca; padding: 32px 32px 20px; margin-top: 40px; }
         .footer-container { max-width: 1200px; margin: 0 auto; display: grid; grid-template-columns: 1.5fr 1fr 1fr 1fr; gap: 40px; }
-        .footer-logo { font-family: 'Orbitron', sans-serif; font-size: 1.2rem; font-weight: 700; color: #2563eb; margin-bottom: 12px; }
+        .footer-logo { font-family: 'Orbitron', sans-serif; font-size: 1.2rem; font-weight: 700; color: #dc2626; margin-bottom: 12px; }
         .footer-desc { color: #64748b; line-height: 1.7; font-size: 0.85rem; margin-bottom: 16px; }
         .footer-social { display: flex; gap: 10px; }
-        .social-link { display: flex; align-items: center; justify-content: center; width: 36px; height: 36px; background: rgba(37,99,235,0.1); border: 1px solid rgba(37,99,235,0.2); border-radius: 8px; color: #2563eb; text-decoration: none; font-size: 0.85rem; transition: all 0.2s; }
-        .social-link:hover { background: #2563eb; color: #fff; }
+        .social-link { display: flex; align-items: center; justify-content: center; width: 36px; height: 36px; background: rgba(220,38,38,0.1); border: 1px solid rgba(220,38,38,0.2); border-radius: 8px; color: #dc2626; text-decoration: none; font-size: 0.85rem; transition: all 0.2s; }
+        .social-link:hover { background: #dc2626; color: #fff; }
         .footer-section h4 { font-size: 0.95rem; font-weight: 600; color: #1e293b; margin-bottom: 16px; text-transform: uppercase; letter-spacing: 1px; }
         .footer-section ul { list-style: none; }
         .footer-section ul li { margin-bottom: 10px; }
         .footer-section ul li a { color: #64748b; text-decoration: none; font-size: 0.85rem; transition: color 0.2s; }
-        .footer-section ul li a:hover { color: #2563eb; }
+        .footer-section ul li a:hover { color: #dc2626; }
         .footer-rating { margin-bottom: 16px; }
         .stars { color: #fbbf24; font-size: 1.1rem; letter-spacing: 2px; }
         .rating-text { font-weight: 700; color: #1e293b; font-size: 0.9rem; margin-top: 4px; }
         .rating-count { font-size: 0.75rem; color: #64748b; margin-top: 2px; }
         .footer-trust { display: flex; gap: 8px; flex-wrap: wrap; }
         .trust-badge { background: rgba(22,163,74,0.1); color: #16a34a; border: 1px solid rgba(22,163,74,0.2); padding: 4px 10px; border-radius: 6px; font-size: 0.7rem; font-weight: 600; }
-        .footer-bottom { max-width: 1200px; margin: 24px auto 0; padding-top: 16px; border-top: 1px solid #e2e8f0; text-align: center; color: #94a3b8; font-size: 0.75rem; }
+        .footer-bottom { max-width: 1200px; margin: 24px auto 0; padding-top: 16px; border-top: 1px solid #fecaca; text-align: center; color: #94a3b8; font-size: 0.75rem; }
         .footer-bottom p { color: #64748b; margin-bottom: 4px; }
-        .footer-bottom .footer-note { color: #2563eb; }
+        .footer-bottom .footer-note { color: #dc2626; }
 
         @media (max-width: 768px) {
             main { padding: 0 16px 40px; }
@@ -366,6 +1122,10 @@
             .stats { grid-template-columns: repeat(2, 1fr); }
             .cart-showcase { grid-template-columns: 1fr; }
             .acc-detail-specs { grid-template-columns: 1fr; }
+            .guide-modal { margin: 10px; border-radius: 16px; }
+            .guide-header { padding: 18px 20px; border-radius: 16px 16px 0 0; }
+            .guide-header h2 { font-size: 0.95rem; }
+            .guide-body { padding: 18px 20px; }
         }
         @media (max-width: 500px) { .chat-window { right: 12px; bottom: 80px; width: calc(100vw - 24px); } .chat-fab { bottom: 16px; right: 16px; } }
     </style>
@@ -373,15 +1133,6 @@
 <body th:attr="data-logged-in=${session.userId != null}">
 
 <!-- Audio -->
-<audio id="bgMusic" loop preload="none">
-    <source th:src="@{/audio/Pokiwar Music.mp3}" type="audio/mpeg">
-</audio>
-
-<!-- Sound Toggle Button -->
-<button class="sound-toggle" id="soundToggle" title="Bat/Tat am thanh">
-    <span class="sound-icon" id="soundIcon">&#128264;</span>
-    <span class="sound-label" id="soundLabel">Bat nhac</span>
-</button>
 
 <!-- Holiday Marquee Bar -->
 <div class="holiday-bar" id="holidayBar">
@@ -393,35 +1144,47 @@
 <!-- Header -->
 <header class="header" id="trang-chu">
     <a class="brand" href="#trang-chu">
-        <span>&#127918;</span> Genshin Cute Shop
+        <div class="logo-wrapper">
+            <img class="brand-img" src="/images/logo.png" alt="Logo">
+            <div class="logo-glow"></div>
+            <div class="logo-engine"></div>
+        </div>
+        <span class="brand-text">Genshin Cute Shop</span>
     </a>
     <nav class="nav">
-        <a href="#trang-chu">Trang chu</a>
-        <a th:href="@{/minigame}">&#127918; Mini Game</a>
-        <a href="#kho-acc">Mua ngay</a>
-        <a th:href="@{/reviews}">&#11088; Danh gia</a>
-        <a th:href="@{/compare}" class="nav-compare">&#9878; So sanh <span class="compare-badge" id="compare-count" th:text="${compareCount != null ? compareCount : 0}">0</span></a>
-        <a th:href="@{/cart}">&#128722; Gio hang <span class="cart-badge" id="cart-count" th:text="${cartSummary.count}">0</span></a>
-        <a th:href="@{/wallet}" th:if="${session.userId != null}">&#128176; Nap tien</a>
-        <a th:href="@{/profile}" th:if="${session.userId != null}">Ho so</a>
-        <a th:href="@{/my-orders}" th:if="${session.userId != null}">Don mua</a>
-        <a th:href="@{/admin}" th:if="${session.role == 'ADMIN'}">Admin</a>
-        <a th:href="@{/ctv/submit}" th:if="${session.role == 'CTV'}">CTV</a>
-        <a href="#lien-he">Lien he</a>
-        <a th:href="@{/auth/login}" th:if="${session.userId == null}">Dang nhap</a>
-        <a class="cta" th:href="@{/auth/register}" th:if="${session.userId == null}">Dang ky ngay</a>
+        <a th:href="@{/}"><span>Trang chủ</span></a>
+        <a th:href="@{/minigame}"><span>&#127918; Mini Game</span></a>
+        <a href="#kho-acc"><span>Mua ngay</span></a>
+        <a th:href="@{/reviews}"><span>&#11088; Đánh giá</span></a>
+        <a href="#" onclick="openGuide(); return false;"><span>&#10067; Hướng dẫn</span></a>
+        <a th:href="@{/cart}"><span>&#128722; Giỏ hàng <span class="cart-badge" id="cart-count" th:text="${cartSummary.count}">0</span></span></a>
+        <a th:href="@{/wallet}" th:if="${session.userId != null}"><span>&#128176; Nạp tiền</span></a>
+        <a th:href="@{/profile}" th:if="${session.userId != null}"><span>Hồ sơ</span></a>
+        <a th:href="@{/my-orders}" th:if="${session.userId != null}"><span>Đơn mua</span></a>
+        <a th:href="@{/admin}" th:if="${session.role == 'ADMIN'}"><span>Admin</span></a>
+        <a th:href="@{/ctv/submit}" th:if="${session.role == 'CTV'}"><span>CTV</span></a>
+        <a th:href="@{/contact}"><span>Liên hệ</span></a>
+        <a th:href="@{/auth/login}" th:if="${session.userId == null}"><span>Đăng nhập</span></a>
+        <a class="cta" th:href="@{/auth/register}" th:if="${session.userId == null}">Đăng ký ngay</a>
         <div class="user-menu" th:if="${session.userId != null}">
-            <button class="user-trigger" id="userMenuTrigger" type="button">
-                <img th:src="@{/images/user-avatar.png}" alt="User avatar" loading="lazy">
-            </button>
+            <div class="user-trigger" id="userMenuTrigger">
+                <img th:if="${session.avatarUrl != null}" th:src="@{${session.avatarUrl}}" alt="User avatar" loading="lazy">
+                <span th:unless="${session.avatarUrl != null}" class="default-avatar">
+                    <i class="fas fa-user"></i>
+                </span>
+            </div>
             <div class="user-dropdown" id="userDropdown">
                 <div class="user-name" th:text="${session.username}">Username</div>
                 <div class="user-wallet" th:if="${session.wallet != null}">
-                    &#128176; So du: <span th:text="${session.wallet}">0</span>
+                    Số dư: <span th:text="${session.wallet}">0</span>
                 </div>
-                <a th:href="@{/my-orders}" style="display:block;padding:8px 0;font-weight:800;color:#2563eb;text-decoration:none;font-size:0.88rem">&#128203; Lich su mua</a>
-                <form th:action="@{/auth/logout}" method="post">
-                    <button class="user-logout" type="submit">Dang xuat</button>
+                <a th:href="@{/my-orders}" style="display:block;padding:10px 0;font-weight:800;color:#dc2626;text-decoration:none;font-size:0.88rem;text-align:center">&#128203; Lịch sử mua</a>
+                <button class="sound-toggle" id="soundToggle" style="width:100%;margin-top:8px;border:none;border-radius:10px;padding:10px;background:linear-gradient(135deg,#667eea,#764ba2);color:#fff;font-weight:700;font-size:0.85rem;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:8px;transition:all 0.3s ease;box-shadow:0 4px 15px rgba(102,126,234,0.3);position:static">
+                    <span id="soundIcon">🔊</span>
+                    <span id="soundLabel">Tắt nhạc</span>
+                </button>
+                <form th:action="@{/auth/logout}" method="post" style="margin-top:8px">
+                    <button class="user-logout" type="submit">Đăng xuất</button>
                 </form>
             </div>
         </div>
@@ -432,11 +1195,11 @@
 <!-- Hero -->
 <section class="hero">
     <div class="hero-badge">&#9889; Gaming Account Shop &#9889;</div>
-    <h1>Shop Acc Game<br>Chat Luong Cao</h1>
-    <p>Nick xin, gia mem, giao acc nhanh trong 5 phut. Uy tin hang dau, cam ket chat luong!</p>
+    <h1>Shop Acc Game<br>Chất Lượng Cao</h1>
+    <p>Nick xịn, giá mềm, giao acc nhanh trong 5 phút. Uy tín hàng đầu, cam kết chất lượng!</p>
     <div class="hero-actions">
-        <a href="#kho-acc" class="btn btn-primary">Xem kho acc ngay &#9889;</a>
-        <a th:href="@{/auth/register}" class="btn btn-outline">Dang ky mien phi</a>
+        <a href="#kho-acc" class="btn btn-primary">Xem kho acc ngay ⚡</a>
+        <a th:href="@{/auth/register}" class="btn btn-outline">Đăng ký miễn phí</a>
     </div>
 </section>
 
@@ -444,48 +1207,48 @@
 <div class="stats">
     <div class="stat">
         <div class="stat-num">2,400+</div>
-        <div class="stat-label">Tai khoan da ban</div>
+        <div class="stat-label">Tài khoản đã bán</div>
     </div>
     <div class="stat">
         <div class="stat-num">99%</div>
-        <div class="stat-label">Khach hang hai long</div>
+        <div class="stat-label">Khách hàng hài lòng</div>
     </div>
     <div class="stat">
-        <div class="stat-num">5 phut</div>
-        <div class="stat-label">Giao acc tuc thi</div>
+        <div class="stat-num">5 phút</div>
+        <div class="stat-label">Giao acc tức thì</div>
     </div>
     <div class="stat">
         <div class="stat-num">24/7</div>
-        <div class="stat-label">Ho tro online</div>
+        <div class="stat-label">Hỗ trợ online</div>
     </div>
 </div>
 
 <!-- Cart Showcase -->
 <section class="cart-showcase" id="gio-hang" aria-labelledby="gio-hang-title">
     <div class="cart-copy">
-        <span class="cart-kicker">&#128722; Gio hang noi bat</span>
-        <h3 id="gio-hang-title">Them vao gio nhanh, chat acc dep trong vai phut</h3>
-        <p>Khu vuc gio hang tren trang chu co giao dien gaming noi bat hon. Ban co the dung block nay nhu diem nhan cho acc hot, flash sale hoac danh sach chuan bi mua.</p>
+        <span class="cart-kicker">🛒 Giỏ hàng nổi bật</span>
+        <h3 id="gio-hang-title">Thêm vào giỏ nhanh, chất acc đẹp trong vài phút</h3>
+        <p>Khu vực giỏ hàng trên trang chủ có giao diện gaming nổi bật hơn. Bạn có thể dùng block này như điểm nhấn cho acc hot, flash sale hoặc danh sách chuẩn bị mua.</p>
         <div class="cart-meta">
-            <span class="cart-chip">&#9889; Flash sale 20%</span>
-            <span class="cart-chip">&#127774; Giao trong 5 phut</span>
-            <span class="cart-chip">&#128737; Bao hanh doi lai</span>
+            <span class="cart-chip">⚡ Flash sale 20%</span>
+            <span class="cart-chip">🌞 Giao trong 5 phút</span>
+            <span class="cart-chip">🛡️ Bảo hành đổi lại</span>
         </div>
         <div class="hero-actions">
-            <a href="#kho-acc" class="btn btn-primary">Them vao gio ngay</a>
-            <a th:href="@{/cart}" class="btn btn-outline">Xem gio hang</a>
+            <a href="#kho-acc" class="btn btn-primary">Thêm vào giỏ ngay</a>
+            <a th:href="@{/cart}" class="btn btn-outline">Xem giỏ hàng</a>
         </div>
         <p class="cart-status" id="cart-status"></p>
     </div>
     <div class="cart-art">
-        <img th:src="@{/images/home-cart-banner.png}" alt="Minh hoa gio hang trang chu" loading="lazy">
+        <img th:src="@{/images/home-cart-banner.png}" alt="Minh họa giỏ hàng trang chủ" loading="lazy">
     </div>
 </section>
 
 <!-- Cards -->
 <div class="warehouse-wrap" id="kho-acc">
-<h2 class="section-title">Kho Acc Noi Bat</h2>
-<p th:if="${#lists.isEmpty(visibleAccounts)}" style="text-align:center;color:#64748b;font-weight:600">Chua co acc trong kho - hay them de hien thi.</p>
+<h2 class="section-title">Kho Acc Nổi Bật</h2>
+<p th:if="${#lists.isEmpty(visibleAccounts)}" style="text-align:center;color:#64748b;font-weight:600">Chưa có acc trong kho - hãy thêm để hiển thị.</p>
 <section class="cards cards-center" th:if="${!#lists.isEmpty(visibleAccounts)}">
     <article class="card" th:each="acc : ${visibleAccounts}" th:with="imgSrc=${(acc.listingImagePath != null && !#strings.isEmpty(acc.listingImagePath)) ? acc.listingImagePath : (acc.product != null ? acc.product.imagePath : '')}, isSold=${acc.hidden || acc.status.name() == 'SOLD'}">
         <div th:class="${isSold} ? 'card sold' : 'card'">
@@ -495,13 +1258,13 @@
                         <div class="card-image-glow"></div>
                         <div class="card-image-shine"></div>
                         <img th:src="${imgSrc}" th:alt="${acc.product != null ? acc.product.name : 'Game'}" loading="lazy">
-                        <div th:if="${isSold}" class="sold-overlay">Het hang</div>
+                        <div th:if="${isSold}" class="sold-overlay">Hết hàng</div>
                     </div>
                 </div>
                 <div class="card-body">
                     <span th:class="${'card-tag' + (acc.product != null && #strings.contains(acc.product.slug,'premium') ? ' purple' : (acc.product != null && #strings.contains(acc.product.slug,'vip') ? ' gold' : ''))}">Game</span>
                     <h3 th:text="${acc.product != null ? acc.product.name : 'Game'}">Game</h3>
-                    <span th:class="${isSold} ? 'card-explore-btn sold-btn' : 'card-explore-btn'">[[${isSold} ? 'Het hang' : 'Kham pha']]</span>
+                    <span th:class="${isSold} ? 'card-explore-btn sold-btn' : 'card-explore-btn'">[[${isSold} ? 'Hết hàng' : 'Khám phá']]</span>
                 </div>
             </a>
         </div>
@@ -512,9 +1275,9 @@
 <!-- Acc Detail Modal -->
 <div class="acc-detail-overlay" id="accDetailModal">
     <div class="acc-detail-modal">
-        <button class="acc-detail-close" onclick="closeAccDetail()" title="Dong">&#10006;</button>
+        <button class="acc-detail-close" onclick="closeAccDetail()" title="Đóng">✖</button>
         <div class="acc-detail-image">
-            <img id="accDetailImage" src="" alt="Chi tiet tai khoan">
+            <img id="accDetailImage" src="" alt="Chi tiết tài khoản">
         </div>
         <div class="acc-detail-info">
             <span class="acc-detail-tag" id="accDetailTag">Game</span>
@@ -534,7 +1297,7 @@
                 </div>
             </div>
             <div class="acc-detail-desc" id="accDetailExtra">
-                <h4>Thong tin them</h4>
+                <h4>Thông tin thêm</h4>
                 <p>-</p>
             </div>
             <div class="acc-detail-footer">
@@ -551,7 +1314,7 @@
     <div class="footer-container">
         <div class="footer-brand">
             <div class="footer-logo">&#127918; GameShop</div>
-            <p class="footer-desc">Chuyen cung cap tai khoan game chat luong cao, gia ca hop ly. Giao dich nhanh chong, an toan va uy tin hang dau Viet Nam.</p>
+            <p class="footer-desc">Chuyên cung cấp tài khoản game chất lượng cao, giá cả hợp lý. Giao dịch nhanh chóng, an toàn và uy tín hàng đầu Việt Nam.</p>
             <div class="footer-social">
                 <a href="https://www.facebook.com/" target="_blank" class="social-link">&#128100;</a>
                 <a href="https://zalo.me/" target="_blank" class="social-link">&#128172;</a>
@@ -559,29 +1322,29 @@
             </div>
         </div>
         <div class="footer-section">
-            <h4>Dich vu</h4>
+            <h4>Dịch vụ</h4>
             <ul>
-                <li><a href="/">Mua tai khoan</a></li>
-                <li><a href="/cart">Gio hang</a></li>
-                <li><a href="/my-orders">Lich su mua</a></li>
-                <li><a href="/reviews">Danh gia</a></li>
+                <li><a href="/">Mua tài khoản</a></li>
+                <li><a href="/cart">Giỏ hàng</a></li>
+                <li><a href="/my-orders">Lịch sử mua</a></li>
+                <li><a href="/reviews">Đánh giá</a></li>
             </ul>
         </div>
         <div class="footer-section">
-            <h4>Ho tro</h4>
+            <h4>Hỗ trợ</h4>
             <ul>
-                <li><a href="#">Huong dan mua</a></li>
-                <li><a href="#">Chinh sach bao hanh</a></li>
-                <li><a href="#">Dieu khoan</a></li>
-                <li><a href="#">Lien he</a></li>
+                <li><a href="#">Hướng dẫn mua</a></li>
+                <li><a href="#">Chính sách bảo hành</a></li>
+                <li><a href="#">Điều khoản</a></li>
+                <li><a th:href="@{/contact}">Liên hệ</a></li>
             </ul>
         </div>
         <div class="footer-section">
-            <h4>Danh gia</h4>
+            <h4>Đánh giá</h4>
             <div class="footer-rating">
                 <div class="stars">&#9733;&#9733;&#9733;&#9733;&#9733;</div>
                 <p class="rating-text">4.9/5 sao</p>
-                <p class="rating-count">Hon 2,000+ danh gia tich cuc tu khach hang</p>
+                <p class="rating-count">Hơn 2,000+ đánh giá tích cực từ khách hàng</p>
             </div>
             <div class="footer-trust">
                 <span class="trust-badge">&#128737; Bao mat</span>
@@ -591,31 +1354,200 @@
         </div>
     </div>
     <div class="footer-bottom">
-        <p>&copy; 2026 GenshinCuteShop - Chuyen ban acc Genshin Impact, Lien Quan Mobile va cac game khac.</p>
-        <p class="footer-note">Cam ket 100% tai khoan chinh chu, giao ngay trong 5 phut sau khi thanh toan.</p>
+        <p>&copy; 2026 GenshinCuteShop - Chuyên bán acc Genshin Impact, Liên Quân Mobile và các game khác.</p>
+        <p class="footer-note">Cam kết 100% tài khoản chính chủ, giao ngay trong 5 phút sau khi thanh toán.</p>
     </div>
 </footer>
 
-<!-- Daily Login Modal -->
+<!-- Holiday Detail Modal -->
+<div class="guide-modal-overlay" id="holidayModal">
+    <div class="guide-modal" style="max-width: 550px;">
+        <div class="guide-header" style="background: linear-gradient(135deg, #dc2626, #ef4444);">
+            <h2 id="holidayModalTitle">🎉 Chi tiết ngày lễ</h2>
+            <button class="guide-close" onclick="closeHolidayModal()">&times;</button>
+        </div>
+        <div class="guide-body" style="padding: 24px;">
+            <div id="holidayModalContent"></div>
+        </div>
+    </div>
+</div>
+
+<style>
+    .holiday-detail-card {
+        background: linear-gradient(135deg, #fff5f5, #fef2f2);
+        border-radius: 20px;
+        padding: 24px;
+        text-align: center;
+        border: 2px solid #fecaca;
+        margin-bottom: 16px;
+    }
+    .holiday-detail-icon {
+        font-size: 4rem;
+        margin-bottom: 12px;
+        display: block;
+    }
+    .holiday-detail-name {
+        font-family: 'Orbitron', sans-serif;
+        font-size: 1.4rem;
+        font-weight: 800;
+        color: #dc2626;
+        margin-bottom: 8px;
+    }
+    .holiday-detail-date {
+        color: #64748b;
+        font-size: 0.95rem;
+        margin-bottom: 16px;
+    }
+    .holiday-detail-desc {
+        color: #475569;
+        line-height: 1.7;
+        margin-bottom: 20px;
+    }
+        .holiday-detail-countdown {
+            margin-top: 16px;
+            background: linear-gradient(135deg, #fef3c7, #fde68a);
+            border-radius: 16px;
+            padding: 16px;
+            text-align: center;
+        }
+        .countdown-label {
+            color: #92400e;
+            font-size: 0.85rem;
+            margin-bottom: 8px;
+        }
+        .countdown-days {
+            font-family: 'Orbitron', sans-serif;
+            font-size: 2rem;
+            font-weight: 900;
+            color: #dc2626;
+        }
+
+        /* Holiday Modal Overlay */
+        .guide-modal-overlay {
+            display: none;
+            position: fixed;
+            inset: 0;
+            background: rgba(0, 0, 0, 0.6);
+            z-index: 10000;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+            backdrop-filter: blur(4px);
+        }
+        .guide-modal-overlay.show {
+            display: flex;
+        }
+</style>
+
+<!-- Guide Modal -->
+<div class="guide-modal-overlay" id="guideModal">
+    <div class="guide-modal">
+        <div class="guide-header">
+            <h2>&#10067; Hướng dẫn mua tài khoản</h2>
+            <button class="guide-close" onclick="closeGuide()">&times;</button>
+        </div>
+        <div class="guide-body">
+            <!-- Section 1 -->
+            <div class="guide-section">
+                <div class="guide-section-title">🎮 Cách đặt mua tài khoản</div>
+                
+                <div class="guide-step">
+                    <div class="guide-step-num">1</div>
+                    <div class="guide-step-content">
+                        <h4>Chọn tài khoản game</h4>
+                        <p>Browse danh sách tài khoản và chọn acc phù hợp với nhu cầu của bạn. Xem thông tin chi tiết như rank, skin, server...</p>
+                    </div>
+                </div>
+
+                <div class="guide-step">
+                    <div class="guide-step-num">2</div>
+                    <div class="guide-step-content">
+                        <h4>Thêm vào giỏ hàng</h4>
+                        <p>Nhấn nút "Khám phá" hoặc "Mua ngay" trên acc bạn muốn. Acc sẽ được thêm vào giỏ hàng.</p>
+                    </div>
+                </div>
+
+                <div class="guide-step">
+                    <div class="guide-step-num">3</div>
+                    <div class="guide-step-content">
+                        <h4>Tiến hành thanh toán</h4>
+                        <p>Vào giỏ hàng, kiểm tra thông tin và nhấn "Thanh toán". Hệ thống sẽ tự động giao acc cho bạn.</p>
+                    </div>
+                </div>
+
+                <div class="guide-step">
+                    <div class="guide-step-num">4</div>
+                    <div class="guide-step-content">
+                        <h4>Nhận thông tin tài khoản</h4>
+                        <p>Sau khi thanh toán thành công, thông tin acc (username/password) sẽ được gửi qua email hoặc hiển thị ngay trên web.</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Section 2 -->
+            <div class="guide-section">
+                <div class="guide-section-title">💰 Phương thức thanh toán</div>
+                
+                <div class="guide-step">
+                    <div class="guide-step-num">✅</div>
+                    <div class="guide-step-content">
+                        <h4>Ví in-app (Khuyến nghị)</h4>
+                        <p>Nạp tiền vào ví trên web trước, sau đó dùng số dư để mua acc. Thanh toán nhanh chóng và tiện lợi.</p>
+                    </div>
+                </div>
+
+                <div class="guide-step">
+                    <div class="guide-step-num">💱</div>
+                    <div class="guide-step-content">
+                        <h4>Chuyển khoản ngân hàng</h4>
+                        <p>Chuyển khoản trực tiếp qua ngân hàng. Sau khi xác nhận, số dư sẽ được cộng vào tài khoản.</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Section 3 -->
+            <div class="guide-section">
+                <div class="guide-section-title">🛡️ Chính sách bảo hành</div>
+                
+                <div class="guide-step">
+                    <div class="guide-step-num">💡</div>
+                    <div class="guide-step-content">
+                        <h4>Bảo hành đổi acc mới</h4>
+                        <p>Nếu acc bị lỗi hoặc không đúng mô tả trong 24h, shop sẽ đổi acc mới hoặc hoàn tiền 100%.</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Tips -->
+            <div class="guide-tip">
+                <div class="guide-tip-title">⚠️ Lưu ý quan trọng</div>
+                <p>Sau khi nhận acc, vui lòng đổi mật khẩu ngay để bảo mật tài khoản. Không chia sẻ thông tin acc cho người khác.</p>
+            </div>
+        </div>
+        <div class="guide-footer">
+            <a href="#kho-acc" class="guide-btn" onclick="closeGuide()">&#128722; Bắt đầu mua sắm</a>
+        </div>
+    </div>
+</div>
 <div class="daily-login-modal" id="dailyLoginModal">
     <div class="daily-login-overlay"></div>
     <div class="daily-login-content">
         <button class="daily-login-close" id="dailyLoginClose" onclick="closeDailyLoginModal()">&#10006;</button>
         <div class="daily-login-icon">&#127873;</div>
         <div class="daily-login-header">
-            <h2>Diem Danh Hang Ngay</h2>
-            <p>Check-in moi ngay de giu streak!</p>
+            <h2>Điểm Danh Hàng Ngày</h2>
+            <p>Check-in mỗi ngày để giữ streak!</p>
         </div>
         <div class="daily-login-streak">
             <div class="streak-display">
                 <span class="streak-number" id="streakNumber">0</span>
-                <span class="streak-label">ngay streak</span>
+                <span class="streak-label">ngày streak</span>
             </div>
         </div>
         <div class="daily-login-progress">
             <div class="progress-label">
                 <span>Tien den streak</span>
-                <span id="progressText">0/7 ngay</span>
+                <span id="progressText">0/7 ngày</span>
             </div>
             <div class="progress-bar">
                 <div class="progress-fill" id="progressFill" style="width: 0%"></div>
@@ -623,8 +1555,8 @@
         </div>
         <div class="daily-login-actions">
             <button class="checkin-btn" id="checkinBtn" onclick="doCheckIn()">
-                <span class="btn-text">&#127919; Diem Danh</span>
-                <span class="btn-loading" style="display: none;">Dang xu ly...</span>
+                <span class="btn-text">🎯 Điểm Danh</span>
+                <span class="btn-loading" style="display: none;">Đang xử lý...</span>
             </button>
         </div>
         <div class="daily-login-message" id="dailyLoginMessage"></div>
@@ -635,10 +1567,10 @@
 <div class="daily-success-overlay" id="dailySuccessOverlay">
     <div class="success-content">
         <div class="success-icon">&#127881;</div>
-        <h2>Diem Danh Thanh Cong!</h2>
+        <h2>Điểm Danh Thành Công!</h2>
         <p id="successMessage">Ban nhan duoc <strong>+10d</strong></p>
-        <p style="margin-top: 8px; color: #fb923c;">Streak: <span id="successStreak">1</span> ngay</p>
-        <button class="success-close-btn" onclick="closeSuccessOverlay()">Dong</button>
+        <p style="margin-top: 8px; color: #fb923c;">Streak: <span id="successStreak">1</span> ngày</p>
+        <button class="success-close-btn" onclick="closeSuccessOverlay()">Đóng</button>
     </div>
 </div>
 
@@ -646,22 +1578,22 @@
 <button class="chat-fab" id="chatBtn">&#128172;</button>
 <div class="chat-window" id="chatWindow">
     <div class="chat-header">
-        <span>&#128172; Chat ho tro</span>
+        <span>💬 Chat hỗ trợ</span>
         <button class="chat-close" id="chatClose">&#10006;</button>
     </div>
     <div class="chat-messages" id="chatMessages">
-        <div class="chat-msg admin">
-            <div class="chat-bubble">Xin chao! Shop Acc Genshin co the giup gi cho ban?</div>
-            <div class="chat-meta">Ho tro vien vua xong</div>
+            <div class="chat-msg admin">
+            <div class="chat-bubble">Xin chào! Shop Acc Genshin có thể giúp gì cho bạn?</div>
+            <div class="chat-meta">Hỗ trợ viên vừa xong</div>
         </div>
     </div>
     <div class="chat-input-area" id="chatInputArea">
-        <input type="text" class="chat-input" id="chatInput" placeholder="Nhap tin nhan..." autocomplete="off">
+        <input type="text" class="chat-input" id="chatInput" placeholder="Nhập tin nhắn..." autocomplete="off">
         <button class="chat-send-btn" id="chatSend">&#10148;</button>
     </div>
     <div class="chat-login-msg" id="chatLoginMsg" style="display:none;">
-        <p>Vui long dang nhap de chat voi chung toi</p>
-        <a href="/auth/login" class="chat-login-btn">Dang nhap ngay</a>
+        <p>Vui lòng đăng nhập để chat với chúng tôi</p>
+        <a href="/auth/login" class="chat-login-btn">Đăng nhập ngay</a>
     </div>
 </div>
 
@@ -710,10 +1642,10 @@
         const productId = button.dataset.productId;
         const originalText = button.textContent;
         button.disabled = true;
-        button.textContent = 'Dang them...';
+        button.textContent = 'Đang thêm...';
         fetch('/cart/add', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ productId }) })
         .then(async res => { if (res.status === 401) { window.location.href = '/auth/login'; return null; } return res.json(); })
-        .then(data => { if (!data) return; updateCartUi(data); button.textContent = 'Da them vao gio'; })
+        .then(data => { if (!data) return; updateCartUi(data); button.textContent = 'Đã thêm vào giỏ'; })
         .catch(err => { cartStatusEl.textContent = err.message; })
         .finally(() => { setTimeout(() => { button.disabled = false; button.textContent = originalText; }, 1500); });
     }
@@ -726,14 +1658,14 @@
 <script>
 (function() {
     const holidays2026 = [
-        { date: "2026-01-01", name: "Tet Duong Lich", icon: "&#127884;" },
-        { date: "2026-04-26", name: "Gi? T? H?ng V??ng", icon: "&#127984;", isToday: true },
-        { date: "2026-04-30", name: "Ngay Giai Phong Mien Nam", icon: "&#127463;&#127480;" },
-        { date: "2026-09-02", name: "Quoc Khanh Viet Nam", icon: "&#127463;&#127480;" },
-        { date: "2026-10-31", name: "Halloween", icon: "&#127875;" },
-        { date: "2026-12-25", name: "Giang Sinh", icon: "&#127876;" },
-        { date: "2026-02-18", name: "Tet Nguyen Dan 2026", icon: "&#129395;" },
-        { date: "2026-09-25", name: "Tet Trung Thu", icon: "&#127761;" },
+        { date: "2026-01-01", name: "Tết Dương Lịch", icon: "🎀", desc: "Tết Dương Lịch là ngày đầu tiên của năm mới theo lịch Gregory, được đón chào trên toàn thế giới với các hoạt động như tiệc tùng, pháo hoa, và chúc mừng năm mới. Đây là dịp để mọi người sum họp gia đình và tạo kế hoạch cho năm mới đầy hứa hẹn." },
+        { date: "2026-02-18", name: "Tết Nguyên Đán 2026", icon: "🧧", desc: "Tết Nguyên Đán (Tết ta) là lễ hội quan trọng nhất trong năm của người Việt Nam, đánh dấu sự khởi đầu của một năm mới theo âm lịch. Trong những ngày Tết, người dân Việt Nam thường về quê sum họp, thắp hương tổ tiên, ăn bánh chưng, chơi đất nặn, và chúc Tết nhau những lời tốt đẹp nhất." },
+        { date: "2026-04-26", name: "Giỗ Tổ Hùng Vương", icon: "🏛️", desc: "Giỗ Tổ Hùng Vương (Lễ hội Đền Hùng) là ngày lễ tưởng nhớ công lao dựng nước và giữ nước của các vua Hùng và tổ tiên dân tộc Việt Nam. Ngày lễ thường được tổ chức vào ngày 10 tháng 3 âm lịch hàng năm tại Đền Hùng ở Phú Thọ, với các nghi thức dâng hương, lễ rước và nhiều hoạt động văn hóa truyền thống." },
+        { date: "2026-04-30", name: "Ngày Giải Phóng Miền Nam", icon: "🇻🇳", desc: "Ngày 30 tháng 4 là kỷ niệm sự kiện quân đội Việt Nam giải phóng Sài Gòn, chấm dứt chiến tranh và thống nhất đất nước. Đây là một trong những ngày lễ lớn nhất của Việt Nam, đánh dấu mốc son chói lọi trong lịch sử dân tộc Việt Nam với ý nghĩa hòa bình và thống nhất Tổ quốc." },
+        { date: "2026-09-02", name: "Quốc Khánh Việt Nam", icon: "🇻🇳", desc: "Quốc khánh 2/9 là ngày kỷ niệm Chủ tịch Hồ Chí Minh đọc Tuyên ngôn Độc lập tại Quảng trường Ba Đình, khai sinh ra nước Việt Nam Dân chủ Cộng hòa (nay là Cộng hòa Xã hội Chủ nghĩa Việt Nam). Đây là ngày hội lớn của toàn dân, thể hiện tinh thần độc lập, tự hào dân tộc và tình yêu Tổ quốc." },
+        { date: "2026-09-25", name: "Tết Trung Thu", icon: "🌕", desc: "Tết Trung Thu (Rằm Trung Thu, Tết Đêm Nay) là lễ trăng tròn đầu tiên của năm, có nguồn gốc từ Trung Quốc nhưng cũng được đón chào tại Việt Nam. Vào đêm Trung Thu, trẻ em thường được tặng đèn lồng, phá cỗ, xem mặt trăng và thưởng thức bánh Trung Thu cùng gia đình. Đây là dịp để sum vầy và tưởng nhớ những người đã khuất." },
+        { date: "2026-10-31", name: "Halloween", icon: "🎃", desc: "Halloween (Đêm Halloween) là lễ hội truyền thống có nguồn gốc từ các nước phương Tây, đặc biệt phổ biến ở Mỹ và châu Âu. Lễ hội này thường được tổ chức vào đêm 31/10, với các hoạt động như hóa trang thành nhân vật kinh dị, khắc bí ngô thành đèn ma, đi xin kẹo và tổ chức các bữa tiệc hoặc tham quan nhà ma." },
+        { date: "2026-12-25", name: "Giáng Sinh", icon: "🎅", desc: "Giáng Sinh (Christmas, Noel) là ngày lễ kỷ niệm ngày Chúa Giáng Sinh ra đời, được tổ chức vào ngày 25/12 hàng năm. Đây là một trong những ngày lễ lớn nhất của Kitô giáo và cũng được đón chào rộng rãi ở nhiều quốc gia trên thế giới. Người ta thường trang trí cây thông Noel, tặng quà và sum họp gia đình trong ngày này." },
     ];
 
     function getTodayHoliday() {
@@ -745,39 +1677,147 @@
         return null;
     }
 
+    function openHolidayModal(holidayData) {
+        const holiday = typeof holidayData === 'string' ? JSON.parse(decodeURIComponent(holidayData)) : holidayData;
+        const holidayDate = new Date(holiday.date);
+        const today = new Date(); today.setHours(0, 0, 0, 0);
+        const diffDays = Math.ceil((holidayDate.getTime() - today.getTime()) / (1000 * 60 * 60 * 24));
+        
+        let countdownHtml = '';
+        if (diffDays > 0) {
+            countdownHtml = '<div class="holiday-detail-countdown"><div class="countdown-label">⏰ Còn lại</div><div class="countdown-days">' + diffDays + ' ngày</div></div>';
+        } else if (diffDays === 0) {
+            countdownHtml = '<div class="holiday-detail-countdown" style="background: linear-gradient(135deg, #bbf7d0, #dcfce7); border-color: #22c55e;"><div class="countdown-label" style="color: #16a34a;">🎉 ĐANG DIỄN RA HÔM NAY!</div><div class="countdown-days" style="color: #16a34a;">HAPPENING NOW</div></div>';
+        } else {
+            countdownHtml = '<div class="holiday-detail-countdown" style="background: linear-gradient(135deg, #e2e8f0, #f1f5f9); border-color: #94a3b8;"><div class="countdown-label" style="color: #64748b;">Đã qua rồi 😢</div><div class="countdown-days" style="color: #94a3b8;">-' + Math.abs(diffDays) + ' ngày</div></div>';
+        }
+
+        const modalContent = '<div class="holiday-detail-card"><span class="holiday-detail-icon">' + holiday.icon + '</span><div class="holiday-detail-name">' + holiday.name + '</div><div class="holiday-detail-date">📅 ' + formatDate(holiday.date) + '</div><div class="holiday-detail-desc">' + holiday.desc + '</div></div>' + countdownHtml;
+
+        document.getElementById('holidayModalTitle').innerHTML = holiday.icon + ' ' + holiday.name;
+        document.getElementById('holidayModalContent').innerHTML = modalContent;
+        document.getElementById('holidayModal').classList.add('show');
+    }
+
+    function closeHolidayModal() {
+        document.getElementById('holidayModal').classList.remove('show');
+    }
+
+    function formatDate(dateStr) {
+        const date = new Date(dateStr);
+        return 'Ngày ' + date.getDate() + ' tháng ' + (date.getMonth() + 1) + ' năm ' + date.getFullYear();
+    }
+
     function renderHolidayBar() {
         const content = document.getElementById('holidayContent');
         const todayHoliday = getTodayHoliday();
         let html = '';
-        if (todayHoliday) { html += '<span class="holiday-item" style="color: #fbbf24; font-weight: 800;"><span class="holiday-icon">' + todayHoliday.icon + '</span> Hom nay: ' + todayHoliday.name + '</span><span class="holiday-divider">|</span>'; }
+        if (todayHoliday) { 
+            html += '<span class="holiday-item" style="color: #fbbf24; font-weight: 800;">' + todayHoliday.icon + ' Hôm nay: ' + todayHoliday.name + '</span><span class="holiday-divider">|</span>'; 
+        }
         holidays2026.forEach(h => {
             if (todayHoliday && h.date === todayHoliday.date) return;
             const holidayDate = new Date(h.date); holidayDate.setHours(0, 0, 0, 0);
             const today = new Date(); today.setHours(0, 0, 0, 0);
             const diffDays = Math.ceil((holidayDate.getTime() - today.getTime()) / (1000 * 60 * 60 * 24));
-            let dayLabel = diffDays === 0 ? 'Hom nay' : diffDays === 1 ? 'Ngay mai' : diffDays > 1 ? diffDays + ' ngay' : 'Da qua';
-            html += '<span class="holiday-item"><span class="holiday-icon">' + h.icon + '</span><span class="holiday-date">' + dayLabel + '</span><span class="holiday-name">' + h.name + '</span></span><span class="holiday-divider">|</span>';
+            let dayLabel = diffDays === 0 ? 'Hôm nay' : diffDays === 1 ? 'Ngày mai' : diffDays > 1 ? diffDays + ' ngày' : 'Đã qua';
+            const hData = encodeURIComponent(JSON.stringify(h));
+            html += '<span class="holiday-item" onclick="openHolidayModal(\'' + hData + '\')" style="cursor:pointer;">' + h.icon + ' <span class="holiday-date">' + dayLabel + '</span> ' + h.name + '</span><span class="holiday-divider">|</span>';
         });
-        if (!html) { html = '<span class="holiday-item">&#9889; Chao mung den Gaming Zone! &#9889;</span>'; }
+        if (!html) { 
+            html = '<span class="holiday-item">★ Genshin Cute Shop - Uy tín hàng đầu! ★</span><span class="holiday-divider">|</span>';
+            html += '<span class="holiday-item">★ Khuyến mãi đặc biệt - Giảm 20%! ★</span><span class="holiday-divider">|</span>';
+            html += '<span class="holiday-item">★ Giao acc ngay trong 5 phút! ★</span><span class="holiday-divider">|</span>';
+            html += '<span class="holiday-item">★ Bảo hành 7 ngày - Hoàn tiền nếu lỗi! ★</span>';
+        }
         content.innerHTML = html + html;
     }
+
+    // Make functions globally available
+    window.openHolidayModal = openHolidayModal;
+    window.closeHolidayModal = closeHolidayModal;
+
+    // Close modal when clicking overlay
+    document.getElementById('holidayModal').addEventListener('click', function(e) {
+        if (e.target === this) closeHolidayModal();
+    });
+
     renderHolidayBar();
 })();
 
 (function() {
-    const bgMusic = document.getElementById('bgMusic');
+    // Create audio element
+    const audioSource = '/audio/Pokiwar Music.mp3';
+    let bgMusic = null;
+    let audioCreated = false;
+
+    function createAudio() {
+        if (audioCreated) return;
+        bgMusic = document.createElement('audio');
+        bgMusic.loop = true;
+        bgMusic.preload = 'none';
+        bgMusic.innerHTML = '<source src="' + audioSource + '" type="audio/mpeg">';
+        bgMusic.volume = 0.15;
+        document.body.appendChild(bgMusic);
+        audioCreated = true;
+    }
+
     const soundToggle = document.getElementById('soundToggle');
     const soundIcon = document.getElementById('soundIcon');
     const soundLabel = document.getElementById('soundLabel');
-    let isMuted = false;
-    if (bgMusic) bgMusic.volume = 0.15;
-    function startMusic() {
-        if (bgMusic) { bgMusic.play().then(() => { soundToggle.classList.add('playing'); soundIcon.innerHTML = '&#128264;'; soundLabel.textContent = 'Tat nhac'; }).catch(() => { soundIcon.innerHTML = '&#128263;'; soundLabel.textContent = 'Bat nhac'; }); }
+
+    // Check localStorage for music state
+    let isMuted = localStorage.getItem('musicMuted') === 'true';
+
+    function updateSoundUI() {
+        if (isMuted) {
+            soundIcon.textContent = '🔇';
+            soundLabel.textContent = 'Bật nhạc';
+            soundToggle.style.background = 'linear-gradient(135deg, #9ca3af, #6b7280)';
+        } else {
+            soundIcon.textContent = '🔊';
+            soundLabel.textContent = 'Tắt nhạc';
+            soundToggle.style.background = 'linear-gradient(135deg, #667eea, #764ba2)';
+        }
     }
-    startMusic();
-    soundToggle.addEventListener('click', function() {
-        if (isMuted) { isMuted = false; if (bgMusic) bgMusic.muted = false; soundToggle.classList.remove('muted'); soundToggle.classList.add('playing'); soundIcon.innerHTML = '&#128264;'; soundLabel.textContent = 'Tat nhac'; }
-        else { isMuted = true; if (bgMusic) bgMusic.muted = true; soundToggle.classList.remove('playing'); soundToggle.classList.add('muted'); soundIcon.innerHTML = '&#128263;'; soundLabel.textContent = 'Bat nhac'; }
+
+    function toggleMusic() {
+        createAudio();
+        isMuted = !isMuted;
+        localStorage.setItem('musicMuted', isMuted);
+        if (isMuted) {
+            bgMusic.pause();
+        } else {
+            bgMusic.play().catch(() => {});
+        }
+        updateSoundUI();
+    }
+
+    // Initialize on page load
+    if (soundToggle) {
+        updateSoundUI();
+        soundToggle.addEventListener('click', toggleMusic);
+
+        // Auto play music on first interaction
+        if (!isMuted) {
+            document.addEventListener('click', function initMusic() {
+                createAudio();
+                bgMusic.play().catch(() => {});
+                document.removeEventListener('click', initMusic);
+            }, { once: true });
+        }
+    }
+
+    // Listen for storage changes from other tabs
+    window.addEventListener('storage', function(e) {
+        if (e.key === 'musicMuted') {
+            isMuted = e.newValue === 'true';
+            if (bgMusic) {
+                if (isMuted) bgMusic.pause();
+                else bgMusic.play().catch(() => {});
+            }
+            updateSoundUI();
+        }
     });
 })();
 
@@ -810,7 +1850,7 @@
         const isAdmin = data.role === 'ADMIN' || data.sender === 'Admin';
         const div = document.createElement('div');
         div.className = 'chat-msg ' + (isOwn ? 'user' : 'admin');
-        let metaHtml = (isAdmin ? 'Ho tro' : data.sender) + ' - ' + (data.timestamp || '');
+        let metaHtml = (isAdmin ? 'Hỗ trợ' : data.sender) + ' - ' + (data.timestamp || '');
         div.innerHTML = '<div class="chat-bubble">' + escHtml(data.content) + '</div><div class="chat-meta">' + metaHtml + '</div>';
         chatMessages.appendChild(div);
         chatMessages.scrollTop = chatMessages.scrollHeight;
@@ -833,7 +1873,7 @@
         fetch('/api/chat/user/conversation?sessionId=' + encodeURIComponent(userSessionId)).then(r => r.json()).then(msgs => {
             chatMessages.innerHTML = '';
             if (msgs && msgs.length > 0) { msgs.forEach(m => showMsg(m)); }
-            else { chatMessages.innerHTML = '<div class="chat-msg admin"><div class="chat-bubble">Xin chao ' + currentUser + '! Shop Acc Genshin co the giup gi cho ban?</div><div class="chat-meta">Ho tro vien vua xong</div></div>'; }
+            else { chatMessages.innerHTML = '<div class="chat-msg admin"><div class="chat-bubble">Xin chào ' + currentUser + '! Shop Acc Genshin có thể giúp gì cho bạn?</div><div class="chat-meta">Hỗ trợ viên vừa xong</div></div>'; }
         }).catch(err => console.error('Load history error:', err));
     }
     
@@ -856,7 +1896,7 @@
         const currentStreak = data.currentStreak || 0;
         const progress = Math.min((currentStreak / streakDays) * 100, 100);
         if (progressFill) progressFill.style.width = progress + '%';
-        if (progressText) progressText.textContent = currentStreak + '/' + streakDays + ' ngay';
+        if (progressText) progressText.textContent = currentStreak + '/' + streakDays + ' ngày';
         dailyLoginModal.classList.add('open');
         dailyLoginMessage.textContent = '';
         dailyLoginMessage.className = 'daily-login-message';
@@ -870,8 +1910,8 @@
         const successMessage = document.getElementById('successMessage');
         if (successStreak) successStreak.textContent = data.newStreak;
         if (successMessage) {
-            let msg = 'Ban nhan duoc <strong>+' + data.moneyEarned + 'd</strong>';
-            if (data.streakBonusReceived) { msg += '<br>&#127881; Dat 7 ngay! Nhan them <strong>+' + data.streakBonusAmount + 'd</strong>!'; }
+            let msg = 'Bạn nhận được <strong>+' + data.moneyEarned + 'd</strong>';
+            if (data.streakBonusReceived) { msg += '<br>🎉 Đạt 7 ngày! Nhận thêm <strong>+' + data.streakBonusAmount + 'd</strong>!'; }
             successMessage.innerHTML = msg;
         }
         if (dailySuccessOverlay) dailySuccessOverlay.classList.add('open');
@@ -895,20 +1935,37 @@
             if (data.success) { closeDailyLoginModal(); showSuccessOverlay(data); }
             else { dailyLoginMessage.textContent = data.message || 'Co loi xay ra!'; dailyLoginMessage.className = 'daily-login-message error'; if (data.message && data.message.includes('Da diem danh')) { setTimeout(() => { closeDailyLoginModal(); }, 2000); } }
         })
-        .catch(err => { dailyLoginMessage.textContent = 'Loi ket noi!'; dailyLoginMessage.className = 'daily-login-message error'; })
+        .catch(err => { dailyLoginMessage.textContent = 'Lỗi kết nối!'; dailyLoginMessage.className = 'daily-login-message error'; })
         .finally(() => { if (checkinBtn) { checkinBtn.disabled = false; if (btnText) btnText.style.display = 'inline'; if (btnLoading) btnLoading.style.display = 'none'; } });
     };
 
     function checkDailyLoginStatus() {
         const isLoggedIn = document.body.dataset.loggedIn === 'true';
         if (!isLoggedIn) return;
-        fetch('/api/daily-login/status').then(r => r.json()).then(data => { if (data && !data.alreadyLoggedInToday) { showDailyLoginModal(data); } }).catch(err => { console.log('Khong the kiem tra trang thai daily login:', err); });
+        fetch('/api/daily-login/status').then(r => r.json()).then(data => { if (data && !data.alreadyLoggedInToday) { showDailyLoginModal(data); } }).catch(err => { console.log('Không thể kiểm tra trạng thái daily login:', err); });
     }
 
     if (dailyLoginModal) { const overlay = dailyLoginModal.querySelector('.daily-login-overlay'); if (overlay) { overlay.addEventListener('click', closeDailyLoginModal); } }
     if (dailySuccessOverlay) { dailySuccessOverlay.addEventListener('click', function(e) { if (e.target === dailySuccessOverlay) { closeSuccessOverlay(); } }); }
     if (document.readyState === 'loading') { document.addEventListener('DOMContentLoaded', () => { setTimeout(checkDailyLoginStatus, 800); }); } else { setTimeout(checkDailyLoginStatus, 800); }
 })();
+
+// Guide Modal Functions
+function openGuide() {
+    document.getElementById('guideModal').classList.add('show');
+    document.body.style.overflow = 'hidden';
+}
+
+function closeGuide() {
+    document.getElementById('guideModal').classList.remove('show');
+    document.body.style.overflow = '';
+}
+
+// Close on overlay click
+document.getElementById('guideModal').addEventListener('click', function(e) {
+    if (e.target === this) closeGuide();
+});
+
 </script>
 
 </body>

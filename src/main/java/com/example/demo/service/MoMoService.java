@@ -68,6 +68,10 @@ public class MoMoService {
                "&signature=" + signature;
     }
 
+    public String createDepositUrl(String orderId, long amount, String requestId, HttpServletRequest request) {
+        return createPaymentUrl(Long.parseLong(orderId), amount, requestId);
+    }
+
     public Map<String, String> createPaymentRequest(Long orderId, long amount, String requestId) {
         String orderInfo = "Thanh toan don hang #" + orderId;
         String requestType = "captureWallet";
@@ -94,6 +98,22 @@ public class MoMoService {
     }
 
     public boolean validateSignature(Map<String, Object> params) {
+        if (!params.containsKey("signature")) return false;
+        
+        String receivedSignature = params.get("signature").toString();
+        Map<String, String> signParams = new HashMap<>();
+        params.forEach((key, value) -> {
+            if (value != null) signParams.put(key, value.toString());
+        });
+        signParams.remove("signature");
+        
+        String rawData = buildRawData(signParams);
+        String calculatedSignature = hmacSHA256(rawData, secretKey);
+        
+        return calculatedSignature.equalsIgnoreCase(receivedSignature);
+    }
+
+    public boolean validateDepositSignature(Map<String, ?> params) {
         if (!params.containsKey("signature")) return false;
         
         String receivedSignature = params.get("signature").toString();

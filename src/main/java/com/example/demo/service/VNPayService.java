@@ -78,6 +78,10 @@ public class VNPayService {
         return vnpPaymentUrl + "?" + queryUrl;
     }
 
+    public String createDepositUrl(String orderId, long amount, HttpServletRequest request) {
+        return createPaymentUrl(Long.parseLong(orderId), amount, request);
+    }
+
     public boolean validateSignature(Map<String, String> params) {
         String vnpSecureHash = params.get("vnp_SecureHash");
         if (vnpSecureHash == null) return false;
@@ -101,6 +105,10 @@ public class VNPayService {
 
         String calculatedHash = hmacSHA512(vnpHashSecret, hashData.toString());
         return calculatedHash.equalsIgnoreCase(vnpSecureHash);
+    }
+
+    public boolean validateDepositSignature(Map<String, String> params) {
+        return validateSignature(params);
     }
 
     public Long extractOrderId(String txnRef) {

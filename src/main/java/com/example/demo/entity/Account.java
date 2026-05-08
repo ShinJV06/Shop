@@ -52,6 +52,8 @@ public class Account {
 
     private String provider; // google, facebook, local
 
+    private String providerId; // Firebase UID hoặc OAuth ID
+
     private String avatarUrl;
 
     @PrePersist

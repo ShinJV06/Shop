@@ -257,4 +257,77 @@ public class AuthenticationController {
         redirectAttributes.addFlashAttribute("successMessage", "Đăng xuất thành công.");
         return "redirect:/auth/login";
     }
+
+    @PostMapping("/auth/firebase-login")
+    @ResponseBody
+    public ResponseEntity<?> firebaseLogin(@RequestBody Map<String, String> body, HttpSession session) {
+        try {
+            String idToken = body.get("idToken");
+            String provider = body.get("provider");
+
+            if (idToken == null || idToken.isEmpty()) {
+                return ResponseEntity.badRequest().body(Map.of("error", "Token not provided"));
+            }
+
+            // Decode Firebase ID token (không verify trong dev mode)
+            // Firebase JWT uses base64url encoding
+            String[] tokenParts = idToken.split("\\.");
+            if (tokenParts.length != 3) {
+                return ResponseEntity.badRequest().body(Map.of("error", "Invalid token format"));
+            }
+
+            // Decode payload (phần giữa) - Firebase uses base64url
+            String payload;
+            try {
+                // Replace URL-safe chars and add padding if needed
+                String base64 = tokenParts[1]
+                    .replace('-', '+')
+                    .replace('_', '/');
+                // Add padding
+                int padding = base64.length() % 4;
+                if (padding > 0) {
+                    base64 += "====".substring(padding);
+                }
+                byte[] decoded = java.util.Base64.getDecoder().decode(base64);
+                payload = new String(decoded, java.nio.charset.StandardCharsets.UTF_8);
+            } catch (Exception e) {
+                return ResponseEntity.badRequest().body(Map.of("error", "Failed to decode token: " + e.getMessage()));
+            }
+
+            com.fasterxml.jackson.databind.ObjectMapper mapper = new com.fasterxml.jackson.databind.ObjectMapper();
+            Map<String, Object> tokenData = mapper.readValue(payload, Map.class);
+
+            // Firebase uses "sub" for user identifier
+            String uid = tokenData.get("sub") != null ? tokenData.get("sub").toString() : null;
+            if (uid == null || uid.isEmpty()) {
+                return ResponseEntity.badRequest().body(Map.of("error", "Invalid token: missing user identifier"));
+            }
+            String email = tokenData.get("email") != null ? tokenData.get("email").toString() : null;
+            String name = tokenData.get("name") != null ? tokenData.get("name").toString() : null;
+            String picture = tokenData.get("picture") != null ? tokenData.get("picture").toString() : null;
+
+            AccountResponse account = authenticationService.firebaseLogin(
+                uid,
+                email,
+                name,
+                provider != null ? provider.toUpperCase() : "FIREBASE",
+                picture
+            );
+
+            // Lưu session
+            session.setAttribute("userId", account.getId());
+            session.setAttribute("username", account.getUsername());
+            session.setAttribute("role", account.getRole() != null ? account.getRole().name() : "USER");
+            session.setAttribute("token", account.getToken());
+            session.setAttribute("wallet", shopCatalogService.formatPrice(account.getWallet()));
+            session.setAttribute("avatarUrl", account.getAvatarUrl());
+            session.setAttribute("provider", account.getProvider());
+            session.setMaxInactiveInterval(10 * 60);
+
+            return ResponseEntity.ok(account);
+        } catch (Exception ex) {
+            ex.printStackTrace();
+            return ResponseEntity.badRequest().body(Map.of("error", ex.getMessage()));
+        }
+    }
 }

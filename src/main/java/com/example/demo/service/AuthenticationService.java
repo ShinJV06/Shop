@@ -174,6 +174,58 @@ public class AuthenticationService {
         account.setAvatarUrl(avatarUrl);
         accountRepository.save(account);
     }
+
+    @Transactional
+    public AccountResponse firebaseLogin(String uid, String email, String displayName, String provider, String photoUrl) {
+        Account account = accountRepository.findAccountByProviderId(uid);
+
+        if (account == null) {
+            // Tạo tài khoản mới
+            account = new Account();
+            account.setUsername(generateUniqueUsername(email, displayName));
+            account.setEmail(email != null ? email : uid + "@" + provider.toLowerCase() + ".generated");
+            account.setProvider(provider);
+            account.setProviderId(uid);
+            account.setPassword(passwordEncoder.encode(UUID.randomUUID().toString()));
+            account.setRole(Role.USER);
+            account.setLocked(false);
+            account.setCreatedAt(new Date());
+
+            if (photoUrl != null && !photoUrl.isEmpty()) {
+                account.setAvatarUrl(photoUrl);
+            }
+
+            account = accountRepository.save(account);
+            eventPublisher.publishEvent(new WelcomeAccountEvent(account));
+        }
+
+        String token = tokenService.generateToken(account);
+        return toAccountResponse(account, token);
+    }
+
+    private String generateUniqueUsername(String email, String displayName) {
+        String base;
+        if (email != null && !email.isEmpty()) {
+            base = email.split("@")[0];
+        } else if (displayName != null && !displayName.isEmpty()) {
+            base = displayName.replaceAll("\\s+", "");
+        } else {
+            base = "user";
+        }
+
+        // Loại bỏ ký tự đặc biệt
+        base = base.replaceAll("[^a-zA-Z0-9]", "");
+
+        // Kiểm tra trùng lặp
+        String username = base;
+        int counter = 1;
+        while (accountRepository.findAccountByUsername(username) != null) {
+            username = base + counter;
+            counter++;
+        }
+
+        return username;
+    }
 }
 
 

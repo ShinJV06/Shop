@@ -18,6 +18,8 @@ public interface AccountRepository extends JpaRepository<Account, Long> {
 
     Account findAccountByResetToken(String resetToken);
 
+    Account findAccountByProviderId(String providerId);
+
     long countByRole(Role role);
 
     long countByCreatedAtAfter(java.util.Date from);

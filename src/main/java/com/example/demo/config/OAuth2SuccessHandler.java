@@ -34,24 +34,28 @@ public class OAuth2SuccessHandler implements AuthenticationSuccessHandler {
         String email = null;
         String name = null;
         String username = null;
+        String providerId = null;
 
         if ("google".equals(provider)) {
             Map<String, Object> attributes = oauth2User.getAttributes();
+            providerId = (String) attributes.get("sub"); // Google unique ID
             email = (String) attributes.get("email");
             name = (String) attributes.get("name");
             username = "gg_" + email.split("@")[0];
         } else if ("facebook".equals(provider)) {
             Map<String, Object> attributes = oauth2User.getAttributes();
+            providerId = (String) attributes.get("id"); // Facebook unique ID
             email = (String) attributes.get("email");
             if (email == null) {
-                email = (String) attributes.get("id") + "@facebook.com";
+                email = providerId + "@facebook.com";
             }
             name = (String) attributes.get("name");
             username = "fb_" + (name != null ? name.replaceAll("\\s+", "") : email.split("@")[0]);
         }
 
-        if (email != null) {
-            Account account = accountRepository.findAccountByEmail(email);
+        if (providerId != null) {
+            // Tìm account theo providerId (unique) thay vì email
+            Account account = accountRepository.findAccountByProviderId(providerId);
             if (account == null) {
                 account = new Account();
                 account.setEmail(email);
@@ -62,8 +66,10 @@ public class OAuth2SuccessHandler implements AuthenticationSuccessHandler {
                 account.setLocked(false);
                 account.setWallet(0.0);
                 account.setProvider(provider);
+                account.setProviderId(providerId);
                 accountRepository.save(account);
             } else {
+                // Cập nhật provider nếu cần
                 account.setProvider(provider);
                 accountRepository.save(account);
             }
